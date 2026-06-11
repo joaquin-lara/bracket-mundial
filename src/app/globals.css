@@ -326,6 +326,50 @@ table.standings tr.me td {
   opacity: 0.6;
 }
 
+.player-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.player-btn {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 18px 0;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.player-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.pin-input {
+  letter-spacing: 8px;
+  font-size: 22px;
+  text-align: center;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 8px 0 0;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+}
+
 .auth-card .alt {
   margin-top: 16px;
   font-size: 13px;

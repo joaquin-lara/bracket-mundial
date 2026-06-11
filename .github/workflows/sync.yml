@@ -1,0 +1,17 @@
+# Calls the app's sync endpoint every 30 minutes (Vercel's free plan only
+# allows daily crons, so GitHub Actions does the frequent runs).
+# Requires two repository secrets: SYNC_URL and CRON_SECRET.
+name: Sync World Cup scores
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call sync endpoint
+        run: |
+          curl -fsS -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "${{ secrets.SYNC_URL }}"

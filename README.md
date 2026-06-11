@@ -15,7 +15,11 @@ A match decided on penalties counts as a draw (the score at the end of extra tim
 
 ## Stack
 
-Next.js 14 (App Router, TypeScript), Supabase (Postgres + email/password auth), Vercel (hosting + cron), football-data.org (fixtures and results).
+Next.js 14 (App Router, TypeScript), Supabase (Postgres + auth), Vercel (hosting + cron), football-data.org (fixtures and results).
+
+## Players and login
+
+The roster is fixed in `src/lib/players.ts` (Carlos, Sebas, Mauri, Joaquin). On the login screen each player taps their name and enters a 4-digit PIN. The first PIN a player ever enters claims their slot and becomes their PIN. Behind the scenes each player is a normal Supabase Auth user (hidden email `name@bracketmundial.app`, password derived from the PIN), so all row-level security still applies. To reset someone's PIN, delete their user in Supabase (Authentication → Users) and they can claim a new one; their predictions are removed with the account, so only do this early on. "Confirm email" must be OFF in Supabase Auth settings.
 
 ## Setup
 

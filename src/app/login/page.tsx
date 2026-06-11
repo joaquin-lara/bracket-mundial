@@ -1,60 +1,94 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { PLAYERS, pinPassword, playerEmail, type Player } from '@/lib/players';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [player, setPlayer] = useState<Player | null>(null);
+  const [pin, setPin] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setBusy(true);
-    setError(null);
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setError(error.message);
-      setBusy(false);
+    if (!player || !/^\d{4}$/.test(pin)) {
+      setError('Enter your 4-digit PIN.');
       return;
     }
+    setBusy(true);
+    setError(null);
+
+    const supabase = createClient();
+    const email = playerEmail(player);
+    const password = pinPassword(player, pin);
+
+    // Try logging in; if this player has never set a PIN, create the
+    // account with this PIN (first PIN entered claims the slot).
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    if (signInError) {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { display_name: player } },
+      });
+      if (signUpError || !data.session) {
+        setError('Wrong PIN. Try again.');
+        setPin('');
+        setBusy(false);
+        return;
+      }
+    }
+
     router.push('/');
     router.refresh();
   }
 
   return (
     <main>
-      <form className="auth-card" onSubmit={handleSubmit}>
-        <h1>Log in</h1>
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        {error && <p className="msg-err">{error}</p>}
-        <button type="submit" disabled={busy}>
-          {busy ? 'Logging in…' : 'Log in'}
-        </button>
-        <p className="alt">
-          No account? <Link href="/signup">Sign up</Link>
-        </p>
-      </form>
+      <div className="auth-card">
+        <h1>Bracket Mundial</h1>
+        {!player ? (
+          <>
+            <p className="subtitle">Which player are you?</p>
+            <div className="player-grid">
+              {PLAYERS.map((p) => (
+                <button key={p} className="player-btn" onClick={() => setPlayer(p)}>
+                  {p}
+                </button>
+              ))}
+            </div>
+          </>
+        ) : (
+          <form onSubmit={submit}>
+            <p className="subtitle">
+              Hi {player}.{' '}
+              <button type="button" className="link-btn" onClick={() => { setPlayer(null); setPin(''); setError(null); }}>
+                Not you?
+              </button>
+            </p>
+            <label htmlFor="pin">Your 4-digit PIN</label>
+            <input
+              id="pin"
+              className="pin-input"
+              type="password"
+              inputMode="numeric"
+              pattern="\d{4}"
+              maxLength={4}
+              autoFocus
+              value={pin}
+              onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
+            />
+            <p className="hint">First time? Whatever PIN you enter now becomes yours.</p>
+            {error && <p className="msg-err">{error}</p>}
+            <button type="submit" disabled={busy || pin.length !== 4}>
+              {busy ? 'Entering…' : 'Enter'}
+            </button>
+          </form>
+        )}
+      </div>
     </main>
   );
 }
