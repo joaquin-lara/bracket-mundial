@@ -1,0 +1,31 @@
+{
+  "name": "bracket-mundial",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run src/lib/scoring.test.ts",
+    "test:db": "vitest run tests/db.test.ts",
+    "seed:openfootball": "tsx scripts/seed-openfootball.ts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.45.4",
+    "next": "^14.2.15",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.0",
+    "@types/pg": "^8.11.10",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "pg": "^8.13.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.2"
+  }
+}
