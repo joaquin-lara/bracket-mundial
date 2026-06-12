@@ -966,6 +966,164 @@ h1 {
   }
 }
 
+/* ---- points race chart ---- */
+
+.race-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px 20px 10px;
+  margin-top: 24px;
+}
+
+.race-title {
+  font-family: var(--narrow);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  margin-bottom: 8px;
+}
+
+.race-title::before {
+  content: '⚽';
+  font-size: 11px;
+  margin-right: 8px;
+}
+
+.race-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.rc-grid {
+  stroke: rgba(244, 241, 232, 0.08);
+  stroke-width: 1;
+}
+
+.rc-axis {
+  fill: var(--dim);
+  font-family: var(--narrow);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.rc-label {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ---- pick wall heatmap ---- */
+
+.heat-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-top: 24px;
+}
+
+.heat-sub {
+  font-family: var(--narrow);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--dim);
+  margin: -2px 0 14px;
+}
+
+.heat-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.heat-name {
+  width: 88px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  padding-top: 1px;
+}
+
+.heat-flag {
+  width: 16px;
+  height: 12px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.heat-cells {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.heat-cell {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.hc-3 {
+  background: var(--gold);
+}
+
+.hc-2 {
+  background: #7fc8a9;
+}
+
+.hc-1 {
+  background: rgba(244, 241, 232, 0.22);
+}
+
+.hc-none {
+  background: rgba(255, 138, 115, 0.08);
+  border: 1px dashed rgba(255, 138, 115, 0.55);
+}
+
+.heat-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 8px;
+  font-family: var(--narrow);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.heat-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.heat-legend .heat-cell {
+  width: 11px;
+  height: 11px;
+}
+
+@media (max-width: 500px) {
+  .heat-name {
+    width: 72px;
+    font-size: 12px;
+  }
+
+  .heat-cell {
+    width: 12px;
+    height: 12px;
+  }
+}
+
 /* ---- standings ---- */
 
 table.standings {

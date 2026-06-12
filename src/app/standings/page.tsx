@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import PickHeatmap, { type HeatColumn, type HeatRow } from '@/components/PickHeatmap';
+import RaceChart, { type RacePoint } from '@/components/RaceChart';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { createClient } from '@/lib/supabase/server';
 
@@ -22,6 +24,54 @@ export default async function StandingsPage() {
 
   const { data } = await supabase.from('standings').select('*');
   const rows = (data ?? []) as StandingRow[];
+
+  // Scored predictions (visible to everyone post-kickoff) + kickoff dates
+  // feed the points race chart.
+  const { data: scored } = await supabase
+    .from('predictions')
+    .select('points, user_id, match_id, matches(kickoff)')
+    .not('points', 'is', null);
+  const { data: profiles } = await supabase.from('profiles').select('id, display_name');
+  const nameById = new Map((profiles ?? []).map((p) => [p.id as string, p.display_name as string]));
+
+  const raceEntries: RacePoint[] = (scored ?? [])
+    .map((p) => {
+      const match = p.matches as unknown as { kickoff: string } | null;
+      return {
+        name: nameById.get(p.user_id as string) ?? 'Unknown',
+        kickoff: match?.kickoff ?? '',
+        points: (p.points as number) ?? 0,
+      };
+    })
+    .filter((e) => e.kickoff !== '');
+
+  // Pick wall: one column per finished match, one row per player.
+  const { data: finished } = await supabase
+    .from('matches')
+    .select('id, home_code, away_code, home_score, away_score, kickoff')
+    .eq('status', 'FINISHED')
+    .order('kickoff', { ascending: true });
+
+  const heatColumns: HeatColumn[] = (finished ?? []).map((m) => {
+    const day = new Date(m.kickoff as string).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+    });
+    return {
+      id: m.id as number,
+      title: `${m.home_code ?? 'TBD'} ${m.home_score}–${m.away_score} ${m.away_code ?? 'TBD'} · ${day}`,
+    };
+  });
+
+  const pointsByUserMatch = new Map<string, number>();
+  for (const p of scored ?? []) {
+    pointsByUserMatch.set(`${p.user_id}|${p.match_id}`, (p.points as number) ?? 0);
+  }
+
+  const heatRows: HeatRow[] = rows.map((r) => ({
+    name: r.display_name,
+    cells: (finished ?? []).map((m) => pointsByUserMatch.get(`${r.user_id}|${m.id}`) ?? null),
+  }));
 
   return (
     <main>
@@ -47,7 +97,7 @@ export default async function StandingsPage() {
                 </td>
                 <td>
                   {r.display_name}
-                  {i === 0 ? ' 🏆' : ''}
+                  {i === 0 ? ' 🏆' : i === rows.length - 1 && rows.length === 4 ? ' 💩' : ''}
                 </td>
                 <td className="num pts">{r.total}</td>
                 <td className="num">{r.games_scored}</td>
@@ -56,6 +106,10 @@ export default async function StandingsPage() {
           </tbody>
         </table>
       )}
+
+      <RaceChart entries={raceEntries} />
+
+      <PickHeatmap columns={heatColumns} rows={heatRows} />
     </main>
   );
 }

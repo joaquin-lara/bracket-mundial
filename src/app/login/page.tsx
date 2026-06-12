@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { flagUrl } from '@/lib/flags';
 import { PLAYER_META, PLAYERS, pinPassword, playerEmail, type Player } from '@/lib/players';
 import { createClient } from '@/lib/supabase/client';
 
@@ -11,6 +12,7 @@ export default function LoginPage() {
   const [pin, setPin] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [leaving, setLeaving] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,17 +44,22 @@ export default function LoginPage() {
       }
     }
 
-    router.push('/');
-    router.refresh();
+    // Fade the card out fully before the home page (and its globe
+    // entrance) takes over.
+    setLeaving(true);
+    setTimeout(() => {
+      router.push('/');
+      router.refresh();
+    }, 550);
   }
 
   return (
     <main>
-      <div className="auth-card">
+      <div className={`auth-card${leaving ? ' leaving' : ''}`}>
         <h1>
-          Stonks
+          Stonks World
           <br />
-          Bracket.
+          Cup Bracket.
         </h1>
         {!player ? (
           <>
@@ -60,8 +67,9 @@ export default function LoginPage() {
             <div className="player-grid">
               {PLAYERS.map((p) => (
                 <button key={p} className="player-btn" onClick={() => setPlayer(p)}>
-                  <span className="player-avatar" style={{ background: PLAYER_META[p].color }}>
-                    {PLAYER_META[p].initial}
+                  <span className="player-avatar" style={{ background: 'rgba(0,0,0,0.5)' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={flagUrl(PLAYER_META[p].flagCode)!} alt={p} className="contender-flag" />
                   </span>
                   {p}
                 </button>
