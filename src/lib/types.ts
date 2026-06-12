@@ -1,10 +1,3 @@
-export interface Goal {
-  minute: number;
-  scorer: string;
-  team: 'home' | 'away';
-  type: 'REGULAR' | 'OWN_GOAL' | 'PENALTY';
-}
-
 export interface Match {
   id: number;
   home_team: string;
@@ -18,7 +11,6 @@ export interface Match {
   home_score: number | null;
   away_score: number | null;
   scored: boolean;
-  goals: Goal[];
 }
 
 export interface Prediction {

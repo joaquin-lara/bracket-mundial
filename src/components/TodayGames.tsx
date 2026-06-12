@@ -1,18 +1,7 @@
 'use client';
 
 import Flag from './Flag';
-import { stageLabel, type Goal, type Match } from '@/lib/types';
-
-function goalLine(goals: Goal[], team: 'home' | 'away'): string {
-  return goals
-    .filter((g) => g.team === team)
-    .map((g) => {
-      const name = g.scorer.split(' ').pop() ?? g.scorer;
-      const suffix = g.type === 'OWN_GOAL' ? ' (og)' : g.type === 'PENALTY' ? ' (pen)' : '';
-      return `${g.minute}' ${name}${suffix}`;
-    })
-    .join(' · ');
-}
+import { stageLabel, type Match } from '@/lib/types';
 
 export default function TodayGames({ matches }: { matches: Match[] }) {
   const localToday = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in local time
@@ -35,7 +24,6 @@ export default function TodayGames({ matches }: { matches: Match[] }) {
           const finished = m.status === 'FINISHED';
           const live = m.status === 'IN_PLAY' || m.status === 'PAUSED';
           const time = new Date(m.kickoff).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-          const showGoals = (finished || live) && m.goals?.length > 0;
           return (
             <div className="sched-entry" key={m.id}>
               <div className="sched-row">
@@ -61,15 +49,6 @@ export default function TodayGames({ matches }: { matches: Match[] }) {
                   )}
                 </span>
               </div>
-              {showGoals && (
-                <div className="sched-goals">
-                  <span />
-                  <span className="goal-list home">{goalLine(m.goals, 'home')}</span>
-                  <span />
-                  <span className="goal-list away">{goalLine(m.goals, 'away')}</span>
-                  <span />
-                </div>
-              )}
             </div>
           );
         })}

@@ -1,8 +1,7 @@
 // Fixture sources. Both return the same FixtureRow shape so the sync layer
 // is swappable: football-data.org (primary) and openfootball (fallback).
 
-import { finalScore, isFinished, type ApiScore } from './scoring';
-import type { Goal } from './types';
+import { finalScore, type ApiScore } from './scoring';
 
 export interface FixtureRow {
   id: number;
@@ -16,7 +15,6 @@ export interface FixtureRow {
   status: string;
   home_score: number | null;
   away_score: number | null;
-  goals: Goal[];
 }
 
 // --- football-data.org v4 --------------------------------------------------
@@ -28,14 +26,6 @@ interface FdTeam {
   tla?: string | null;
 }
 
-interface FdGoal {
-  minute: number;
-  injuryTime: number | null;
-  type: string;
-  team: { name: string | null } | null;
-  scorer: { name: string | null } | null;
-}
-
 interface FdMatch {
   id: number;
   utcDate: string;
@@ -45,23 +35,6 @@ interface FdMatch {
   homeTeam: FdTeam | null;
   awayTeam: FdTeam | null;
   score: ApiScore | null;
-  goals?: FdGoal[];
-}
-
-export async function fetchFootballDataMatchDetail(
-  apiKey: string,
-  matchId: number,
-): Promise<FixtureRow> {
-  const res = await fetch(`https://api.football-data.org/v4/matches/${matchId}`, {
-    headers: { 'X-Auth-Token': apiKey },
-    cache: 'no-store',
-  });
-  if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    throw new Error(`football-data.org match ${matchId} responded ${res.status}: ${body.slice(0, 200)}`);
-  }
-  const m = (await res.json()) as FdMatch;
-  return mapFdMatch(m);
 }
 
 export async function fetchFootballDataFixtures(apiKey: string): Promise<FixtureRow[]> {
@@ -81,10 +54,7 @@ export async function fetchFootballDataFixtures(apiKey: string): Promise<Fixture
 }
 
 function mapFdMatch(m: FdMatch): FixtureRow {
-  // finalScore returns null for unplayed matches (null fullTime), and the
-  // running score for IN_PLAY ones, so live goals show up between syncs.
   const score = finalScore(m.score);
-  const VALID_TYPES = new Set(['REGULAR', 'OWN_GOAL', 'PENALTY']);
   return {
     id: m.id,
     home_team: m.homeTeam?.name ?? 'TBD',
@@ -97,12 +67,6 @@ function mapFdMatch(m: FdMatch): FixtureRow {
     status: m.status ?? 'SCHEDULED',
     home_score: score?.home ?? null,
     away_score: score?.away ?? null,
-    goals: (m.goals ?? []).map((g) => ({
-      minute: g.minute,
-      scorer: g.scorer?.name ?? 'Unknown',
-      team: g.team?.name === m.homeTeam?.name ? 'home' : 'away',
-      type: (VALID_TYPES.has(g.type) ? g.type : 'REGULAR') as Goal['type'],
-    })),
   };
 }
 
@@ -157,7 +121,6 @@ function mapOfMatch(m: OfMatch): FixtureRow | null {
     status: finished ? 'FINISHED' : new Date(kickoff).getTime() <= Date.now() ? 'TIMED' : 'SCHEDULED',
     home_score: finished ? ft![0] : null,
     away_score: finished ? ft![1] : null,
-    goals: [],
   };
 }
 

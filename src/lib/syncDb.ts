@@ -56,16 +56,5 @@ export function makeSupabaseSyncDb(admin: SupabaseClient): SyncDb {
         .eq('id', matchId);
       if (error) throw new Error(`markScored: ${error.message}`);
     },
-
-    async getFinishedEmptyGoals() {
-      const { data, error } = await admin
-        .from('matches')
-        .select('id, goals')
-        .eq('status', 'FINISHED');
-      if (error) throw new Error(`getFinishedEmptyGoals: ${error.message}`);
-      return (data ?? [])
-        .filter((r) => !r.goals || (r.goals as unknown[]).length === 0)
-        .map((r) => ({ id: r.id as number }));
-    },
   };
 }

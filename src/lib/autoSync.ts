@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { fetchFixtures, fetchFootballDataMatchDetail } from './footballData';
+import { fetchFixtures } from './footballData';
 import { runSync } from './sync';
 import { makeSupabaseSyncDb } from './syncDb';
 
@@ -40,12 +40,7 @@ async function doSync(): Promise<void> {
     const newest = data?.[0]?.updated_at ? new Date(data[0].updated_at as string).getTime() : 0;
     if (Date.now() - newest < STALE_MS) return;
 
-    const source = process.env.FIXTURES_SOURCE ?? 'football-data';
-    const detailFn =
-      source !== 'openfootball' && process.env.FOOTBALL_DATA_API_KEY
-        ? (id: number) => fetchFootballDataMatchDetail(process.env.FOOTBALL_DATA_API_KEY!, id)
-        : undefined;
-    await runSync(makeSupabaseSyncDb(admin), fetchFixtures, detailFn);
+    await runSync(makeSupabaseSyncDb(admin), fetchFixtures);
   } catch (err) {
     console.error('auto-sync failed:', err instanceof Error ? err.message : err);
   }

@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse, type NextRequest } from 'next/server';
-import { fetchFixtures, fetchFootballDataMatchDetail } from '@/lib/footballData';
+import { fetchFixtures } from '@/lib/footballData';
 import { runSync } from '@/lib/sync';
 import { makeSupabaseSyncDb } from '@/lib/syncDb';
 
@@ -21,13 +21,7 @@ export async function GET(request: NextRequest) {
   );
 
   try {
-    const apiKey = process.env.FOOTBALL_DATA_API_KEY;
-    const source = process.env.FIXTURES_SOURCE ?? 'football-data';
-    const detailFn =
-      source !== 'openfootball' && apiKey
-        ? (id: number) => fetchFootballDataMatchDetail(apiKey, id)
-        : undefined;
-    const result = await runSync(makeSupabaseSyncDb(admin), fetchFixtures, detailFn);
+    const result = await runSync(makeSupabaseSyncDb(admin), fetchFixtures);
     return NextResponse.json({ ok: true, ...result });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
