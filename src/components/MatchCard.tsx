@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { submitPrediction } from '@/app/actions';
+import Flag from './Flag';
 import { lockTime, stageLabel, type Match, type Prediction, type RevealedPick } from '@/lib/types';
 
 interface Props {
@@ -75,7 +76,7 @@ export default function MatchCard({ match, prediction, revealedPicks }: Props) {
 
       <div className="match-row">
         <div className="team">
-          {match.home_code && <span className="code">{match.home_code}</span>}
+          <Flag code={match.home_code} name={match.home_team} />
           <span>{match.home_team}</span>
         </div>
 
@@ -111,7 +112,7 @@ export default function MatchCard({ match, prediction, revealedPicks }: Props) {
 
         <div className="team away">
           <span>{match.away_team}</span>
-          {match.away_code && <span className="code">{match.away_code}</span>}
+          <Flag code={match.away_code} name={match.away_team} />
         </div>
       </div>
 

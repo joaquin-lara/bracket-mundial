@@ -69,7 +69,7 @@ export async function submitPrediction(
     };
   }
 
-  revalidatePath('/');
+  revalidatePath('/today');
   revalidatePath('/matches');
   return { ok: true };
 }

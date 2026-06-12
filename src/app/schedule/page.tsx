@@ -1,0 +1,32 @@
+import type { Metadata } from 'next';
+import ScheduleList from '@/components/ScheduleList';
+import { createClient } from '@/lib/supabase/server';
+import type { Match } from '@/lib/types';
+
+export const metadata: Metadata = { title: 'Schedule' };
+export const dynamic = 'force-dynamic';
+
+export default async function SchedulePage() {
+  const supabase = createClient();
+
+  const { data } = await supabase
+    .from('matches')
+    .select('*')
+    .order('kickoff', { ascending: true });
+
+  const matches = (data ?? []) as Match[];
+
+  return (
+    <main>
+      <h1>Schedule</h1>
+      <p className="subtitle">
+        Every World Cup 2026 fixture, with live and final scores. Times shown in your timezone.
+      </p>
+      {matches.length === 0 ? (
+        <p className="empty">No fixtures yet. They appear after the first sync runs.</p>
+      ) : (
+        <ScheduleList matches={matches} />
+      )}
+    </main>
+  );
+}

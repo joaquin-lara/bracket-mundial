@@ -5,7 +5,10 @@ import { signOut } from './actions';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Bracket Mundial',
+  title: {
+    default: 'Stonks Bracket',
+    template: '%s · Stonks Bracket',
+  },
   description: 'World Cup 2026 prediction game',
 };
 
@@ -19,17 +22,23 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en">
       <body>
         {user && (
-          <nav className="nav">
+          <header className="topbar">
             <Link href="/" className="brand">
-              Bracket Mundial
+              <span className="brand-badge">⚽</span>
+              <span className="brand-name">Stonks©</span>
             </Link>
-            <Link href="/">Today</Link>
-            <Link href="/matches">Schedule</Link>
-            <Link href="/standings">Standings</Link>
-            <form action={signOut}>
-              <button type="submit">Sign out</button>
-            </form>
-          </nav>
+            <nav className="topnav">
+              <Link href="/today">Today</Link>
+              <Link href="/matches">Enter your bracket</Link>
+              <Link href="/schedule">Schedule</Link>
+              <Link href="/bracket">World Cup Bracket</Link>
+              <Link href="/standings">Standings</Link>
+              <Link href="/rules">Rules</Link>
+              <form action={signOut}>
+                <button type="submit">Sign out</button>
+              </form>
+            </nav>
+          </header>
         )}
         {children}
       </body>

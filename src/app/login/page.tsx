@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { PLAYERS, pinPassword, playerEmail, type Player } from '@/lib/players';
+import { PLAYER_META, PLAYERS, pinPassword, playerEmail, type Player } from '@/lib/players';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
@@ -49,13 +49,20 @@ export default function LoginPage() {
   return (
     <main>
       <div className="auth-card">
-        <h1>Bracket Mundial</h1>
+        <h1>
+          Stonks
+          <br />
+          Bracket.
+        </h1>
         {!player ? (
           <>
             <p className="subtitle">Which player are you?</p>
             <div className="player-grid">
               {PLAYERS.map((p) => (
                 <button key={p} className="player-btn" onClick={() => setPlayer(p)}>
+                  <span className="player-avatar" style={{ background: PLAYER_META[p].color }}>
+                    {PLAYER_META[p].initial}
+                  </span>
                   {p}
                 </button>
               ))}
