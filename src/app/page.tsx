@@ -1,8 +1,9 @@
 import Link from 'next/link';
+import Flag from '@/components/Flag';
 import GlobeBackdrop from '@/components/GlobeBackdrop';
 import { PLAYER_META, PLAYERS } from '@/lib/players';
 import { createClient } from '@/lib/supabase/server';
-import type { Match } from '@/lib/types';
+import { stageLabel, type Match } from '@/lib/types';
 
 export const revalidate = 60; // cache for 1 minute
 
@@ -45,7 +46,7 @@ export default async function HomePage() {
 
           <div className="cta-row">
             <Link href="/matches" className="btn-gold">
-              Enter your predictions →
+              Edit your bracket →
             </Link>
             <Link href="/standings" className="btn-ghost">
               Player standings
@@ -53,6 +54,41 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {(todayMatches ?? []).length > 0 && (
+        <section className="today-games">
+          <div className="contenders-head">
+            <span className="contenders-label">Today&apos;s Games</span>
+            <div className="contenders-line" />
+          </div>
+          <div className="sched-card">
+            {(todayMatches as Match[]).map((m) => {
+              const finished = m.status === 'FINISHED';
+              const live = m.status === 'IN_PLAY' || m.status === 'PAUSED';
+              const time = new Date(m.kickoff).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+              return (
+                <div className="sched-row" key={m.id}>
+                  <span className="sched-time">{time}</span>
+                  <span className="sched-team home">
+                    <span className="sched-name">{m.home_team}</span>
+                    <Flag code={m.home_code} name={m.home_team} />
+                  </span>
+                  <span className={`sched-mid${live ? ' live' : ''}`}>
+                    {finished || live ? `${m.home_score ?? ''} – ${m.away_score ?? ''}` : 'vs'}
+                  </span>
+                  <span className="sched-team">
+                    <Flag code={m.away_code} name={m.away_team} />
+                    <span className="sched-name">{m.away_team}</span>
+                  </span>
+                  <span className="sched-stage">
+                    {live ? <span className="badge-live">LIVE</span> : finished ? <>FT · {stageLabel(m.stage, m.group_name)}</> : stageLabel(m.stage, m.group_name)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       <section className="contenders">
         <div className="contenders-head">

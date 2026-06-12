@@ -483,7 +483,7 @@ h1 {
 .btn-ghost {
   font-weight: 700;
   border: 1px solid rgba(244, 241, 232, 0.3);
-  background: rgba(244, 241, 232, 0.12);
+  background: rgba(0, 0, 0, 0.5);
   color: var(--cream);
 }
 
@@ -492,6 +492,16 @@ h1 {
 }
 
 /* ---- contenders ---- */
+
+.today-games {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 30px 36px 0;
+}
+
+.today-games .sched-card {
+  background: rgba(0, 0, 0, 0.5);
+}
 
 .contenders {
   max-width: 1040px;
@@ -534,7 +544,7 @@ h1 {
 }
 
 .contender-card {
-  background: rgba(244, 241, 232, 0.13);
+  background: rgba(0, 0, 0, 0.5);
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 22px 20px;

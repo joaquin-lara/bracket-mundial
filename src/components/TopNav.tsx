@@ -6,9 +6,9 @@ import { useEffect, useState } from 'react';
 import { signOut } from '@/app/actions';
 
 const LINKS = [
-  ['/matches', 'Enter your predictions'],
-  ['/schedule', 'Schedule'],
+  ['/matches', 'Edit your bracket'],
   ['/bracket', 'World Cup Bracket'],
+  ['/schedule', 'Game schedule'],
   ['/standings', 'Player Standings'],
   ['/rules', 'Rules'],
 ] as const;
