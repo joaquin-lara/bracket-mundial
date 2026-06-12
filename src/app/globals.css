@@ -334,6 +334,13 @@ h1 {
   user-select: none;
 }
 
+@media (max-width: 768px) {
+  .globe-backdrop {
+    width: min(700px, 140vw);
+    top: 40%;
+  }
+}
+
 .globe-inner {
   position: relative;
   width: 100%;
