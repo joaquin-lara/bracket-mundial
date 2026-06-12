@@ -2,6 +2,7 @@
 
 import gsap from 'gsap';
 import { useEffect } from 'react';
+import { introDecision } from '@/lib/introGate';
 
 // Must match GlobeBackdrop timeline: delay(0.15) + drop(1.1) + spin(2.0)
 const GLOBE_END = 3.25;
@@ -15,6 +16,13 @@ export default function HomeIntro() {
       const heroContent = document.querySelector<HTMLElement>('.hero-content');
       const todayGames = document.querySelector<HTMLElement>('.today-games');
       const contenders = document.querySelector<HTMLElement>('.contenders');
+
+      // Revisiting the home tab: no show, just make everything visible.
+      if (!introDecision()) {
+        if (topbar) gsap.set(topbar, { y: 0, opacity: 1 });
+        gsap.set([stripes, heroContent, todayGames, contenders].filter(Boolean), { opacity: 1 });
+        return;
+      }
 
       // CSS already hides opacity; set the starting Y for the topbar slide.
       if (topbar) gsap.set(topbar, { y: -80 });

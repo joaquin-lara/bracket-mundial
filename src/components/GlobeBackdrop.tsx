@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { feature, mesh } from 'topojson-client';
 import worldData from 'world-atlas/countries-110m.json';
+import { decideIntro } from '@/lib/introGate';
 import type { Match } from '@/lib/types';
 
 const CITIES: [string, number, number][] = [
@@ -70,6 +71,10 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
     // Real-time clock: animations land where they should even if the tab
     // was hidden mid-flight (no slow-motion catch-up on return).
     gsap.ticker.lagSmoothing(0);
+
+    // Intro plays only on the first full load of the site, not when the
+    // home tab is revisited.
+    const playIntro = decideIntro();
 
     gsap.set(el, { scale: 0.1, y: -window.innerHeight * 1.6, opacity: 1 });
     gsap.set(svgRef.current, { opacity: 0 });
@@ -160,9 +165,9 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
         }, '<-0.2')
         .to(canvas, { opacity: 0, duration: 2.0, ease: 'power2.inOut' }, '<-0.2');
 
-      // Tab hidden? Skip the entrance and land on the finished scene, so
-      // returning users never find a ball frozen in the sky.
-      if (document.hidden) tl.progress(1);
+      // Skip the entrance (landing on the finished scene) when the intro
+      // already played this session, or when the tab is hidden.
+      if (!playIntro || document.hidden) tl.progress(1);
     });
 
     return () => {
