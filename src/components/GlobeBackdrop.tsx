@@ -2,15 +2,14 @@
 
 import { geoDistance, geoOrthographic, geoPath } from 'd3-geo';
 import gsap from 'gsap';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { feature, mesh } from 'topojson-client';
 import worldData from 'world-atlas/countries-110m.json';
 import type { Match } from '@/lib/types';
 
-// 2026 host cities (lat, lon). Today's matches are assigned one each in
-// order (the free API doesn't expose venues, so the city pick rotates, but
-// every dot sits at a real stadium city).
 const CITIES: [string, number, number][] = [
   ['Mexico City', 19.3, -99.2],
   ['Guadalajara', 20.7, -103.3],
@@ -33,10 +32,8 @@ const CITIES: [string, number, number][] = [
 const CX = 300;
 const CY = 300;
 const R = 260;
-// Fallback view center when no games today: middle of the host region.
-const FALLBACK: [number, number] = [33, -98]; // lat, lon
+const FALLBACK: [number, number] = [33, -98];
 
-// Module-level singletons: one globe per page.
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const world = worldData as any;
 const LAND = feature(world, world.objects.land);
@@ -49,14 +46,11 @@ const EQUATOR = {
 const projection = geoOrthographic().translate([CX, CY]).scale(R).clipAngle(90);
 const pathGen = geoPath(projection);
 
-/**
- * Static earth behind the hero: real country shapes (world-atlas 110m) on an
- * orthographic projection, centered on the average location of today's match
- * cities. Today's games pulse in gold at real host-city coordinates.
- */
 export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
   const [mounted, setMounted] = useState(false);
   const innerRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const ballCanvasRef = useRef<HTMLCanvasElement>(null);
   const landRef = useRef<SVGPathElement>(null);
   const bordersRef = useRef<SVGPathElement>(null);
   const eqRef = useRef<SVGPathElement>(null);
@@ -66,14 +60,43 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
 
   useEffect(() => {
     const el = innerRef.current;
-    if (!el) return;
+    const canvas = ballCanvasRef.current;
+    if (!el || !canvas) return;
 
-    gsap.set(el, { scale: 0.1, y: -window.innerHeight * 1.6 });
+    gsap.set(el, { scale: 0.1, y: -window.innerHeight * 1.6, opacity: 1 });
+    gsap.set(svgRef.current, { opacity: 0 });
 
-    const rotProxy = { lon: centerLon };
-    const tl = gsap.timeline({ delay: 0.15 });
+    // ── Three.js ball setup ──────────────────────────────────────────────────
+    const { width, height } = el.getBoundingClientRect();
+    const size = Math.round(Math.max(width, height, 300));
 
-    const updateGlobe = () => {
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setSize(size, size, false);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    const scene = new THREE.Scene();
+    // Frustum ±1 so a ball of radius 0.867 matches the SVG globe (260/300 = 86.7% of half-width)
+    const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
+    cam.position.z = 3;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+    const sun = new THREE.DirectionalLight(0xffffff, 2.5);
+    sun.position.set(3, 4, 5);
+    scene.add(sun);
+
+    let rafId: number;
+
+    const animate = () => {
+      rafId = requestAnimationFrame(animate);
+      renderer.render(scene, cam);
+    };
+    animate();
+
+    // ── Start animation only after model has loaded ──────────────────────────
+    let tl: gsap.core.Timeline;
+
+    const updateGlobe = (rotProxy: { lon: number }) => {
       projection.rotate([-rotProxy.lon, -centerLat]);
       landRef.current?.setAttribute('d', pathGen(LAND as any) ?? '');
       bordersRef.current?.setAttribute('d', pathGen(BORDERS as any) ?? '');
@@ -91,24 +114,40 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
       }
     };
 
-    tl.to(el, {
-      y: 0,
-      duration: 1.1,
-      ease: 'power3.out',
-    })
-    .to(el, {
-      scale: 1,
-      duration: 2.0,
-      ease: 'power2.inOut',
-    })
-    .to(rotProxy, {
-      lon: centerLon - 360,
-      duration: 2.2,
-      ease: 'power3.inOut',
-      onUpdate: updateGlobe,
-    }, '<-0.2');
+    const loader = new GLTFLoader();
+    loader.load('/Trionda%202026.glb', (gltf) => {
+      const model = gltf.scene;
+      const box = new THREE.Box3().setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
+      model.position.sub(center);
+      model.scale.multiplyScalar(1.733 / Math.max(size.x, size.y, size.z));
+      scene.add(model);
 
-    return () => { tl.kill(); };
+      const rotProxy = { lon: centerLon };
+
+      tl = gsap.timeline({ delay: 0.15 });
+      tl.to(el, { y: 0, duration: 1.1, ease: 'power3.out' })
+        .set(canvas, { opacity: 1 }, '<')
+        .set(svgRef.current, { opacity: 1 })
+        .to(el, { scale: 1, duration: 2.0, ease: 'power2.inOut' })
+        .to(rotProxy, {
+          lon: centerLon - 360,
+          duration: 2.2,
+          ease: 'power3.inOut',
+          onUpdate: () => {
+            updateGlobe(rotProxy);
+            model.rotation.y = -(rotProxy.lon - centerLon) * (Math.PI / 180);
+          },
+        }, '<-0.2')
+        .to(canvas, { opacity: 0, duration: 2.0, ease: 'power2.inOut' }, '<-0.2');
+    });
+
+    return () => {
+      tl?.kill();
+      cancelAnimationFrame(rafId);
+      renderer.dispose();
+    };
   }, [mounted]);
 
   const localToday = new Date().toLocaleDateString('en-CA');
@@ -120,7 +159,6 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
 
   const centerLat = used.length ? used.reduce((s, c) => s + c[1], 0) / used.length : FALLBACK[0];
   const centerLon = used.length ? used.reduce((s, c) => s + c[2], 0) / used.length : FALLBACK[1];
-
 
   projection.rotate([-centerLon, -centerLat]);
 
@@ -141,45 +179,45 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
   const content = (
     <div className="globe-backdrop" aria-hidden="true">
       <div ref={innerRef} className="globe-inner">
-      <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <radialGradient id="globeGlow" cx="50%" cy="42%" r="60%">
-            <stop offset="0%" stopColor="rgba(230,179,55,0.10)" />
-            <stop offset="55%" stopColor="rgba(230,179,55,0.04)" />
-            <stop offset="100%" stopColor="rgba(230,179,55,0)" />
-          </radialGradient>
-          <radialGradient id="sphereShade" cx="38%" cy="30%" r="78%">
-            <stop offset="0%" stopColor="rgba(155, 208, 218, 0.5)" />
-            <stop offset="50%" stopColor="rgba(82, 150, 168, 0.42)" />
-            <stop offset="100%" stopColor="rgba(20, 62, 80, 0.6)" />
-          </radialGradient>
-        </defs>
+        <svg ref={svgRef} viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="globeGlow" cx="50%" cy="42%" r="60%">
+              <stop offset="0%" stopColor="rgba(230,179,55,0.10)" />
+              <stop offset="55%" stopColor="rgba(230,179,55,0.04)" />
+              <stop offset="100%" stopColor="rgba(230,179,55,0)" />
+            </radialGradient>
+            <radialGradient id="sphereShade" cx="38%" cy="30%" r="78%">
+              <stop offset="0%" stopColor="rgba(155, 208, 218, 0.5)" />
+              <stop offset="50%" stopColor="rgba(82, 150, 168, 0.42)" />
+              <stop offset="100%" stopColor="rgba(20, 62, 80, 0.6)" />
+            </radialGradient>
+          </defs>
 
-        {/* opaque base blocks stripes from bleeding through the ocean */}
-        <circle cx={CX} cy={CY} r={R} fill="var(--bg-dark)" />
+          <circle cx={CX} cy={CY} r={R} fill="var(--bg-dark)" />
+          <circle cx={CX} cy={CY} r="295" fill="url(#globeGlow)" />
+          <circle cx={CX} cy={CY} r={R} fill="url(#sphereShade)" />
 
-        {/* halo + shaded ocean */}
-        <circle cx={CX} cy={CY} r="295" fill="url(#globeGlow)" />
-        <circle cx={CX} cy={CY} r={R} fill="url(#sphereShade)" />
+          <path ref={landRef} d={shapes.land} className="g-land" />
+          <path ref={bordersRef} d={shapes.borders} className="g-borders" />
+          <path ref={eqRef} d={shapes.eq} className="g-equator" />
 
-        {/* land, borders, equator */}
-        <path ref={landRef} d={shapes.land} className="g-land" />
-        <path ref={bordersRef} d={shapes.borders} className="g-borders" />
-        <path ref={eqRef} d={shapes.eq} className="g-equator" />
+          <circle cx={CX} cy={CY} r={R} className="g-line g-outline" />
 
-        {/* sphere outline */}
-        <circle cx={CX} cy={CY} r={R} className="g-line g-outline" />
-
-        {/* today's matches at host-city coordinates */}
-        <g ref={dotsRef}>
-        {dots.map((d, i) => (
-          <g key={d.id} transform={`translate(${d.x.toFixed(1)} ${d.y.toFixed(1)})`} opacity={d.opacity.toFixed(2)}>
-            <circle r="4.5" className="g-dot" style={{ animationDelay: `${i * 0.35}s` }} />
-            <circle r="4.5" className="g-ping" style={{ animationDelay: `${i * 0.35}s` }} />
+          <g ref={dotsRef}>
+            {dots.map((d, i) => (
+              <g key={d.id} transform={`translate(${d.x.toFixed(1)} ${d.y.toFixed(1)})`} opacity={d.opacity.toFixed(2)}>
+                <circle r="4.5" className="g-dot" style={{ animationDelay: `${i * 0.35}s` }} />
+                <circle r="4.5" className="g-ping" style={{ animationDelay: `${i * 0.35}s` }} />
+              </g>
+            ))}
           </g>
-        ))}
-        </g>
-      </svg>
+        </svg>
+
+        {/* Three.js soccer ball — fades out during zoom to reveal the globe */}
+        <canvas
+          ref={ballCanvasRef}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0 }}
+        />
       </div>
     </div>
   );

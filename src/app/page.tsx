@@ -42,9 +42,9 @@ export default async function HomePage() {
           </div>
 
           <h1 className="hero-title">
-            Stonks
+            Stonks World
             <br />
-            Bracket.
+            Cup Bracket.
           </h1>
 
           <p className="hero-tag">El que sale último es el más pendejo.</p>
