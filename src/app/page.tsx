@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { flagUrl } from '@/lib/flags';
 import GlobeBackdrop from '@/components/GlobeBackdrop';
+import HomeIntro from '@/components/HomeIntro';
+import PitchStripes from '@/components/PitchStripes';
 import TodayGames from '@/components/TodayGames';
 import { PLAYER_META, PLAYERS } from '@/lib/players';
 import { createClient } from '@/lib/supabase/server';
@@ -28,6 +30,8 @@ export default async function HomePage() {
 
   return (
     <div className="home-pitch">
+      <HomeIntro />
+      <PitchStripes />
       <section className="hero">
         <GlobeBackdrop matches={(todayMatches ?? []) as Match[]} />
 

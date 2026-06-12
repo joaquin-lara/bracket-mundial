@@ -1,0 +1,36 @@
+'use client';
+
+import gsap from 'gsap';
+import { useEffect } from 'react';
+
+// Must match GlobeBackdrop timeline: delay(0.15) + drop(1.1) + spin(2.0)
+const GLOBE_END = 3.25;
+
+export default function HomeIntro() {
+  useEffect(() => {
+    // setTimeout(0) ensures portal elements (PitchStripes) have mounted before querying.
+    const t = setTimeout(() => {  // 100ms ensures portal elements have mounted
+      const topbar = document.querySelector<HTMLElement>('.topbar');
+      const stripes = document.querySelector<HTMLElement>('.pitch-stripes');
+      const heroContent = document.querySelector<HTMLElement>('.hero-content');
+      const todayGames = document.querySelector<HTMLElement>('.today-games');
+      const contenders = document.querySelector<HTMLElement>('.contenders');
+
+      // CSS already hides opacity; set the starting Y for the topbar slide.
+      if (topbar) gsap.set(topbar, { y: -80 });
+
+      const tl = gsap.timeline();
+
+      tl.to(stripes,     { opacity: 1, duration: 0.8, ease: 'power2.out' },  GLOBE_END - 0.2)
+        .to(topbar,      { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, '<+0.6')
+        .to(heroContent, { opacity: 1, duration: 0.5, ease: 'power2.out' },   '<+0.2')
+        .to(todayGames,  { opacity: 1, duration: 0.5, ease: 'power2.out' },   '<+0.2')
+        .to(contenders,  { opacity: 1, duration: 0.5, ease: 'power2.out' },   '<+0.2');
+    }, 100);
+
+    return () => clearTimeout(t);
+  }, []);
+
+  // Marker div: CSS :has(.home-intro) hides page elements from the initial server render.
+  return <div className="home-intro" hidden aria-hidden="true" />;
+}

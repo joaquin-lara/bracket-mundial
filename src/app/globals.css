@@ -56,6 +56,15 @@ a {
   vertical-align: -1px;
 }
 
+/* ---- intro animation: CSS hides elements before JS ever runs ---- */
+body:has(.home-intro) .topbar,
+body:has(.home-intro) .hero-content,
+body:has(.home-intro) .today-games,
+body:has(.home-intro) .contenders,
+body:has(.home-intro) .pitch-stripes {
+  opacity: 0;
+}
+
 /* ---- top bar ---- */
 
 .topbar {
@@ -323,6 +332,11 @@ h1 {
   z-index: -1;
   pointer-events: none;
   user-select: none;
+}
+
+.globe-inner {
+  width: 100%;
+  height: 100%;
 }
 
 .globe-backdrop svg {
@@ -1648,8 +1662,10 @@ table.standings tr.me td {
 
 /* ---- futbol touches ---- */
 
-/* pitch: grass stripes on the home page + halfway-line divider */
-.home-pitch {
+/* pitch: grass stripes on the home page */
+.pitch-stripes {
+  position: fixed;
+  inset: 0;
   background: repeating-linear-gradient(
     180deg,
     rgba(244, 241, 232, 0.035) 0px,
@@ -1657,7 +1673,8 @@ table.standings tr.me td {
     transparent 110px,
     transparent 220px
   );
-  background-attachment: fixed;
+  pointer-events: none;
+  z-index: -1;
 }
 
 .contenders-line {

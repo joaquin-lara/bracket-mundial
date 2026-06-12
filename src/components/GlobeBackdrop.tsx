@@ -1,6 +1,9 @@
 'use client';
 
 import { geoDistance, geoOrthographic, geoPath } from 'd3-geo';
+import gsap from 'gsap';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { feature, mesh } from 'topojson-client';
 import worldData from 'world-atlas/countries-110m.json';
 import type { Match } from '@/lib/types';
@@ -52,6 +55,62 @@ const pathGen = geoPath(projection);
  * cities. Today's games pulse in gold at real host-city coordinates.
  */
 export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
+  const [mounted, setMounted] = useState(false);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const landRef = useRef<SVGPathElement>(null);
+  const bordersRef = useRef<SVGPathElement>(null);
+  const eqRef = useRef<SVGPathElement>(null);
+  const dotsRef = useRef<SVGGElement>(null);
+
+  useEffect(() => { setMounted(true); }, []);
+
+  useEffect(() => {
+    const el = innerRef.current;
+    if (!el) return;
+
+    gsap.set(el, { scale: 0.1, y: -window.innerHeight * 1.6 });
+
+    const rotProxy = { lon: centerLon };
+    const tl = gsap.timeline({ delay: 0.15 });
+
+    const updateGlobe = () => {
+      projection.rotate([-rotProxy.lon, -centerLat]);
+      landRef.current?.setAttribute('d', pathGen(LAND as any) ?? '');
+      bordersRef.current?.setAttribute('d', pathGen(BORDERS as any) ?? '');
+      eqRef.current?.setAttribute('d', pathGen(EQUATOR as any) ?? '');
+      const groups = dotsRef.current?.children;
+      if (groups) {
+        Array.from(groups).forEach((g, i) => {
+          const [, lat, lon] = CITIES[i % CITIES.length];
+          const pos = projection([lon, lat]) ?? [CX, CY];
+          const dist = geoDistance([lon, lat], [rotProxy.lon, centerLat]);
+          const opacity = dist < Math.PI / 2 ? Math.min(1, Math.cos(dist) * 2.2) : 0;
+          g.setAttribute('transform', `translate(${pos[0].toFixed(1)} ${pos[1].toFixed(1)})`);
+          g.setAttribute('opacity', opacity.toFixed(2));
+        });
+      }
+    };
+
+    tl.to(el, {
+      y: 0,
+      duration: 1.1,
+      ease: 'power3.out',
+    })
+    .to(el, {
+      scale: 1,
+      duration: 2.0,
+      ease: 'power2.inOut',
+    })
+    .to(rotProxy, {
+      lon: centerLon - 360,
+      duration: 2.2,
+      ease: 'power3.inOut',
+      onUpdate: updateGlobe,
+    }, '<-0.2');
+
+    return () => { tl.kill(); };
+  }, [mounted]);
+
   const localToday = new Date().toLocaleDateString('en-CA');
   const todayMatches = matches.filter(
     (m) => new Date(m.kickoff).toLocaleDateString('en-CA') === localToday
@@ -79,8 +138,9 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
     return { id: m.id, x: pos[0], y: pos[1], opacity };
   });
 
-  return (
+  const content = (
     <div className="globe-backdrop" aria-hidden="true">
+      <div ref={innerRef} className="globe-inner">
       <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <radialGradient id="globeGlow" cx="50%" cy="42%" r="60%">
@@ -95,26 +155,34 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
           </radialGradient>
         </defs>
 
+        {/* opaque base blocks stripes from bleeding through the ocean */}
+        <circle cx={CX} cy={CY} r={R} fill="var(--bg-dark)" />
+
         {/* halo + shaded ocean */}
         <circle cx={CX} cy={CY} r="295" fill="url(#globeGlow)" />
         <circle cx={CX} cy={CY} r={R} fill="url(#sphereShade)" />
 
         {/* land, borders, equator */}
-        <path d={shapes.land} className="g-land" />
-        <path d={shapes.borders} className="g-borders" />
-        <path d={shapes.eq} className="g-equator" />
+        <path ref={landRef} d={shapes.land} className="g-land" />
+        <path ref={bordersRef} d={shapes.borders} className="g-borders" />
+        <path ref={eqRef} d={shapes.eq} className="g-equator" />
 
         {/* sphere outline */}
         <circle cx={CX} cy={CY} r={R} className="g-line g-outline" />
 
         {/* today's matches at host-city coordinates */}
+        <g ref={dotsRef}>
         {dots.map((d, i) => (
           <g key={d.id} transform={`translate(${d.x.toFixed(1)} ${d.y.toFixed(1)})`} opacity={d.opacity.toFixed(2)}>
             <circle r="4.5" className="g-dot" style={{ animationDelay: `${i * 0.35}s` }} />
             <circle r="4.5" className="g-ping" style={{ animationDelay: `${i * 0.35}s` }} />
           </g>
         ))}
+        </g>
       </svg>
+      </div>
     </div>
   );
+
+  return mounted ? createPortal(content, document.body) : null;
 }
