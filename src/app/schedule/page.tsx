@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { Match } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'Schedule' };
-export const dynamic = 'force-dynamic';
+export const revalidate = 60; // cache for 1 minute
 
 export default async function SchedulePage() {
   const supabase = createClient();

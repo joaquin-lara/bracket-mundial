@@ -80,7 +80,6 @@ export async function submitPrediction(
     };
   }
 
-  revalidatePath('/today');
   revalidatePath('/matches');
   return { ok: true };
 }

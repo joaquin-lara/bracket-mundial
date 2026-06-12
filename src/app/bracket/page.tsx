@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { Match } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'World Cup Bracket' };
-export const dynamic = 'force-dynamic';
+export const revalidate = 120; // cache for 2 minutes
 
 const ROUNDS: { stage: string; label: string }[] = [
   { stage: 'LAST_32', label: 'Round of 32' },

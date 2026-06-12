@@ -1,11 +1,13 @@
-# Calls the app's sync endpoint every 30 minutes (Vercel's free plan only
+# Calls the app's sync endpoint every 5 minutes (Vercel's free plan only
 # allows daily crons, so GitHub Actions does the frequent runs).
+# NOTE: at this cadence the repo must be PUBLIC, otherwise the runs exceed
+# the 2,000 free Actions minutes/month for private repos.
 # Requires two repository secrets: SYNC_URL and CRON_SECRET.
 name: Sync World Cup scores
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch: {}
 
 jobs:

@@ -6,8 +6,7 @@ import { useEffect, useState } from 'react';
 import { signOut } from '@/app/actions';
 
 const LINKS = [
-  ['/today', 'Today'],
-  ['/matches', 'Enter your bracket'],
+  ['/matches', 'Enter your predictions'],
   ['/schedule', 'Schedule'],
   ['/bracket', 'World Cup Bracket'],
   ['/standings', 'Player Standings'],
@@ -43,7 +42,7 @@ export default function TopNav() {
 
       <nav className="topnav desktop-nav">
         {LINKS.map(([href, label]) => (
-          <Link href={href} key={href}>
+          <Link href={href} key={href} className={pathname === href ? 'active' : ''}>
             {label}
           </Link>
         ))}
@@ -55,11 +54,16 @@ export default function TopNav() {
       <span className="burger-spacer" />
 
       <div className={`mobile-menu${open ? ' open' : ''}`}>
-        <Link href="/" onClick={() => setOpen(false)}>
+        <Link href="/" onClick={() => setOpen(false)} className={pathname === '/' ? 'active' : ''}>
           Home
         </Link>
         {LINKS.map(([href, label]) => (
-          <Link href={href} key={href} onClick={() => setOpen(false)}>
+          <Link
+            href={href}
+            key={href}
+            onClick={() => setOpen(false)}
+            className={pathname === href ? 'active' : ''}
+          >
             {label}
           </Link>
         ))}

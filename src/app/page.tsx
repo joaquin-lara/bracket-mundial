@@ -4,7 +4,7 @@ import { PLAYER_META, PLAYERS } from '@/lib/players';
 import { createClient } from '@/lib/supabase/server';
 import type { Match } from '@/lib/types';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60; // cache for 1 minute
 
 export default async function HomePage() {
   const supabase = createClient();
@@ -45,10 +45,10 @@ export default async function HomePage() {
 
           <div className="cta-row">
             <Link href="/matches" className="btn-gold">
-              Fill out my bracket →
+              Enter your predictions →
             </Link>
             <Link href="/standings" className="btn-ghost">
-              View live standings
+              Player standings
             </Link>
           </div>
         </div>
