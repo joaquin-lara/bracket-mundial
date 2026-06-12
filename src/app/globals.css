@@ -1006,7 +1006,7 @@ table.standings tr.me td {
   justify-content: center;
   position: relative;
   padding: 5px 0;
-  min-height: 86px;
+  min-height: 118px;
 }
 
 /* outgoing fork: stub from the match center, vertical to the pair midpoint */
@@ -1047,62 +1047,137 @@ table.standings tr.me td {
   pointer-events: none;
 }
 
-.b-match {
+.b-card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 8px 10px;
+  border-radius: 12px;
+  padding: 8px 12px 10px;
   position: relative;
   z-index: 1;
 }
 
-.b-match.final-match {
+.b-card.live {
+  border-color: rgba(255, 122, 89, 0.55);
+}
+
+.b-card.final-match {
   border-color: rgba(230, 179, 55, 0.55);
   background: rgba(230, 179, 55, 0.08);
 }
 
-.b-team {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
+.b-top {
+  text-align: center;
+  margin-bottom: 6px;
+  min-height: 18px;
+}
+
+.b-date {
+  font-family: var(--narrow);
+  font-size: 10.5px;
   font-weight: 600;
-  padding: 2px 0;
-  color: var(--muted);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dim);
 }
 
-.b-team.winner {
-  color: var(--cream);
+.b-livepill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(255, 122, 89, 0.5);
+  border-radius: 999px;
+  padding: 1px 9px;
+  font-family: var(--narrow);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #ff9d80;
+  animation: livePulse 1.6s ease-in-out infinite;
+}
+
+.b-livedot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff7a59;
+}
+
+.b-mid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.b-flag {
+  width: 34px;
+  height: 24px;
+  border-radius: 5px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+}
+
+.b-flag.win {
+  box-shadow: 0 0 0 1.5px var(--gold);
+}
+
+.b-flag.dim {
+  opacity: 0.55;
+}
+
+.b-flagph {
+  width: 34px;
+  height: 24px;
+  border: 1.5px dashed rgba(244, 241, 232, 0.25);
+  border-radius: 5px;
+  background: rgba(244, 241, 232, 0.03);
+  flex-shrink: 0;
+}
+
+.b-scoreline {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 20px;
   font-weight: 800;
+  color: var(--cream);
+  line-height: 1;
 }
 
-.b-team.winner .b-score {
+.b-scoreline .win {
   color: var(--gold);
 }
 
-.b-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: flex;
-  align-items: center;
-}
-
-.b-score {
-  font-weight: 800;
-  min-width: 14px;
-  text-align: right;
-}
-
-.b-meta {
-  font-family: var(--narrow);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.b-dash {
+  font-size: 14px;
   color: var(--dim);
-  margin-top: 4px;
-  text-align: right;
+  font-weight: 600;
+}
+
+.b-noscore {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--dim);
+  letter-spacing: 2px;
+}
+
+.b-codes {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--cream);
+}
+
+.b-codes .win {
+  color: var(--gold);
+}
+
+.b-codes .dim {
+  color: var(--dim);
 }
 
 .third-place {
@@ -1240,8 +1315,8 @@ table.standings tr.me td {
 
 .group-table th:not(.gt-team),
 .group-table td:not(.gt-team) {
-  width: 18px;
-  min-width: 18px;
+  width: 20px;
+  min-width: 20px;
 }
 
 .group-table td.gt-pts,
@@ -1540,8 +1615,8 @@ table.standings tr.me td {
   }
 
   .round {
-    min-width: 168px;
-    width: 168px;
+    min-width: 184px;
+    width: 184px;
   }
 
   .sched-row {
