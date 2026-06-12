@@ -7,7 +7,7 @@ import { signOut } from '@/app/actions';
 
 const LINKS = [
   ['/matches', 'Edit your bracket'],
-  ['/bracket', 'World Cup Bracket'],
+  ['/bracket', 'Group and Bracket Tracker'],
   ['/schedule', 'Game schedule'],
   ['/standings', 'Player Standings'],
   ['/rules', 'Rules'],

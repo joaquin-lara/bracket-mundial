@@ -30,27 +30,31 @@ function Row({ m }: { m: Match }) {
   return (
     <div className="sched-entry">
       <div className="sched-row">
-        <span className="sched-time">{time}</span>
-        <span className="sched-team home">
-          <span className="sched-name">{m.home_team}</span>
-          <Flag code={m.home_code} name={m.home_team} />
-        </span>
+        <div className="sched-side left">
+          <span className="sched-time">{time}</span>
+          <span className="sched-team home">
+            <span className="sched-name">{m.home_team}</span>
+            <Flag code={m.home_code} name={m.home_team} />
+          </span>
+        </div>
         <span className={`sched-mid${live ? ' live' : ''}`}>
           {finished || live ? `${m.home_score ?? ''} – ${m.away_score ?? ''}` : 'vs'}
         </span>
-        <span className="sched-team">
-          <Flag code={m.away_code} name={m.away_team} />
-          <span className="sched-name">{m.away_team}</span>
-        </span>
-        <span className="sched-stage">
-          {live ? (
-            <span className="badge-live">LIVE</span>
-          ) : finished ? (
-            <>FT · {stageLabel(m.stage, m.group_name)}</>
-          ) : (
-            stageLabel(m.stage, m.group_name)
-          )}
-        </span>
+        <div className="sched-side right">
+          <span className="sched-team">
+            <Flag code={m.away_code} name={m.away_team} />
+            <span className="sched-name">{m.away_team}</span>
+          </span>
+          <span className="sched-stage">
+            {live ? (
+              <span className="badge-live">LIVE</span>
+            ) : finished ? (
+              <>FT · {stageLabel(m.stage, m.group_name)}</>
+            ) : (
+              stageLabel(m.stage, m.group_name)
+            )}
+          </span>
+        </div>
       </div>
     </div>
   );

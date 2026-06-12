@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import Flag from '@/components/Flag';
+import GroupTables from '@/components/GroupTables';
 import { ensureFreshScores } from '@/lib/autoSync';
+import { computeGroupTables } from '@/lib/groups';
 import { createClient } from '@/lib/supabase/server';
 import type { Match } from '@/lib/types';
 
-export const metadata: Metadata = { title: 'World Cup Bracket' };
+export const metadata: Metadata = { title: 'Group and Bracket Tracker' };
 export const revalidate = 120; // cache for 2 minutes
 
 const ROUNDS: { stage: string; label: string }[] = [
@@ -54,10 +56,13 @@ export default async function BracketPage() {
   const { data } = await supabase
     .from('matches')
     .select('*')
-    .in('stage', [...ROUNDS.map((r) => r.stage), 'THIRD_PLACE'])
     .order('kickoff', { ascending: true });
 
-  const matches = (data ?? []) as Match[];
+  const allMatches = (data ?? []) as Match[];
+  const groupTables = computeGroupTables(allMatches);
+
+  const knockoutStages = new Set([...ROUNDS.map((r) => r.stage), 'THIRD_PLACE']);
+  const matches = allMatches.filter((m) => knockoutStages.has(m.stage));
   const byStage = new Map<string, Match[]>();
   for (const m of matches) {
     if (!byStage.has(m.stage)) byStage.set(m.stage, []);
@@ -69,11 +74,18 @@ export default async function BracketPage() {
 
   return (
     <div className="bracket-page">
-      <h1>World Cup Bracket</h1>
+      <h1>Group and Bracket Tracker</h1>
       <p className="subtitle">
-        Round of 32 to the Final. Fills in automatically as the tournament unfolds; winners in
-        gold.
+        Group tables and the road from the Round of 32 to the Final. Fills in automatically as
+        the tournament unfolds; winners in gold.
       </p>
+
+      <GroupTables tables={groupTables} />
+
+      <div className="groups-head">
+        <span className="groups-title">Knockout Stage</span>
+        <div className="contenders-line" />
+      </div>
 
       {!hasKnockout ? (
         <p className="empty">The knockout fixtures appear here once the sync loads them.</p>
