@@ -337,7 +337,7 @@ h1 {
 @media (max-width: 768px) {
   .globe-backdrop {
     width: min(700px, 140vw);
-    top: 40%;
+    top: 45%;
   }
 }
 
