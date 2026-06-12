@@ -25,7 +25,7 @@ export default async function HomePage() {
     .order('kickoff', { ascending: true });
 
   return (
-    <div>
+    <div className="home-pitch">
       <section className="hero">
         <GlobeBackdrop matches={(todayMatches ?? []) as Match[]} />
 

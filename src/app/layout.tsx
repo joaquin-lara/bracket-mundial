@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import HomeOnRefresh from '@/components/HomeOnRefresh';
+import TopNav from '@/components/TopNav';
 import { createClient } from '@/lib/supabase/server';
-import { signOut } from './actions';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -23,25 +22,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en">
       <body>
         <HomeOnRefresh />
-        {user && (
-          <header className="topbar">
-            <Link href="/" className="brand">
-              <span className="brand-badge">⚽</span>
-              <span className="brand-name">Stonks©</span>
-            </Link>
-            <nav className="topnav">
-              <Link href="/today">Today</Link>
-              <Link href="/matches">Enter your bracket</Link>
-              <Link href="/schedule">Schedule</Link>
-              <Link href="/bracket">World Cup Bracket</Link>
-              <Link href="/standings">Player Standings</Link>
-              <Link href="/rules">Rules</Link>
-              <form action={signOut}>
-                <button type="submit">Sign out</button>
-              </form>
-            </nav>
-          </header>
-        )}
+        {user && <TopNav />}
         {children}
       </body>
     </html>

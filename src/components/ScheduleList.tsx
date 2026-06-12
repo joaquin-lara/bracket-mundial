@@ -42,7 +42,13 @@ function Row({ m }: { m: Match }) {
         <span className="sched-name">{m.away_team}</span>
       </span>
       <span className="sched-stage">
-        {live ? 'Live' : finished ? 'FT · ' + stageLabel(m.stage, m.group_name) : stageLabel(m.stage, m.group_name)}
+        {live ? (
+          <span className="badge-live">LIVE</span>
+        ) : finished ? (
+          <>FT · {stageLabel(m.stage, m.group_name)}</>
+        ) : (
+          stageLabel(m.stage, m.group_name)
+        )}
       </span>
     </div>
   );

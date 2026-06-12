@@ -36,6 +36,7 @@ function formatCountdown(ms: number): string {
 export default function MatchCard({ match, prediction, revealedPicks }: Props) {
   const lockAt = lockTime(match.kickoff);
   const finished = match.status === 'FINISHED';
+  const live = match.status === 'IN_PLAY' || match.status === 'PAUSED';
   const started = ['IN_PLAY', 'PAUSED', 'FINISHED'].includes(match.status);
   const teamsTbd = match.home_team === 'TBD' || match.away_team === 'TBD';
 
@@ -71,7 +72,13 @@ export default function MatchCard({ match, prediction, revealedPicks }: Props) {
       <div className="match-meta">
         <span>{stageLabel(match.stage, match.group_name)}</span>
         <span>
-          {finished ? 'Full time' : match.status === 'IN_PLAY' || match.status === 'PAUSED' ? 'In play' : kickoffLabel}
+          {finished ? (
+            <span className="badge-ft">FT</span>
+          ) : live ? (
+            <span className="badge-live">LIVE</span>
+          ) : (
+            kickoffLabel
+          )}
         </span>
       </div>
 

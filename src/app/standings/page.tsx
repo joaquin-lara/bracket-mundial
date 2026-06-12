@@ -40,9 +40,14 @@ export default async function StandingsPage() {
           <tbody>
             {rows.map((r, i) => (
               <tr key={r.user_id} className={r.user_id === user.id ? 'me' : ''}>
-                <td>{i + 1}</td>
-                <td>{r.display_name}</td>
-                <td className="num">{r.total}</td>
+                <td>
+                  <span className={`rank-chip rank-${i + 1}`}>{i + 1}</span>
+                </td>
+                <td>
+                  {r.display_name}
+                  {i === 0 ? ' 🏆' : ''}
+                </td>
+                <td className="num pts">{r.total}</td>
                 <td className="num">{r.games_scored}</td>
               </tr>
             ))}

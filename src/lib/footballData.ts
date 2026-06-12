@@ -54,7 +54,9 @@ export async function fetchFootballDataFixtures(apiKey: string): Promise<Fixture
 }
 
 function mapFdMatch(m: FdMatch): FixtureRow {
-  const score = isFinished(m.status) ? finalScore(m.score) : null;
+  // finalScore returns null for unplayed matches (null fullTime), and the
+  // running score for IN_PLAY ones, so live goals show up between syncs.
+  const score = finalScore(m.score);
   return {
     id: m.id,
     home_team: m.homeTeam?.name ?? 'TBD',
