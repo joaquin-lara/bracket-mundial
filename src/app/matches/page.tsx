@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import MatchList from '@/components/MatchList';
+import { ensureFreshScores } from '@/lib/autoSync';
 import { createClient } from '@/lib/supabase/server';
 import type { Match, Prediction, RevealedPick } from '@/lib/types';
 
@@ -7,6 +8,7 @@ export const metadata: Metadata = { title: 'Enter your bracket' };
 export const dynamic = 'force-dynamic';
 
 export default async function EnterBracketPage() {
+  await ensureFreshScores();
   const supabase = createClient();
   const {
     data: { user },

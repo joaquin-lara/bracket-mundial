@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Flag from '@/components/Flag';
+import { ensureFreshScores } from '@/lib/autoSync';
 import { createClient } from '@/lib/supabase/server';
 import type { Match } from '@/lib/types';
 
@@ -47,6 +48,7 @@ function BracketMatch({ m, highlight }: { m: Match; highlight?: boolean }) {
 }
 
 export default async function BracketPage() {
+  await ensureFreshScores();
   const supabase = createClient();
 
   const { data } = await supabase

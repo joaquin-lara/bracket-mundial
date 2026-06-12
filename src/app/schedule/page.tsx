@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import ScheduleList from '@/components/ScheduleList';
+import { ensureFreshScores } from '@/lib/autoSync';
 import { createClient } from '@/lib/supabase/server';
 import type { Match } from '@/lib/types';
 
@@ -7,6 +8,7 @@ export const metadata: Metadata = { title: 'Schedule' };
 export const revalidate = 60; // cache for 1 minute
 
 export default async function SchedulePage() {
+  await ensureFreshScores();
   const supabase = createClient();
 
   const { data } = await supabase

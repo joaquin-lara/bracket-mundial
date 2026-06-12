@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ensureFreshScores } from '@/lib/autoSync';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { title: 'Player Standings' };
@@ -12,6 +13,7 @@ interface StandingRow {
 }
 
 export default async function StandingsPage() {
+  await ensureFreshScores();
   const supabase = createClient();
   const {
     data: { user },
