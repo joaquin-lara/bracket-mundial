@@ -929,9 +929,40 @@ h1 {
 }
 
 @media (max-width: 600px) {
+  .sched-row {
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .sched-side {
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .sched-side.left {
+    align-items: flex-end;
+  }
+
+  .sched-side.right {
+    align-items: flex-start;
+  }
+
+  /* meta line on top: time over the home team, stage over the away team */
+  .sched-side.right .sched-stage {
+    order: -1;
+  }
+
   .sched-time,
   .sched-stage {
-    display: none;
+    font-size: 11px;
+  }
+
+  .sched-stage {
+    text-align: left;
+  }
+
+  .sched-team {
+    font-size: 13px;
   }
 }
 
