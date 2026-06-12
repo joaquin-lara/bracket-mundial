@@ -10,6 +10,7 @@ export const FLAG_CODES: Record<string, string> = {
   BIH: 'ba', // Bosnia-Herzegovina
   BRA: 'br', // Brazil
   CAN: 'ca', // Canada
+  CHI: 'cl', // Chile
   CIV: 'ci', // Ivory Coast
   COD: 'cd', // Congo DR
   COL: 'co', // Colombia
@@ -24,7 +25,9 @@ export const FLAG_CODES: Record<string, string> = {
   FRA: 'fr', // France
   GER: 'de', // Germany
   GHA: 'gh', // Ghana
+  GUA: 'gt', // Guatemala
   HAI: 'ht', // Haiti
+  HON: 'hn', // Honduras
   IRN: 'ir', // Iran
   IRQ: 'iq', // Iraq
   JOR: 'jo', // Jordan
@@ -33,6 +36,7 @@ export const FLAG_CODES: Record<string, string> = {
   KSA: 'sa', // Saudi Arabia
   MAR: 'ma', // Morocco
   MEX: 'mx', // Mexico
+  NCA: 'ni', // Nicaragua
   NED: 'nl', // Netherlands
   NOR: 'no', // Norway
   NZL: 'nz', // New Zealand
