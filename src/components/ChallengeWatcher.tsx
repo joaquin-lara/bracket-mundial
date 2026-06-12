@@ -98,9 +98,9 @@ export default function ChallengeWatcher({ me }: { me: string }) {
       (d) => d.status === 'active' && (d.challenger === me || d.opponent === me)
     );
     const want: PresenceStatus = hasActive ? 'dueling' : 'online';
-    if (presChannel.current && myPresence.current && myPresence.current !== want) {
+    if (presChannel.current && myPresence.current !== want) {
       myPresence.current = want;
-      presChannel.current.track({ status: want });
+      presChannel.current.track({ status: want, at: Date.now() });
     }
 
     loaded.current = true;
@@ -123,17 +123,24 @@ export default function ChallengeWatcher({ me }: { me: string }) {
     presChannel.current = pres;
     pres
       .on('presence', { event: 'sync' }, () => {
-        const raw = pres.presenceState() as Record<string, { status?: string }[]>;
+        const raw = pres.presenceState() as Record<string, { status?: string; at?: number }[]>;
         const map = new Map<string, PresenceStatus>();
         for (const [uid, metas] of Object.entries(raw)) {
-          map.set(uid, metas.some((m) => m.status === 'dueling') ? 'dueling' : 'online');
+          // a player may have several tabs reporting; trust the newest one
+          let latest: { status?: string; at?: number } | undefined;
+          for (const m of metas) {
+            if (!latest || (m.at ?? 0) > (latest.at ?? 0)) latest = m;
+          }
+          map.set(uid, latest?.status === 'dueling' ? 'dueling' : 'online');
         }
         setPresence(map);
       })
       .subscribe((s) => {
         if (s === 'SUBSCRIBED') {
           myPresence.current = 'online';
-          pres.track({ status: 'online' });
+          pres.track({ status: 'online', at: Date.now() });
+          // immediately correct to "dueling" if a duel is already active
+          check();
         }
       });
 
