@@ -37,6 +37,7 @@ export default function MatchCard({ match, prediction, revealedPicks }: Props) {
   const lockAt = lockTime(match.kickoff);
   const finished = match.status === 'FINISHED';
   const started = ['IN_PLAY', 'PAUSED', 'FINISHED'].includes(match.status);
+  const teamsTbd = match.home_team === 'TBD' || match.away_team === 'TBD';
 
   const now = useNow(!started && Date.now() < lockAt + 5000);
   const locked = started || now >= lockAt;
@@ -92,7 +93,7 @@ export default function MatchCard({ match, prediction, revealedPicks }: Props) {
               max={20}
               inputMode="numeric"
               value={home}
-              disabled={locked}
+              disabled={locked || teamsTbd}
               onChange={(e) => setHome(e.target.value)}
               aria-label={`${match.home_team} goals`}
             />
@@ -103,7 +104,7 @@ export default function MatchCard({ match, prediction, revealedPicks }: Props) {
               max={20}
               inputMode="numeric"
               value={away}
-              disabled={locked}
+              disabled={locked || teamsTbd}
               onChange={(e) => setAway(e.target.value)}
               aria-label={`${match.away_team} goals`}
             />
@@ -117,7 +118,9 @@ export default function MatchCard({ match, prediction, revealedPicks }: Props) {
       </div>
 
       <div className="match-footer">
-        {locked ? (
+        {teamsTbd && !started ? (
+          <span className="locked-tag">Teams TBD — opens when both are decided</span>
+        ) : locked ? (
           <span className="locked-tag">
             {started
               ? prediction
@@ -139,7 +142,7 @@ export default function MatchCard({ match, prediction, revealedPicks }: Props) {
           </span>
         )}
 
-        {!locked && (
+        {!locked && !teamsTbd && (
           <button
             className="save-btn"
             onClick={save}

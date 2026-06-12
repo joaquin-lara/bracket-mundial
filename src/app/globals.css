@@ -541,6 +541,35 @@ h1 {
 
 /* ---- read-only schedule ---- */
 
+.seg-toggle {
+  display: inline-flex;
+  gap: 4px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 8px;
+}
+
+.seg-toggle button {
+  background: none;
+  border: none;
+  border-radius: 7px;
+  padding: 7px 16px;
+  font-family: var(--narrow);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dim);
+  cursor: pointer;
+}
+
+.seg-toggle button.active {
+  background: var(--gold);
+  color: var(--bg-dark);
+}
+
 .sched-card {
   background: var(--card);
   border: 1px solid var(--line);

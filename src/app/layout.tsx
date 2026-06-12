@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import HomeOnRefresh from '@/components/HomeOnRefresh';
 import { createClient } from '@/lib/supabase/server';
 import { signOut } from './actions';
 import './globals.css';
@@ -21,6 +22,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en">
       <body>
+        <HomeOnRefresh />
         {user && (
           <header className="topbar">
             <Link href="/" className="brand">
@@ -32,7 +34,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Link href="/matches">Enter your bracket</Link>
               <Link href="/schedule">Schedule</Link>
               <Link href="/bracket">World Cup Bracket</Link>
-              <Link href="/standings">Standings</Link>
+              <Link href="/standings">Player Standings</Link>
               <Link href="/rules">Rules</Link>
               <form action={signOut}>
                 <button type="submit">Sign out</button>

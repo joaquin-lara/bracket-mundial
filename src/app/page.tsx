@@ -28,7 +28,7 @@ export default async function HomePage() {
         <p className="hero-tag">El que sale último es el más pendejo.</p>
 
         <div className="cta-row">
-          <Link href="/today" className="btn-gold">
+          <Link href="/matches" className="btn-gold">
             Fill out my bracket →
           </Link>
           <Link href="/standings" className="btn-ghost">

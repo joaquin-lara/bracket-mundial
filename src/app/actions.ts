@@ -32,6 +32,17 @@ export async function submitPrediction(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: 'Not signed in.' };
 
+  // No predictions on placeholder fixtures (knockout slots without teams).
+  const { data: matchRow } = await supabase
+    .from('matches')
+    .select('home_team, away_team')
+    .eq('id', matchId)
+    .maybeSingle();
+  if (!matchRow) return { ok: false, error: 'Unknown match.' };
+  if (matchRow.home_team === 'TBD' || matchRow.away_team === 'TBD') {
+    return { ok: false, error: 'Teams for this match are not decided yet.' };
+  }
+
   // Column-level grants prevent clients from upserting whole rows, so do a
   // select-then-insert-or-update. The 10-minute lock is enforced by the
   // database RLS policies either way; this code just reports the outcome.

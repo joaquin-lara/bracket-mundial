@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import MatchList from '@/components/MatchList';
 import { createClient } from '@/lib/supabase/server';
-import type { Match, Prediction } from '@/lib/types';
+import type { Match, Prediction, RevealedPick } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'Enter your bracket' };
 export const dynamic = 'force-dynamic';
 
-export default async function SchedulePage() {
+export default async function EnterBracketPage() {
   const supabase = createClient();
   const {
     data: { user },
@@ -21,13 +21,39 @@ export default async function SchedulePage() {
   const matchList = (matches ?? []) as Match[];
 
   const predictions: Record<number, Prediction> = {};
+  const revealedPicks: Record<number, RevealedPick[]> = {};
+
   if (matchList.length > 0) {
+    // RLS filters automatically: own rows always; others' only after kickoff.
     const { data: preds } = await supabase
       .from('predictions')
-      .select('id, match_id, pred_home, pred_away, points')
-      .eq('user_id', user.id);
+      .select('id, match_id, pred_home, pred_away, points, user_id');
+
+    const userIds = [...new Set((preds ?? []).map((p) => p.user_id as string))];
+    const { data: profiles } = userIds.length
+      ? await supabase.from('profiles').select('id, display_name').in('id', userIds)
+      : { data: [] };
+    const nameById = new Map(
+      (profiles ?? []).map((p) => [p.id as string, p.display_name as string])
+    );
+
+    const startedIds = new Set(
+      matchList.filter((m) => new Date(m.kickoff).getTime() <= Date.now()).map((m) => m.id)
+    );
+
     for (const p of preds ?? []) {
-      predictions[p.match_id as number] = p as unknown as Prediction;
+      if (p.user_id === user.id) {
+        predictions[p.match_id as number] = p as unknown as Prediction;
+      }
+      if (startedIds.has(p.match_id as number)) {
+        (revealedPicks[p.match_id as number] ??= []).push({
+          match_id: p.match_id as number,
+          display_name: nameById.get(p.user_id as string) ?? 'Unknown',
+          pred_home: p.pred_home as number,
+          pred_away: p.pred_away as number,
+          points: p.points as number | null,
+        });
+      }
     }
   }
 
@@ -37,15 +63,20 @@ export default async function SchedulePage() {
       <p className="page-intro">
         Every match in the tournament, ready for your picks. Type the <strong>final score</strong>{' '}
         you expect and hit <strong>Save</strong>; edit as often as you like until{' '}
-        <strong>10 minutes before kickoff</strong>. For just the fixtures without picks, see the
-        Schedule tab.
+        <strong>10 minutes before kickoff</strong>. Switch to <strong>Past</strong> to see how
+        everyone&apos;s picks compared to the real results.
       </p>
       {matchList.length === 0 ? (
         <p className="empty">
           No fixtures yet. They appear after the first sync runs (see README step 5).
         </p>
       ) : (
-        <MatchList matches={matchList} predictions={predictions} />
+        <MatchList
+          matches={matchList}
+          predictions={predictions}
+          revealedPicks={revealedPicks}
+          split
+        />
       )}
     </main>
   );

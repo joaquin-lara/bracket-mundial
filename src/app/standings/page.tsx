@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 
-export const metadata: Metadata = { title: 'Standings' };
+export const metadata: Metadata = { title: 'Player Standings' };
 export const dynamic = 'force-dynamic';
 
 interface StandingRow {
@@ -23,7 +23,7 @@ export default async function StandingsPage() {
 
   return (
     <main>
-      <h1>Standings</h1>
+      <h1>Player Standings</h1>
       <p className="subtitle">3 exact score · 2 right outcome · 1 wrong outcome · 0 no pick</p>
       {rows.length === 0 ? (
         <p className="empty">No players yet.</p>
