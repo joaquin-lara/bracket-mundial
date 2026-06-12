@@ -63,16 +63,17 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
     const canvas = ballCanvasRef.current;
     if (!el || !canvas) return;
 
+    // Measure BEFORE applying transforms — getBoundingClientRect reflects scale(0.1) otherwise
+    const { width, height } = el.getBoundingClientRect();
+    const size = Math.round(Math.max(width, height, 300));
+
     gsap.set(el, { scale: 0.1, y: -window.innerHeight * 1.6, opacity: 1 });
     gsap.set(svgRef.current, { opacity: 0 });
 
     // ── Three.js ball setup ──────────────────────────────────────────────────
-    const { width, height } = el.getBoundingClientRect();
-    const size = Math.round(Math.max(width, height, 300));
-
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(size, size, false);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     const scene = new THREE.Scene();
@@ -93,9 +94,6 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
     };
     animate();
 
-    // ── Start animation only after model has loaded ──────────────────────────
-    let tl: gsap.core.Timeline;
-
     const updateGlobe = (rotProxy: { lon: number }) => {
       projection.rotate([-rotProxy.lon, -centerLat]);
       landRef.current?.setAttribute('d', pathGen(LAND as any) ?? '');
@@ -114,14 +112,30 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
       }
     };
 
+    // ── Start animation only after model has loaded ──────────────────────────
+    let tl: gsap.core.Timeline;
+
     const loader = new GLTFLoader();
     loader.load('/Trionda%202026.glb', (gltf) => {
       const model = gltf.scene;
+
       const box = new THREE.Box3().setFromObject(model);
       const center = box.getCenter(new THREE.Vector3());
       const size = box.getSize(new THREE.Vector3());
       model.position.sub(center);
       model.scale.multiplyScalar(1.733 / Math.max(size.x, size.y, size.z));
+
+      const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
+      model.traverse((child) => {
+        const mesh = child as THREE.Mesh;
+        if (!mesh.isMesh) return;
+        const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+        mats.forEach((m) => {
+          const mat = m as THREE.MeshStandardMaterial;
+          if (mat.map) { mat.map.anisotropy = maxAnisotropy; mat.map.needsUpdate = true; }
+        });
+      });
+
       scene.add(model);
 
       const rotProxy = { lon: centerLon };
@@ -130,7 +144,7 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
       tl.to(el, { y: 0, duration: 1.1, ease: 'power3.out' })
         .set(canvas, { opacity: 1 }, '<')
         .set(svgRef.current, { opacity: 1 })
-        .to(el, { scale: 1, duration: 2.0, ease: 'power2.inOut' })
+        .to(el, { scale: 0.76, duration: 2.0, ease: 'power2.inOut' })
         .to(rotProxy, {
           lon: centerLon - 360,
           duration: 2.2,
