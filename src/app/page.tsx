@@ -3,6 +3,7 @@ import { flagUrl } from '@/lib/flags';
 import GlobeBackdrop from '@/components/GlobeBackdrop';
 import HomeIntro from '@/components/HomeIntro';
 import PitchStripes from '@/components/PitchStripes';
+import PresenceDot from '@/components/PresenceDot';
 import TodayGames from '@/components/TodayGames';
 import { PLAYER_META, PLAYERS } from '@/lib/players';
 import { createClient } from '@/lib/supabase/server';
@@ -16,6 +17,11 @@ export default async function HomePage() {
   const { data } = await supabase.from('standings').select('display_name, total');
   const totals = new Map<string, number>(
     (data ?? []).map((r) => [r.display_name as string, r.total as number])
+  );
+
+  const { data: profiles } = await supabase.from('profiles').select('id, display_name');
+  const idByName = new Map(
+    (profiles ?? []).map((p) => [p.display_name as string, p.id as string])
   );
 
   // Fetch 2 days around now; client filters to local today.
@@ -74,7 +80,10 @@ export default async function HomePage() {
               <div className="contender-avatar" style={{ background: 'rgba(0,0,0,0.5)' }}>
                 <img src={flagUrl(PLAYER_META[name].flagCode)!} alt={name} className="contender-flag" />
               </div>
-              <div className="contender-name">{name}</div>
+              <div className="contender-name">
+                {name}
+                {idByName.has(name) && <PresenceDot userId={idByName.get(name)!} />}
+              </div>
               <div className="contender-pts">
                 {totals.has(name) ? `${totals.get(name)} pts` : 'unclaimed'}
               </div>

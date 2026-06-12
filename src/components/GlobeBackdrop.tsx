@@ -67,6 +67,10 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
     const { width, height } = el.getBoundingClientRect();
     const size = Math.round(Math.max(width, height, 300));
 
+    // Real-time clock: animations land where they should even if the tab
+    // was hidden mid-flight (no slow-motion catch-up on return).
+    gsap.ticker.lagSmoothing(0);
+
     gsap.set(el, { scale: 0.1, y: -window.innerHeight * 1.6, opacity: 1 });
     gsap.set(svgRef.current, { opacity: 0 });
 
@@ -155,6 +159,10 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
           },
         }, '<-0.2')
         .to(canvas, { opacity: 0, duration: 2.0, ease: 'power2.inOut' }, '<-0.2');
+
+      // Tab hidden? Skip the entrance and land on the finished scene, so
+      // returning users never find a ball frozen in the sky.
+      if (document.hidden) tl.progress(1);
     });
 
     return () => {

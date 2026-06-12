@@ -10,6 +10,7 @@ const LINKS = [
   ['/bracket', 'Group and Bracket Tracker'],
   ['/schedule', 'Game schedule'],
   ['/standings', 'Player Standings'],
+  ['/duels', 'Penalty Shootouts'],
   ['/rules', 'Rules'],
 ] as const;
 

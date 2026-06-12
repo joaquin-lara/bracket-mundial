@@ -1016,6 +1016,861 @@ h1 {
   font-weight: 700;
 }
 
+/* ---- penalty duels ---- */
+
+.duel-back {
+  display: inline-block;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+
+.duel-scoreboard {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.duel-player {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.duel-player.shooting {
+  border-color: rgba(230, 179, 55, 0.55);
+}
+
+.duel-pname {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 14px;
+  min-width: 0;
+}
+
+.duel-pscore {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--gold);
+  margin-left: auto;
+}
+
+.duel-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.duel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dd-goal {
+  background: var(--gold);
+}
+
+.dd-miss {
+  background: rgba(255, 138, 115, 0.7);
+}
+
+.dd-todo {
+  background: rgba(244, 241, 232, 0.15);
+}
+
+.duel-sudden {
+  text-align: center;
+  font-family: var(--narrow);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--danger);
+  margin-bottom: 8px;
+  animation: livePulse 1.6s ease-in-out infinite;
+}
+
+.duel-scene {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.duel-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: rgba(4, 28, 20, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 16px;
+  animation: overlayIn 0.35s ease;
+}
+
+@keyframes overlayIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.duel-overlay-score {
+  font-size: 40px;
+  font-weight: 900;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.duel-overlay-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.duel-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.duel-beam {
+  animation: beamPulse 5s ease-in-out infinite;
+}
+
+.duel-beam.b2 {
+  animation-delay: 2.5s;
+}
+
+@keyframes beamPulse {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.duel-lamp {
+  filter: none;
+  animation: beamPulse 5s ease-in-out infinite;
+}
+
+.duel-crowd-0 {
+  animation: crowdFlicker 2.1s ease-in-out infinite;
+}
+
+.duel-crowd-1 {
+  animation: crowdFlicker 2.7s ease-in-out infinite;
+  animation-delay: 0.6s;
+}
+
+.duel-crowd-2 {
+  animation: crowdFlicker 3.3s ease-in-out infinite;
+  animation-delay: 1.3s;
+}
+
+@keyframes crowdFlicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* sudden death intensity */
+.duel-svg.sd .duel-beam {
+  animation: beamFlicker 0.5s steps(3) infinite;
+}
+
+.duel-svg.sd .duel-beam.b2 {
+  animation-delay: 0.17s;
+}
+
+.duel-svg.sd .duel-lamp {
+  animation: beamFlicker 0.4s steps(2) infinite;
+}
+
+@keyframes beamFlicker {
+  0% {
+    opacity: 0.35;
+  }
+  40% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0.9;
+  }
+}
+
+.duel-svg.sd [class^='duel-crowd'],
+.duel-svg.sd .duel-crowd-0,
+.duel-svg.sd .duel-crowd-1,
+.duel-svg.sd .duel-crowd-2 {
+  transform-box: fill-box;
+  animation: crowdCrazy 0.5s ease-in-out infinite;
+}
+
+.duel-svg.sd .duel-crowd-1 {
+  animation-duration: 0.62s;
+  animation-delay: 0.1s;
+}
+
+.duel-svg.sd .duel-crowd-2 {
+  animation-duration: 0.43s;
+  animation-delay: 0.2s;
+}
+
+@keyframes crowdCrazy {
+  0%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(-2.5px);
+  }
+}
+
+.duel-sd-tint {
+  animation: sdTint 1.1s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes sdTint {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.duel-sweep {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  opacity: 0.8;
+  animation: sweepLR 2.1s ease-in-out infinite alternate;
+}
+
+.duel-sweep.s2 {
+  animation-duration: 1.6s;
+  animation-direction: alternate-reverse;
+}
+
+@keyframes sweepLR {
+  from {
+    transform: rotate(-15deg);
+  }
+  to {
+    transform: rotate(15deg);
+  }
+}
+
+.duel-flare {
+  animation: flarePulse 0.35s ease-in-out infinite alternate;
+}
+
+@keyframes flarePulse {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.duel-smoke {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: smokeRise 1.6s ease-out infinite;
+}
+
+.duel-smoke.b {
+  animation-delay: 0.35s;
+}
+
+.duel-smoke.c {
+  animation-delay: 0.7s;
+}
+
+@keyframes smokeRise {
+  0% {
+    transform: translateY(6px) scale(0.8);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateY(-16px) scale(1.3);
+    opacity: 0;
+  }
+}
+
+.duel-sd-pop {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sdPop 2.3s ease forwards;
+}
+
+.duel-sd-text {
+  fill: #ff6a4d;
+  font-family: var(--sans);
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+@keyframes sdPop {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  12% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  18% {
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* keeper idle: bouncing on the toes, swaying, arms twitching ready */
+.keeper-idle {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: keeperIdle 1.7s ease-in-out infinite;
+}
+
+.keeper-idle .keeper-arm-l,
+.keeper-idle .keeper-arm-r {
+  transform-box: fill-box;
+  transform-origin: 100% 100%;
+  animation: keeperArmL 1.7s ease-in-out infinite;
+}
+
+.keeper-idle .keeper-arm-r {
+  transform-origin: 0% 100%;
+  animation-name: keeperArmR;
+}
+
+.keeper-idle.hold,
+.keeper-idle.hold .keeper-arm-l,
+.keeper-idle.hold .keeper-arm-r {
+  animation: none;
+}
+
+@keyframes keeperIdle {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-3.5px) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-1px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-3.5px) rotate(2deg);
+  }
+}
+
+@keyframes keeperArmL {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-9deg);
+  }
+  75% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes keeperArmR {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-6deg);
+  }
+  75% {
+    transform: rotate(9deg);
+  }
+}
+
+/* in-scene scorebug */
+.sb-plate {
+  fill: rgba(4, 28, 20, 0.88);
+  stroke: rgba(230, 179, 55, 0.5);
+  stroke-width: 1;
+}
+
+.sb-score {
+  fill: #f4f1e8;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.sb-cpu {
+  fill: rgba(244, 241, 232, 0.7);
+  font-family: var(--narrow);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+/* end game */
+.duel-endwrap {
+  text-align: center;
+  margin: 4px 0 18px;
+}
+
+.duel-end {
+  background: none;
+  border: 1px solid rgba(255, 138, 115, 0.45);
+  border-radius: 8px;
+  color: var(--danger);
+  font-family: var(--narrow);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 7px 16px;
+  cursor: pointer;
+}
+
+.duel-end:hover {
+  background: rgba(255, 138, 115, 0.12);
+}
+
+.duel-end:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.duel-fig-name {
+  fill: rgba(244, 241, 232, 0.8);
+  font-family: var(--narrow);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+.duel-you-text {
+  fill: #0b3d2c;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.duel-you-bob {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: youBob 1.4s ease-in-out infinite;
+}
+
+@keyframes youBob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.duel-banner {
+  font-family: var(--sans);
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bannerPop 0.35s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+@keyframes bannerPop {
+  from {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.duel-banner.goal {
+  fill: var(--gold);
+}
+
+.duel-banner.save {
+  fill: var(--danger);
+}
+
+.duel-status {
+  text-align: center;
+  font-size: 15px;
+  color: var(--muted);
+  margin: 4px 0 12px;
+}
+
+.duel-status.waiting {
+  color: var(--dim);
+  animation: livePulse 1.6s ease-in-out infinite;
+}
+
+.duel-role {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin: 4px 0 12px;
+  font-family: var(--sans);
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  text-align: left;
+}
+
+.duel-role small {
+  display: block;
+  font-family: var(--narrow);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.duel-role-icon {
+  font-size: 26px;
+}
+
+.duel-role.shoot {
+  background: rgba(230, 179, 55, 0.18);
+  border: 1px solid rgba(230, 179, 55, 0.6);
+  color: var(--gold);
+}
+
+.duel-role.keep {
+  background: rgba(127, 200, 169, 0.14);
+  border: 1px solid rgba(127, 200, 169, 0.55);
+  color: #7fc8a9;
+}
+
+.duel-role-tag {
+  font-size: 13px;
+  margin-left: 2px;
+}
+
+.duel-targets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.duel-target.keep {
+  border-color: rgba(127, 200, 169, 0.55);
+}
+
+.duel-target.keep:hover {
+  background: rgba(127, 200, 169, 0.16);
+}
+
+.duel-target {
+  background: var(--card);
+  border: 1px solid rgba(230, 179, 55, 0.45);
+  border-radius: 12px;
+  color: var(--cream);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 800;
+  padding: 16px 0;
+  cursor: pointer;
+}
+
+.duel-target:hover {
+  background: rgba(230, 179, 55, 0.18);
+}
+
+.duel-target:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.duel-final {
+  text-align: center;
+  margin: 8px 0 16px;
+}
+
+.duel-final-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.duel-lobby-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.duel-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+}
+
+.duel-card-cpu {
+  grid-column: 2;
+}
+
+@media (max-width: 500px) {
+  .duel-card-cpu {
+    grid-column: auto;
+  }
+}
+
+.duel-card-name {
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.duel-record {
+  font-family: var(--narrow);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--gold-soft);
+  margin: 2px 0 10px;
+}
+
+.duel-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.duel-row.done {
+  color: var(--muted);
+}
+
+.duel-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.duel-waiting {
+  font-family: var(--narrow);
+  font-size: 12px;
+  color: var(--dim);
+  letter-spacing: 0.08em;
+}
+
+.duel-winner-tag {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold-soft);
+}
+
+@media (max-width: 500px) {
+  .duel-lobby-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .duel-scoreboard {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .duel-target {
+    font-size: 13px;
+    padding: 13px 0;
+  }
+}
+
+/* ---- presence ---- */
+
+.pres-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #4ade80;
+  margin-left: 6px;
+  vertical-align: 1px;
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.6);
+}
+
+.pres-duel {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 13px;
+  animation: livePulse 1.6s ease-in-out infinite;
+}
+
+/* ---- challenge alerts (site-wide) ---- */
+
+.chal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(3, 18, 13, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: overlayIn 0.25s ease;
+}
+
+.chal-modal {
+  background: #0a3526;
+  border: 1.5px solid rgba(230, 179, 55, 0.6);
+  border-radius: 18px;
+  padding: 30px 36px;
+  text-align: center;
+  max-width: 360px;
+  animation: chalPop 0.4s cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+
+@keyframes chalPop {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.chal-icon {
+  font-size: 42px;
+  margin-bottom: 8px;
+}
+
+.chal-title {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+
+.chal-sub {
+  font-family: var(--narrow);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 18px;
+}
+
+.chal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.chal-decline {
+  background: none;
+  border: none;
+  color: var(--danger);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chal-toast {
+  position: fixed;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 400;
+  background: #0a3526;
+  border: 1px solid rgba(230, 179, 55, 0.6);
+  border-radius: 12px;
+  padding: 12px 20px;
+  color: var(--cream);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  animation: toastUp 0.3s ease;
+}
+
+@keyframes toastUp {
+  from {
+    transform: translate(-50%, 16px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 500px) {
+  .chal-toast {
+    white-space: normal;
+    width: calc(100% - 32px);
+    text-align: center;
+  }
+}
+
 /* ---- pick wall heatmap ---- */
 
 .heat-card {

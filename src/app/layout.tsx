@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import ChallengeWatcher from '@/components/ChallengeWatcher';
 import HomeOnRefresh from '@/components/HomeOnRefresh';
 import TopNav from '@/components/TopNav';
 import { createClient } from '@/lib/supabase/server';
@@ -23,6 +24,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <HomeOnRefresh />
         {user && <TopNav />}
+        {user && <ChallengeWatcher me={user.id} />}
         {children}
       </body>
     </html>
