@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import Flag from '@/components/Flag';
 import GroupTables from '@/components/GroupTables';
 import { ensureFreshScores } from '@/lib/autoSync';
+import { flagUrl } from '@/lib/flags';
 import { computeGroupTables } from '@/lib/groups';
 import { createClient } from '@/lib/supabase/server';
 import type { Match } from '@/lib/types';
@@ -17,34 +17,74 @@ const ROUNDS: { stage: string; label: string }[] = [
   { stage: 'FINAL', label: 'Final' },
 ];
 
+function TeamFlag({
+  code,
+  name,
+  win,
+  dim,
+}: {
+  code: string | null;
+  name: string;
+  win?: boolean;
+  dim?: boolean;
+}) {
+  const url = flagUrl(code);
+  if (!url) return <span className="b-flagph" />;
+  // eslint-disable-next-line @next/next/no-img-element
+  return (
+    <img
+      src={url}
+      alt={`${name} flag`}
+      className={`b-flag${win ? ' win' : ''}${dim ? ' dim' : ''}`}
+      loading="lazy"
+    />
+  );
+}
+
 function BracketMatch({ m, highlight }: { m: Match; highlight?: boolean }) {
   const live = m.status === 'IN_PLAY' || m.status === 'PAUSED';
   const finished = m.status === 'FINISHED';
-  const showScore = finished || live;
+  const showScore = (finished || live) && m.home_score != null && m.away_score != null;
   const homeWin = finished && (m.home_score ?? 0) > (m.away_score ?? 0);
   const awayWin = finished && (m.away_score ?? 0) > (m.home_score ?? 0);
-  const dateLabel = new Date(m.kickoff).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-  });
+  const ko = new Date(m.kickoff);
+  const dateLabel = `${ko
+    .toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+    .toUpperCase()} · ${ko.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}`;
 
   return (
-    <div className={`b-match${highlight ? ' final-match' : ''}`}>
-      <div className={`b-team${homeWin ? ' winner' : ''}`}>
-        <span className="b-name">
-          <Flag code={m.home_code} name={m.home_team} />
-          {m.home_team}
-        </span>
-        <span className="b-score">{showScore ? m.home_score ?? '' : ''}</span>
+    <div className={`b-card${live ? ' live' : ''}${highlight ? ' final-match' : ''}`}>
+      <div className="b-top">
+        {finished ? (
+          <span className="badge-ft">FT</span>
+        ) : live ? (
+          <span className="b-livepill">
+            <span className="b-livedot" />
+            LIVE
+          </span>
+        ) : (
+          <span className="b-date">{dateLabel}</span>
+        )}
       </div>
-      <div className={`b-team${awayWin ? ' winner' : ''}`}>
-        <span className="b-name">
-          <Flag code={m.away_code} name={m.away_team} />
-          {m.away_team}
-        </span>
-        <span className="b-score">{showScore ? m.away_score ?? '' : ''}</span>
+
+      <div className="b-mid">
+        <TeamFlag code={m.home_code} name={m.home_team} win={homeWin} dim={awayWin} />
+        {showScore ? (
+          <div className="b-scoreline">
+            <span className={homeWin ? 'win' : ''}>{m.home_score}</span>
+            <span className="b-dash">–</span>
+            <span className={awayWin ? 'win' : ''}>{m.away_score}</span>
+          </div>
+        ) : (
+          <div className="b-noscore">– : –</div>
+        )}
+        <TeamFlag code={m.away_code} name={m.away_team} win={awayWin} dim={homeWin} />
       </div>
-      <div className="b-meta">{finished ? 'FT' : live ? 'Live' : dateLabel}</div>
+
+      <div className="b-codes">
+        <span className={homeWin ? 'win' : awayWin ? 'dim' : ''}>{m.home_code ?? 'TBD'}</span>
+        <span className={awayWin ? 'win' : homeWin ? 'dim' : ''}>{m.away_code ?? 'TBD'}</span>
+      </div>
     </div>
   );
 }
@@ -110,20 +150,18 @@ export default async function BracketPage() {
                         </div>
                       ))
                     )}
+                    {round.stage === 'SEMI_FINALS' && thirdPlace.length > 0 && (
+                      <div className="third-abs">
+                        {thirdPlace.map((m) => (
+                          <BracketMatch m={m} key={m.id} />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               );
             })}
           </div>
-
-          {thirdPlace.length > 0 && (
-            <div className="third-place">
-              <div className="round-label">Third place</div>
-              {thirdPlace.map((m) => (
-                <BracketMatch m={m} key={m.id} />
-              ))}
-            </div>
-          )}
         </>
       )}
     </div>

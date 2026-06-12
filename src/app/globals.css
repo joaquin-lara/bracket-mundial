@@ -997,6 +997,28 @@ table.standings tr.me td {
   display: flex;
   flex-direction: column;
   flex: 1;
+  position: relative;
+}
+
+/* third-place match: centered in the semi-finals column, no connectors */
+.third-abs {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.third-label {
+  font-family: var(--narrow);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--gold-soft);
+  text-align: center;
+  margin-bottom: 6px;
 }
 
 .match-slot {
@@ -1180,11 +1202,6 @@ table.standings tr.me td {
   color: var(--dim);
 }
 
-.third-place {
-  margin-top: 26px;
-  max-width: 240px;
-}
-
 /* ---- group stage tables ---- */
 
 .groups-section {
@@ -1272,6 +1289,7 @@ table.standings tr.me td {
   width: 100%;
   border-collapse: collapse;
   font-size: 12.5px;
+  table-layout: fixed;
 }
 
 .group-table th {
@@ -1304,19 +1322,22 @@ table.standings tr.me td {
   font-weight: 600;
   color: var(--cream);
   min-width: 0;
+  overflow: hidden;
+  padding-left: 8px;
 }
 
 .group-table .gt-name {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 110px;
+  flex: 1;
+  min-width: 0;
 }
 
 .group-table th:not(.gt-team),
 .group-table td:not(.gt-team) {
-  width: 20px;
-  min-width: 20px;
+  width: 25px;
+  min-width: 25px;
 }
 
 .group-table td.gt-pts,
@@ -1343,11 +1364,6 @@ table.standings tr.me td {
 }
 
 
-@media (max-width: 560px) {
-  .group-table .gt-name {
-    max-width: none;
-  }
-}
 
 /* ---- rules ---- */
 
