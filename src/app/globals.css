@@ -1240,8 +1240,8 @@ table.standings tr.me td {
 
 .group-table th:not(.gt-team),
 .group-table td:not(.gt-team) {
-  width: 14px;
-  min-width: 14px;
+  width: 16px;
+  min-width: 16px;
 }
 
 .group-table td.gt-pts,
