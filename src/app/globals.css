@@ -1458,7 +1458,15 @@ h1 {
 /* end game */
 .duel-endwrap {
   text-align: center;
-  margin: 4px 0 18px;
+  margin: 48px 0 18px;
+}
+
+.duel-endwrap .duel-end {
+  font-size: 15px;
+  padding: 16px 0;
+  width: 100%;
+  max-width: 320px;
+  border-radius: 12px;
 }
 
 .duel-end {
