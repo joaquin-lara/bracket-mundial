@@ -1,39 +1,56 @@
 import Link from 'next/link';
+import GlobeBackdrop from '@/components/GlobeBackdrop';
 import { PLAYER_META, PLAYERS } from '@/lib/players';
 import { createClient } from '@/lib/supabase/server';
+import type { Match } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   const supabase = createClient();
+
   const { data } = await supabase.from('standings').select('display_name, total');
   const totals = new Map<string, number>(
     (data ?? []).map((r) => [r.display_name as string, r.total as number])
   );
 
+  // Today's games feed the globe dots.
+  const from = new Date(Date.now() - 8 * 3600_000).toISOString();
+  const to = new Date(Date.now() + 24 * 3600_000).toISOString();
+  const { data: todayMatches } = await supabase
+    .from('matches')
+    .select('*')
+    .gte('kickoff', from)
+    .lte('kickoff', to)
+    .order('kickoff', { ascending: true });
+
   return (
     <div>
       <section className="hero">
-        <div className="pill">
-          <span className="pill-dot" />
-          <span>World Cup 2026 · USA · Canada · Mexico</span>
-        </div>
+        <GlobeBackdrop matches={(todayMatches ?? []) as Match[]} />
 
-        <h1 className="hero-title">
-          Stonks
-          <br />
-          Bracket.
-        </h1>
+        <div className="hero-content">
+          <div className="pill">
+            <span className="pill-dot" />
+            <span>World Cup 2026 · USA · Canada · Mexico</span>
+          </div>
 
-        <p className="hero-tag">El que sale último es el más pendejo.</p>
+          <h1 className="hero-title">
+            Stonks
+            <br />
+            Bracket.
+          </h1>
 
-        <div className="cta-row">
-          <Link href="/matches" className="btn-gold">
-            Fill out my bracket →
-          </Link>
-          <Link href="/standings" className="btn-ghost">
-            View live standings
-          </Link>
+          <p className="hero-tag">El que sale último es el más pendejo.</p>
+
+          <div className="cta-row">
+            <Link href="/matches" className="btn-gold">
+              Fill out my bracket →
+            </Link>
+            <Link href="/standings" className="btn-ghost">
+              View live standings
+            </Link>
+          </div>
         </div>
       </section>
 
