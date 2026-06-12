@@ -2,7 +2,18 @@
 
 import { useState } from 'react';
 import Flag from './Flag';
-import { stageLabel, type Match } from '@/lib/types';
+import { stageLabel, type Goal, type Match } from '@/lib/types';
+
+function goalLine(goals: Goal[], team: 'home' | 'away'): string {
+  return goals
+    .filter((g) => g.team === team)
+    .map((g) => {
+      const name = g.scorer.split(' ').pop() ?? g.scorer;
+      const suffix = g.type === 'OWN_GOAL' ? ' (og)' : g.type === 'PENALTY' ? ' (pen)' : '';
+      return `${g.minute}' ${name}${suffix}`;
+    })
+    .join(' · ');
+}
 
 type View = 'upcoming' | 'past';
 
@@ -23,33 +34,45 @@ function groupByDay(matches: Match[]) {
 function Row({ m }: { m: Match }) {
   const finished = m.status === 'FINISHED';
   const live = m.status === 'IN_PLAY' || m.status === 'PAUSED';
+  const showGoals = (finished || live) && m.goals?.length > 0;
   const time = new Date(m.kickoff).toLocaleTimeString(undefined, {
     hour: '2-digit',
     minute: '2-digit',
   });
   return (
-    <div className="sched-row">
-      <span className="sched-time">{time}</span>
-      <span className="sched-team home">
-        <span className="sched-name">{m.home_team}</span>
-        <Flag code={m.home_code} name={m.home_team} />
-      </span>
-      <span className={`sched-mid${live ? ' live' : ''}`}>
-        {finished || live ? `${m.home_score ?? ''} – ${m.away_score ?? ''}` : 'vs'}
-      </span>
-      <span className="sched-team">
-        <Flag code={m.away_code} name={m.away_team} />
-        <span className="sched-name">{m.away_team}</span>
-      </span>
-      <span className="sched-stage">
-        {live ? (
-          <span className="badge-live">LIVE</span>
-        ) : finished ? (
-          <>FT · {stageLabel(m.stage, m.group_name)}</>
-        ) : (
-          stageLabel(m.stage, m.group_name)
-        )}
-      </span>
+    <div className="sched-entry">
+      <div className="sched-row">
+        <span className="sched-time">{time}</span>
+        <span className="sched-team home">
+          <span className="sched-name">{m.home_team}</span>
+          <Flag code={m.home_code} name={m.home_team} />
+        </span>
+        <span className={`sched-mid${live ? ' live' : ''}`}>
+          {finished || live ? `${m.home_score ?? ''} – ${m.away_score ?? ''}` : 'vs'}
+        </span>
+        <span className="sched-team">
+          <Flag code={m.away_code} name={m.away_team} />
+          <span className="sched-name">{m.away_team}</span>
+        </span>
+        <span className="sched-stage">
+          {live ? (
+            <span className="badge-live">LIVE</span>
+          ) : finished ? (
+            <>FT · {stageLabel(m.stage, m.group_name)}</>
+          ) : (
+            stageLabel(m.stage, m.group_name)
+          )}
+        </span>
+      </div>
+      {showGoals && (
+        <div className="sched-goals">
+          <span />
+          <span className="goal-list home">{goalLine(m.goals, 'home')}</span>
+          <span />
+          <span className="goal-list away">{goalLine(m.goals, 'away')}</span>
+          <span />
+        </div>
+      )}
     </div>
   );
 }

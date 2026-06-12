@@ -41,6 +41,9 @@ export default function TopNav() {
       </Link>
 
       <nav className="topnav desktop-nav">
+        <Link href="/" className={pathname === '/' ? 'active' : ''}>
+          Home
+        </Link>
         {LINKS.map(([href, label]) => (
           <Link href={href} key={href} className={pathname === href ? 'active' : ''}>
             {label}

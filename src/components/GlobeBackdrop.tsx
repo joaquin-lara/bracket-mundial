@@ -1,3 +1,5 @@
+'use client';
+
 import { geoDistance, geoOrthographic, geoPath } from 'd3-geo';
 import { feature, mesh } from 'topojson-client';
 import worldData from 'world-atlas/countries-110m.json';
@@ -50,11 +52,16 @@ const pathGen = geoPath(projection);
  * cities. Today's games pulse in gold at real host-city coordinates.
  */
 export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
-  const count = Math.min(matches.length, CITIES.length);
+  const localToday = new Date().toLocaleDateString('en-CA');
+  const todayMatches = matches.filter(
+    (m) => new Date(m.kickoff).toLocaleDateString('en-CA') === localToday
+  );
+  const count = Math.min(todayMatches.length, CITIES.length);
   const used = CITIES.slice(0, count);
 
   const centerLat = used.length ? used.reduce((s, c) => s + c[1], 0) / used.length : FALLBACK[0];
   const centerLon = used.length ? used.reduce((s, c) => s + c[2], 0) / used.length : FALLBACK[1];
+
 
   projection.rotate([-centerLon, -centerLat]);
 
@@ -64,7 +71,7 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
     eq: pathGen(EQUATOR as any) ?? '',
   };
 
-  const dots = matches.slice(0, count).map((m, i) => {
+  const dots = todayMatches.slice(0, count).map((m, i) => {
     const [, lat, lon] = CITIES[i % CITIES.length];
     const pos = projection([lon, lat]) ?? [CX, CY];
     const dist = geoDistance([lon, lat], [centerLon, centerLat]);

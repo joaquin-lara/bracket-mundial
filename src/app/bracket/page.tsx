@@ -2,7 +2,18 @@ import type { Metadata } from 'next';
 import Flag from '@/components/Flag';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { createClient } from '@/lib/supabase/server';
-import type { Match } from '@/lib/types';
+import type { Goal, Match } from '@/lib/types';
+
+function goalLine(goals: Goal[], team: 'home' | 'away'): string {
+  return goals
+    .filter((g) => g.team === team)
+    .map((g) => {
+      const name = g.scorer.split(' ').pop() ?? g.scorer;
+      const suffix = g.type === 'OWN_GOAL' ? ' (og)' : g.type === 'PENALTY' ? ' (pen)' : '';
+      return `${g.minute}' ${name}${suffix}`;
+    })
+    .join(' · ');
+}
 
 export const metadata: Metadata = { title: 'World Cup Bracket' };
 export const revalidate = 120; // cache for 2 minutes
@@ -26,6 +37,9 @@ function BracketMatch({ m, highlight }: { m: Match; highlight?: boolean }) {
     day: 'numeric',
   });
 
+  const homeGoals = showScore && m.goals?.length > 0 ? goalLine(m.goals, 'home') : '';
+  const awayGoals = showScore && m.goals?.length > 0 ? goalLine(m.goals, 'away') : '';
+
   return (
     <div className={`b-match${highlight ? ' final-match' : ''}`}>
       <div className={`b-team${homeWin ? ' winner' : ''}`}>
@@ -35,6 +49,7 @@ function BracketMatch({ m, highlight }: { m: Match; highlight?: boolean }) {
         </span>
         <span className="b-score">{showScore ? m.home_score ?? '' : ''}</span>
       </div>
+      {homeGoals && <div className="b-goals">{homeGoals}</div>}
       <div className={`b-team${awayWin ? ' winner' : ''}`}>
         <span className="b-name">
           <Flag code={m.away_code} name={m.away_team} />
@@ -42,6 +57,7 @@ function BracketMatch({ m, highlight }: { m: Match; highlight?: boolean }) {
         </span>
         <span className="b-score">{showScore ? m.away_score ?? '' : ''}</span>
       </div>
+      {awayGoals && <div className="b-goals">{awayGoals}</div>}
       <div className="b-meta">{finished ? 'FT' : live ? 'Live' : dateLabel}</div>
     </div>
   );

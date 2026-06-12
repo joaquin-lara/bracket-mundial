@@ -24,12 +24,15 @@ export interface SyncDb {
   getPredictionsForMatch(matchId: number): Promise<PredictionRow[]>;
   setPredictionPoints(updates: { id: string; points: number }[]): Promise<void>;
   markScored(matchId: number): Promise<void>;
+  /** Finished matches whose goals array is still empty. */
+  getFinishedEmptyGoals(): Promise<{ id: number }[]>;
 }
 
 export interface SyncResult {
   fixturesUpserted: number;
   matchesScored: number;
   predictionsScored: number;
+  goalsFilled: number;
 }
 
 /**
@@ -40,7 +43,13 @@ export interface SyncResult {
  *    same values on the next run;
  *  - the `scored` flag stops a finished match from being processed again.
  */
-export async function runSync(db: SyncDb, fetchFixtures: () => Promise<FixtureRow[]>): Promise<SyncResult> {
+const MAX_GOAL_FETCHES_PER_SYNC = 8;
+
+export async function runSync(
+  db: SyncDb,
+  fetchFixtures: () => Promise<FixtureRow[]>,
+  fetchMatchDetail?: (id: number) => Promise<FixtureRow>,
+): Promise<SyncResult> {
   const fixtures = await fetchFixtures();
   await db.upsertMatches(fixtures);
 
@@ -60,9 +69,27 @@ export async function runSync(db: SyncDb, fetchFixtures: () => Promise<FixtureRo
     predictionsScored += updates.length;
   }
 
+  let goalsFilled = 0;
+  if (fetchMatchDetail) {
+    const emptyGoals = await db.getFinishedEmptyGoals();
+    const batch = emptyGoals.slice(0, MAX_GOAL_FETCHES_PER_SYNC);
+    for (const { id } of batch) {
+      try {
+        const detail = await fetchMatchDetail(id);
+        if (detail.goals.length > 0) {
+          await db.upsertMatches([detail]);
+          goalsFilled++;
+        }
+      } catch {
+        // one failed detail fetch must not break the rest of the sync
+      }
+    }
+  }
+
   return {
     fixturesUpserted: fixtures.length,
     matchesScored: toScore.length,
     predictionsScored,
+    goalsFilled,
   };
 }
