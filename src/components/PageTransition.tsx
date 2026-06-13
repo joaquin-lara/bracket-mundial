@@ -12,7 +12,7 @@ export function usePageTransition() {
   return useContext(Ctx);
 }
 
-const BALL_PX = 200;
+const BALL_PX = 300;
 
 export default function PageTransitionProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
