@@ -76,7 +76,13 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
     // home tab is revisited.
     const playIntro = decideIntro();
 
-    gsap.set(el, { scale: 0.1, y: -window.innerHeight * 1.6, opacity: 1 });
+    // On small phones the container is narrower, so scale up both the entry
+    // and landing sizes so the ball/globe feel substantial from the start.
+    const mobile = window.innerWidth <= 500;
+    const startScale = mobile ? 0.15 : 0.1;
+    const endScale = mobile ? 1.14 : 0.76;
+
+    gsap.set(el, { scale: startScale, y: -window.innerHeight * 1.6, opacity: 1 });
     gsap.set(svgRef.current, { opacity: 0 });
 
     // ── Three.js ball setup ──────────────────────────────────────────────────
@@ -153,7 +159,7 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
       tl.to(el, { y: 0, duration: 1.1, ease: 'power3.out' })
         .set(canvas, { opacity: 1 }, '<')
         .set(svgRef.current, { opacity: 1 })
-        .to(el, { scale: 0.76, duration: 2.0, ease: 'power2.inOut' })
+        .to(el, { scale: endScale, duration: 2.0, ease: 'power2.inOut' })
         .to(rotProxy, {
           lon: centerLon - 360,
           duration: 2.2,

@@ -121,6 +121,7 @@ export default function DuelArena({
   const [cpuRecord, setCpuRecord] = useState({ w: 0, l: 0 });
   const [sdFlash, setSdFlash] = useState(false);
   const sdShown = useRef<Set<string>>(new Set());
+  const prevAnimating = useRef(false);
 
   const nameOf = useCallback(
     (id: string) =>
@@ -190,11 +191,17 @@ export default function DuelArena({
     setActiveId(CPU_DUEL_ID);
   }
 
-  // one-time MUERTE SÚBITA flash when a duel reaches sudden death (after
-  // the equalizer's reveal animation finishes, never during it)
+  // one-time MUERTE SÚBITA flash when a duel reaches sudden death. It must land
+  // on the beat the turn actually flips, i.e. the instant the equalizer's
+  // reveal animation finishes — so fire only on the animating true→false edge.
+  // (Firing whenever `animating` is merely false lit it up a beat early, the
+  // moment the new kick arrived, before its reveal even played.)
   useEffect(() => {
-    if (!duel || duel.status !== 'active' || duel.kick <= 10 || animating) return;
+    const justFinishedReveal = prevAnimating.current && !animating;
+    prevAnimating.current = animating;
+    if (!duel || duel.status !== 'active' || duel.kick <= 10) return;
     if (sdShown.current.has(duel.id)) return;
+    if (!justFinishedReveal) return;
     sdShown.current.add(duel.id);
     setSdFlash(true);
     const t = setTimeout(() => setSdFlash(false), 2300);
