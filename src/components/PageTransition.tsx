@@ -111,7 +111,6 @@ export default function PageTransitionProvider({ children }: { children: React.R
     gsap.timeline()
       .to(label,             { opacity: 0, duration: 0.15 })
       .to(ballWrap,          { x: window.innerWidth, duration: 1.1, ease: 'power2.in' }, '<0.05')
-      .to(spinProxy.current, { speed: 0, duration: 0.25 }, '<')
       .to(panel,             { x: '100%', duration: 0.4, ease: 'power2.inOut' })
       .call(() => {
         stopRender.current();
