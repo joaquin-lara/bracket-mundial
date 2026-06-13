@@ -9,50 +9,9 @@ import type { Match } from '@/lib/types';
 import { stageLabel } from '@/lib/types';
 import { predict, pct } from '@/lib/ml/model';
 import { DATASET, MODEL, lookup, TEAMS } from '@/lib/ml/teams';
-import {
-  simulate,
-  type SimGroup,
-  type SimFixture,
-  type SimResult,
-} from '@/lib/ml/simulate';
 
 export const metadata: Metadata = { title: 'ML Predictor' };
 export const dynamic = 'force-dynamic';
-
-function isGroupStage(m: Match): boolean {
-  return (
-    m.group_name != null ||
-    m.stage === 'GROUP_STAGE' ||
-    m.stage === 'GROUP'
-  );
-}
-
-/** Derive the 12 groups and their fixtures (by TLA code) from the live table. */
-function buildGroups(matches: Match[]): { groups: SimGroup[]; fixtures: SimFixture[] } {
-  const groupTeams = new Map<string, Set<string>>();
-  const fixtures: SimFixture[] = [];
-  for (const m of matches) {
-    if (!isGroupStage(m) || !m.group_name) continue;
-    if (!m.home_code || !m.away_code) continue;
-    if (!lookup(m.home_code) || !lookup(m.away_code)) continue;
-    if (!groupTeams.has(m.group_name)) groupTeams.set(m.group_name, new Set());
-    groupTeams.get(m.group_name)!.add(m.home_code);
-    groupTeams.get(m.group_name)!.add(m.away_code);
-    fixtures.push({
-      group: m.group_name,
-      home: m.home_code,
-      away: m.away_code,
-      played: m.status === 'FINISHED' && m.home_score != null && m.away_score != null,
-      homeScore: m.home_score,
-      awayScore: m.away_score,
-    });
-  }
-  const groups: SimGroup[] = [...groupTeams.entries()]
-    .filter(([, s]) => s.size === 4)
-    .map(([name, s]) => ({ name, teams: [...s] }))
-    .sort((a, b) => a.name.localeCompare(b.name));
-  return { groups, fixtures };
-}
 
 function MiniBar({ h, d, a }: { h: number; d: number; a: number }) {
   return (
@@ -90,13 +49,6 @@ export default async function PredictorPage() {
     )
     .slice(0, 14);
 
-  const { groups, fixtures } = buildGroups(matches);
-  let sim: SimResult | null = null;
-  if (groups.length === 12) {
-    // 12 complete groups -> exactly 32 advancers -> a clean knockout bracket.
-    sim = simulate(groups, fixtures, 4000);
-  }
-
   // Live worked example for the explainer: a marquee matchup.
   const example = predict({ home: 'ARG', away: 'BRA', neutral: true })!;
   const exHalf = (MODEL.avgTotalGoals / 2).toFixed(2);
@@ -117,7 +69,7 @@ export default async function PredictorPage() {
       <p className="subtitle">
         A statistical model trained on {DATASET.matchesProcessed.toLocaleString()} international
         matches ({DATASET.dateRange[0].slice(0, 4)}–{DATASET.dateRange[1].slice(0, 4)}). Pick any
-        two teams, see the real fixtures rated, and simulate the whole tournament.
+        two teams and see the real World Cup fixtures rated.
       </p>
 
       {/* ---- interactive picker ---- */}
@@ -284,38 +236,6 @@ export default async function PredictorPage() {
                 </div>
               );
             })}
-          </div>
-        </section>
-      )}
-
-      {/* ---- tournament simulation ---- */}
-      {sim && (
-        <section className="ml-section">
-          <h2 className="ml-h2">Tournament simulation</h2>
-          <p className="ml-lead">
-            The full World Cup played out {sim.iterations.toLocaleString()} times. Finished group
-            games are locked in; everything else is sampled from the model. Knockout pairings are
-            seeded by strength (an approximation of the official bracket), so treat title odds as a
-            strength-driven estimate.
-          </p>
-          <div className="ml-odds">
-            <div className="ml-odds-head">
-              <span>Team</span>
-              <span>Advance</span>
-              <span>Final</span>
-              <span>Title</span>
-            </div>
-            {sim.teams.slice(0, 16).map((t) => (
-              <div className="ml-odds-row" key={t.code}>
-                <span className="ml-odds-team">
-                  <Flag code={t.code} name={t.name} />
-                  {t.name}
-                </span>
-                <span className="ml-odds-v">{(t.advance * 100).toFixed(0)}%</span>
-                <span className="ml-odds-v">{(t.final * 100).toFixed(1)}%</span>
-                <span className="ml-odds-v ml-odds-title">{(t.title * 100).toFixed(1)}%</span>
-              </div>
-            ))}
           </div>
         </section>
       )}

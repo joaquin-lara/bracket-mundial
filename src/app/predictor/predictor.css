@@ -519,66 +519,6 @@
   margin-top: 6px;
 }
 
-/* tournament odds table */
-
-.ml-odds {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  overflow: hidden;
-}
-
-.ml-odds-head,
-.ml-odds-row {
-  display: grid;
-  grid-template-columns: 1fr 80px 70px 70px;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-}
-
-.ml-odds-head {
-  font-family: var(--narrow);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--dim);
-  border-bottom: 1px solid var(--line);
-}
-
-.ml-odds-head span:not(:first-child),
-.ml-odds-v {
-  text-align: right;
-}
-
-.ml-odds-row {
-  border-top: 1px solid var(--line);
-  font-size: 14px;
-}
-
-.ml-odds-row:nth-child(2) {
-  border-top: none;
-}
-
-.ml-odds-team {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 700;
-  color: var(--cream);
-  min-width: 0;
-}
-
-.ml-odds-v {
-  font-weight: 700;
-  color: var(--muted);
-}
-
-.ml-odds-title {
-  color: var(--gold);
-  font-weight: 800;
-}
-
 .ml-foot {
   font-size: 12px;
   color: var(--dim);
@@ -596,10 +536,5 @@
   }
   .ml-score-grid {
     grid-template-columns: repeat(3, 1fr);
-  }
-  .ml-odds-head,
-  .ml-odds-row {
-    grid-template-columns: 1fr 56px 52px 52px;
-    font-size: 13px;
   }
 }
