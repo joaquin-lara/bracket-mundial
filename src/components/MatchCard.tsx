@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { submitPrediction } from '@/app/actions';
 import Flag from './Flag';
 import { lockTime, stageLabel, type Match, type Prediction, type RevealedPick } from '@/lib/types';
@@ -147,6 +148,16 @@ export default function MatchCard({ match, prediction, revealedPicks }: Props) {
           <span className={`points-badge points-${prediction.points}`}>
             {prediction.points} pt{prediction.points === 1 ? '' : 's'}
           </span>
+        )}
+
+        {!teamsTbd && match.home_code && match.away_code && (
+          <Link
+            className="ml-link-btn"
+            href={`/predictor?home=${match.home_code}&away=${match.away_code}`}
+            title={`Open ${match.home_team} vs ${match.away_team} in the ML Predictor`}
+          >
+            ML Prediction
+          </Link>
         )}
 
         {!locked && !teamsTbd && (

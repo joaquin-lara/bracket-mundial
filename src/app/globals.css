@@ -703,6 +703,14 @@ h1 {
   background: rgba(11, 61, 44, 0.6);
   border: 1px solid rgba(244, 241, 232, 0.25);
   border-radius: 8px;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.score-inputs input::-webkit-outer-spin-button,
+.score-inputs input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .score-inputs input:focus {
@@ -726,11 +734,13 @@ h1 {
 }
 
 .match-footer {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   margin-top: 12px;
+  min-height: 36px;
   font-size: 13px;
 }
 
@@ -964,6 +974,30 @@ h1 {
   .sched-team {
     font-size: 13px;
   }
+}
+
+/* ---- "ML Prediction" link on bracket cards ---- */
+
+.ml-link-btn {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(244, 241, 232, 0.06);
+  color: var(--gold-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.ml-link-btn:hover {
+  border-color: rgba(230, 179, 55, 0.5);
+  color: var(--gold);
 }
 
 /* ---- points race chart ---- */

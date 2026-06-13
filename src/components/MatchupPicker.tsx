@@ -1,11 +1,18 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Flag from './Flag';
-import { TEAMS } from '@/lib/ml/teams';
+import { TEAMS, byCode } from '@/lib/ml/teams';
 import { predict, pct } from '@/lib/ml/model';
 
 const OPTIONS = TEAMS.map((t) => ({ code: t.code, name: t.name }));
+
+/** Validate a ?home= / ?away= code from the URL, or null if not one of the 48. */
+function validCode(raw: string | null): string | null {
+  const c = (raw ?? '').toUpperCase();
+  return byCode(c) ? c : null;
+}
 
 function ProbBar({ home, draw, away }: { home: number; draw: number; away: number }) {
   return (
@@ -18,8 +25,15 @@ function ProbBar({ home, draw, away }: { home: number; draw: number; away: numbe
 }
 
 export default function MatchupPicker() {
-  const [home, setHome] = useState('ARG');
-  const [away, setAway] = useState('BRA');
+  const params = useSearchParams();
+  const presetHome = validCode(params.get('home')) ?? 'ARG';
+  let presetAway = validCode(params.get('away')) ?? (presetHome === 'BRA' ? 'ARG' : 'BRA');
+  if (presetAway === presetHome) {
+    presetAway = TEAMS.find((t) => t.code !== presetHome)!.code;
+  }
+
+  const [home, setHome] = useState(presetHome);
+  const [away, setAway] = useState(presetAway);
   const [neutral, setNeutral] = useState(true);
 
   const result = useMemo(
@@ -128,7 +142,9 @@ export default function MatchupPicker() {
             {result.topScores.map((s, i) => (
               <div className="ml-score-cell" key={i}>
                 <span className="ml-score-num">
+                  <Flag code={H.code} name={H.name} />
                   {s.home}–{s.away}
+                  <Flag code={A.code} name={A.name} />
                 </span>
                 <span className="ml-score-prob">{pct(s.prob)}</span>
               </div>

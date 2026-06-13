@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import './predictor.css';
 import Flag from '@/components/Flag';
 import MatchupPicker from '@/components/MatchupPicker';
@@ -125,7 +126,9 @@ export default async function PredictorPage() {
         <p className="ml-lead">
           Choose two of the 48 qualified teams. Everything updates live in your browser.
         </p>
-        <MatchupPicker />
+        <Suspense fallback={null}>
+          <MatchupPicker />
+        </Suspense>
       </section>
 
       {/* ---- how it works ---- */}
