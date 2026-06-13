@@ -1967,6 +1967,59 @@ h1 {
   }
 }
 
+/* ---- match-day recap ---- */
+
+.recap-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-top: 24px;
+}
+
+.recap-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.recap-title {
+  font-family: var(--narrow);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+
+.recap-title::before {
+  content: '📰';
+  font-size: 12px;
+  margin-right: 8px;
+}
+
+.recap-day {
+  font-family: var(--narrow);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--dim);
+}
+
+.recap-line {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 14px;
+  color: var(--muted);
+  padding: 5px 0;
+}
+
+.recap-icon {
+  flex-shrink: 0;
+}
+
 /* ---- pick wall heatmap ---- */
 
 .heat-card {

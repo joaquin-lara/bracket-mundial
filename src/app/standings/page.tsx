@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import PickHeatmap, { type HeatColumn, type HeatRow } from '@/components/PickHeatmap';
 import RaceChart, { type RacePoint } from '@/components/RaceChart';
+import RecapCard from '@/components/RecapCard';
 import { ensureFreshScores } from '@/lib/autoSync';
+import { buildRecap, type RecapInput } from '@/lib/recap';
 import { createClient } from '@/lib/supabase/server';
 import { GUEST_NAME } from '@/lib/players';
 
@@ -31,14 +33,24 @@ export default async function StandingsPage() {
   // feed the points race chart.
   const { data: scored } = await supabase
     .from('predictions')
-    .select('points, user_id, match_id, matches(kickoff)')
+    .select(
+      'points, user_id, match_id, pred_home, pred_away, matches(kickoff, home_code, away_code, home_score, away_score)'
+    )
     .not('points', 'is', null);
   const { data: profiles } = await supabase.from('profiles').select('id, display_name');
   const nameById = new Map((profiles ?? []).map((p) => [p.id as string, p.display_name as string]));
 
+  type ScoredMatch = {
+    kickoff: string;
+    home_code: string | null;
+    away_code: string | null;
+    home_score: number | null;
+    away_score: number | null;
+  };
+
   const raceEntries: RacePoint[] = (scored ?? [])
     .map((p) => {
-      const match = p.matches as unknown as { kickoff: string } | null;
+      const match = p.matches as unknown as ScoredMatch | null;
       return {
         name: nameById.get(p.user_id as string) ?? 'Unknown',
         kickoff: match?.kickoff ?? '',
@@ -46,6 +58,29 @@ export default async function StandingsPage() {
       };
     })
     .filter((e) => e.kickoff !== '');
+
+  // Match-day recap from the same scored rows.
+  const recapInput: RecapInput[] = (scored ?? [])
+    .map((p) => {
+      const m = p.matches as unknown as ScoredMatch | null;
+      if (!m?.kickoff) return null;
+      return {
+        name: nameById.get(p.user_id as string) ?? 'Unknown',
+        kickoff: m.kickoff,
+        points: (p.points as number) ?? 0,
+        exact:
+          m.home_score != null &&
+          m.away_score != null &&
+          (p.pred_home as number) === m.home_score &&
+          (p.pred_away as number) === m.away_score,
+        homeCode: m.home_code,
+        awayCode: m.away_code,
+        homeScore: m.home_score,
+        awayScore: m.away_score,
+      };
+    })
+    .filter((e): e is RecapInput => e !== null);
+  const recap = buildRecap(recapInput);
 
   // Pick wall: one column per finished match, one row per player.
   const { data: finished } = await supabase
@@ -108,6 +143,8 @@ export default async function StandingsPage() {
           </tbody>
         </table>
       )}
+
+      <RecapCard recap={recap} />
 
       <RaceChart entries={raceEntries} />
 
