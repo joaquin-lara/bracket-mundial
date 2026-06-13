@@ -2020,6 +2020,44 @@ h1 {
   flex-shrink: 0;
 }
 
+/* ---- page transition panel ---- */
+
+.page-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg-light);
+  transform: translateX(-100%);
+  pointer-events: none;
+  will-change: transform;
+  overflow: hidden;
+}
+
+.transition-ball-wrap {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  margin-left: -100px;
+  margin-top: -100px;
+}
+
+.transition-loading {
+  position: absolute;
+  top: calc(45% + 118px);
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  color: var(--gold-soft);
+  font-family: var(--narrow);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 /* ---- pick wall heatmap ---- */
 
 .heat-card {

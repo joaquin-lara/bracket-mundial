@@ -1,9 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { signOut } from '@/app/actions';
+import TransitionLink from './TransitionLink';
 
 const LINKS = [
   ['/matches', 'Edit your bracket'],
@@ -19,7 +19,6 @@ export default function TopNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
-  // Slide up when a tab is picked (route change).
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
@@ -37,19 +36,19 @@ export default function TopNav() {
         <span />
       </button>
 
-      <Link href="/" className="brand" onClick={() => setOpen(false)}>
+      <TransitionLink href="/" className="brand" onClick={() => setOpen(false)}>
         <span className="brand-badge">⚽</span>
         <span className="brand-name">Stonks©</span>
-      </Link>
+      </TransitionLink>
 
       <nav className="topnav desktop-nav">
-        <Link href="/" className={pathname === '/' ? 'active' : ''}>
+        <TransitionLink href="/" className={pathname === '/' ? 'active' : ''}>
           Home
-        </Link>
+        </TransitionLink>
         {LINKS.map(([href, label]) => (
-          <Link href={href} key={href} className={pathname === href ? 'active' : ''}>
+          <TransitionLink href={href} key={href} className={pathname === href ? 'active' : ''}>
             {label}
-          </Link>
+          </TransitionLink>
         ))}
         <form action={signOut}>
           <button type="submit">Sign out</button>
@@ -59,18 +58,18 @@ export default function TopNav() {
       <span className="burger-spacer" />
 
       <div className={`mobile-menu${open ? ' open' : ''}`}>
-        <Link href="/" onClick={() => setOpen(false)} className={pathname === '/' ? 'active' : ''}>
+        <TransitionLink href="/" onClick={() => setOpen(false)} className={pathname === '/' ? 'active' : ''}>
           Home
-        </Link>
+        </TransitionLink>
         {LINKS.map(([href, label]) => (
-          <Link
+          <TransitionLink
             href={href}
             key={href}
             onClick={() => setOpen(false)}
             className={pathname === href ? 'active' : ''}
           >
             {label}
-          </Link>
+          </TransitionLink>
         ))}
         <form action={signOut}>
           <button type="submit">Sign out</button>
