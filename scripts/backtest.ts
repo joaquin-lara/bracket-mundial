@@ -187,6 +187,89 @@ class BaseRateModel implements Predictor {
   }
 }
 
+// --- model 3: online Dixon-Coles (attack/defense + low-score correction) ----
+// Each team carries a log-scale attack and defense rating. Goal means are
+//   lambda_home = exp(base + home[neutral?0] + att_home - def_away)
+//   lambda_away = exp(base +                  att_away - def_home)
+// After each match the ratings take a gradient step on the Poisson
+// log-likelihood (for a log link the gradient is simply observed - expected
+// goals), so this is "Elo for goals" and updates online -- no batch refit, and
+// leakage-free in the walk-forward loop. The Dixon-Coles tau correction tilts
+// the four low-score cells (0-0, 1-0, 0-1, 1-1) to fix the draw deficit of an
+// independent Poisson. Friendlies move the ratings less than competitive games.
+class DixonColesOnline implements Predictor {
+  readonly name = 'Dixon-Coles online (attack/defense)';
+  private att = new Map<string, number>();
+  private def = new Map<string, number>();
+  private played = new Map<string, number>();
+  private base = Math.log(1.35); // ~ log(avg goals per team); drifts online
+  private home = 0.25; // home advantage in log-goal space
+
+  // hyperparameters (literature-sensible defaults; not tuned on the eval window)
+  private readonly lrTeam = 0.05;
+  private readonly lrGlobal = 0.004;
+  private readonly rho = -0.07; // low-score correction (negative inflates draws)
+  private readonly shrink = 0.0015; // pull ratings toward 0: regularize + time-decay
+  private readonly friendlyWeight = 0.5;
+
+  private a(t: string): number {
+    return this.att.get(t) ?? 0;
+  }
+  private d(t: string): number {
+    return this.def.get(t) ?? 0;
+  }
+
+  freeze(): void {
+    /* nothing to freeze: the model learns online through the training prefix */
+  }
+
+  private means(r: Row): [number, number] {
+    const lh = Math.exp(this.base + (r.neutral ? 0 : this.home) + this.a(r.home) - this.d(r.away));
+    const la = Math.exp(this.base + this.a(r.away) - this.d(r.home));
+    return [lh, la];
+  }
+
+  predict(r: Row): Probs | null {
+    if ((this.played.get(r.home) ?? 0) < MIN_HISTORY) return null;
+    if ((this.played.get(r.away) ?? 0) < MIN_HISTORY) return null;
+    const [lh, la] = this.means(r);
+    const g = scoreGrid(lh, la, MAX_GOALS);
+    let pH = 0,
+      pD = 0,
+      pA = 0,
+      tot = 0;
+    for (const c of g.cells) {
+      let f = 1;
+      if (c.home === 0 && c.away === 0) f = 1 - lh * la * this.rho;
+      else if (c.home === 0 && c.away === 1) f = 1 + lh * this.rho;
+      else if (c.home === 1 && c.away === 0) f = 1 + la * this.rho;
+      else if (c.home === 1 && c.away === 1) f = 1 - this.rho;
+      const p = Math.max(0, c.prob * f);
+      tot += p;
+      if (c.home > c.away) pH += p;
+      else if (c.home === c.away) pD += p;
+      else pA += p;
+    }
+    return { H: pH / tot, D: pD / tot, A: pA / tot };
+  }
+
+  update(r: Row): void {
+    const [lh, la] = this.means(r);
+    const w = r.tournament.toLowerCase() === 'friendly' ? this.friendlyWeight : 1;
+    const eh = r.hs - lh; // gradient of att_home / -def_away
+    const ea = r.as - la; // gradient of att_away / -def_home
+    const lr = this.lrTeam * w;
+    this.att.set(r.home, this.a(r.home) * (1 - this.shrink) + lr * eh);
+    this.def.set(r.away, this.d(r.away) * (1 - this.shrink) - lr * eh);
+    this.att.set(r.away, this.a(r.away) * (1 - this.shrink) + lr * ea);
+    this.def.set(r.home, this.d(r.home) * (1 - this.shrink) - lr * ea);
+    this.base += this.lrGlobal * w * (eh + ea);
+    if (!r.neutral) this.home += this.lrGlobal * w * eh;
+    this.played.set(r.home, (this.played.get(r.home) ?? 0) + 1);
+    this.played.set(r.away, (this.played.get(r.away) ?? 0) + 1);
+  }
+}
+
 // --- metrics ----------------------------------------------------------------
 const BINS = 10;
 class Metrics {
@@ -259,7 +342,11 @@ function main(): void {
   }
   const rows = parseCsv(readFileSync(CSV_PATH, 'utf8'));
 
-  const models: Predictor[] = [new EloPoissonModel(), new BaseRateModel()];
+  const models: Predictor[] = [
+    new DixonColesOnline(),
+    new EloPoissonModel(),
+    new BaseRateModel(),
+  ];
   // one metrics bucket per model, for all eval games and competitive-only games
   const all = models.map(() => new Metrics());
   const comp = models.map(() => new Metrics());
