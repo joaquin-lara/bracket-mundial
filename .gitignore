@@ -6,3 +6,6 @@ out/
 .vercel
 *.tsbuildinfo
 next-env.d.ts
+
+# ML predictor: raw historical dataset (re-downloaded by npm run build:elo)
+/data/

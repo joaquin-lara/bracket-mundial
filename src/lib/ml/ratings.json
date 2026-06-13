@@ -1,0 +1,3763 @@
+{
+  "generatedAt": "2026-06-12T23:31:14.783Z",
+  "source": "martj42/international_results (mirror of Kaggle international results 1872-present)",
+  "matchesProcessed": 49407,
+  "dateRange": [
+    "1872-11-30",
+    "2026-06-11"
+  ],
+  "model": {
+    "homeAdvantageElo": 100,
+    "goalsPerElo": 0.005596,
+    "avgTotalGoals": 2.9392,
+    "homeMarginGoals": 0.6744,
+    "eloBaseline": 1500
+  },
+  "totalRankedTeams": 247,
+  "teams": {
+    "ALG": {
+      "name": "Algeria",
+      "code": "ALG",
+      "elo": 1883,
+      "matches": 617,
+      "lastPlayed": "2026-06-10",
+      "globalRank": 29,
+      "form": {
+        "played": 10,
+        "won": 7,
+        "drawn": 2,
+        "lost": 1,
+        "goalsFor": 21,
+        "goalsAgainst": 4,
+        "recent": [
+          {
+            "date": "2025-12-12",
+            "opp": "United Arab Emirates",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-24",
+            "opp": "Sudan",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-12-28",
+            "opp": "Burkina Faso",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-12-31",
+            "opp": "Equatorial Guinea",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2026-01-06",
+            "opp": "DR Congo",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-01-10",
+            "opp": "Nigeria",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Guatemala",
+            "gf": 7,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Uruguay",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-03",
+            "opp": "Netherlands",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-10",
+            "opp": "Bolivia",
+            "gf": 4,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "ARG": {
+      "name": "Argentina",
+      "code": "ARG",
+      "elo": 2188.2,
+      "matches": 1069,
+      "lastPlayed": "2026-06-09",
+      "globalRank": 2,
+      "form": {
+        "played": 10,
+        "won": 8,
+        "drawn": 1,
+        "lost": 1,
+        "goalsFor": 25,
+        "goalsAgainst": 3,
+        "recent": [
+          {
+            "date": "2025-06-10",
+            "opp": "Colombia",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-09-04",
+            "opp": "Venezuela",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Ecuador",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "Venezuela",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "Puerto Rico",
+            "gf": 6,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-14",
+            "opp": "Angola",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Mauritania",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Zambia",
+            "gf": 5,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "Honduras",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-09",
+            "opp": "Iceland",
+            "gf": 3,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "AUS": {
+      "name": "Australia",
+      "code": "AUS",
+      "elo": 1898.2,
+      "matches": 581,
+      "lastPlayed": "2026-06-06",
+      "globalRank": 26,
+      "form": {
+        "played": 10,
+        "won": 5,
+        "drawn": 1,
+        "lost": 4,
+        "goalsFor": 13,
+        "goalsAgainst": 10,
+        "recent": [
+          {
+            "date": "2025-09-05",
+            "opp": "New Zealand",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "New Zealand",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "Canada",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "United States",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2025-11-14",
+            "opp": "Venezuela",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Colombia",
+            "gf": 0,
+            "ga": 3
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Cameroon",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Curaçao",
+            "gf": 5,
+            "ga": 1
+          },
+          {
+            "date": "2026-05-30",
+            "opp": "Mexico",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "Switzerland",
+            "gf": 1,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "AUT": {
+      "name": "Austria",
+      "code": "AUT",
+      "elo": 1883.4,
+      "matches": 860,
+      "lastPlayed": "2026-06-01",
+      "globalRank": 28,
+      "form": {
+        "played": 10,
+        "won": 8,
+        "drawn": 1,
+        "lost": 1,
+        "goalsFor": 27,
+        "goalsAgainst": 4,
+        "recent": [
+          {
+            "date": "2025-06-10",
+            "opp": "San Marino",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-06",
+            "opp": "Cyprus",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Bosnia and Herzegovina",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2025-10-09",
+            "opp": "San Marino",
+            "gf": 10,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-12",
+            "opp": "Romania",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-15",
+            "opp": "Cyprus",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Bosnia and Herzegovina",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Ghana",
+            "gf": 5,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "South Korea",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-01",
+            "opp": "Tunisia",
+            "gf": 1,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "BEL": {
+      "name": "Belgium",
+      "code": "BEL",
+      "elo": 1943.1,
+      "matches": 853,
+      "lastPlayed": "2026-06-06",
+      "globalRank": 19,
+      "form": {
+        "played": 10,
+        "won": 7,
+        "drawn": 3,
+        "lost": 0,
+        "goalsFor": 37,
+        "goalsAgainst": 6,
+        "recent": [
+          {
+            "date": "2025-09-04",
+            "opp": "Liechtenstein",
+            "gf": 6,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-07",
+            "opp": "Kazakhstan",
+            "gf": 6,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "North Macedonia",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-13",
+            "opp": "Wales",
+            "gf": 4,
+            "ga": 2
+          },
+          {
+            "date": "2025-11-15",
+            "opp": "Kazakhstan",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Liechtenstein",
+            "gf": 7,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-28",
+            "opp": "United States",
+            "gf": 5,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Mexico",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-02",
+            "opp": "Croatia",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "Tunisia",
+            "gf": 5,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "BIH": {
+      "name": "Bosnia and Herzegovina",
+      "code": "BIH",
+      "elo": 1651.2,
+      "matches": 283,
+      "lastPlayed": "2026-06-06",
+      "globalRank": 87,
+      "form": {
+        "played": 10,
+        "won": 3,
+        "drawn": 6,
+        "lost": 1,
+        "goalsFor": 20,
+        "goalsAgainst": 10,
+        "recent": [
+          {
+            "date": "2025-09-06",
+            "opp": "San Marino",
+            "gf": 6,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Austria",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2025-10-09",
+            "opp": "Cyprus",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2025-10-12",
+            "opp": "Malta",
+            "gf": 4,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-15",
+            "opp": "Romania",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Austria",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-26",
+            "opp": "Wales",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Italy",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-05-29",
+            "opp": "North Macedonia",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "Panama",
+            "gf": 1,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "BRA": {
+      "name": "Brazil",
+      "code": "BRA",
+      "elo": 2067.3,
+      "matches": 1059,
+      "lastPlayed": "2026-06-06",
+      "globalRank": 5,
+      "form": {
+        "played": 10,
+        "won": 6,
+        "drawn": 1,
+        "lost": 3,
+        "goalsFor": 25,
+        "goalsAgainst": 11,
+        "recent": [
+          {
+            "date": "2025-09-04",
+            "opp": "Chile",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Bolivia",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "South Korea",
+            "gf": 5,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "Japan",
+            "gf": 2,
+            "ga": 3
+          },
+          {
+            "date": "2025-11-15",
+            "opp": "Senegal",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Tunisia",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-26",
+            "opp": "France",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Croatia",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2026-05-31",
+            "opp": "Panama",
+            "gf": 6,
+            "ga": 2
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "Egypt",
+            "gf": 2,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "CAN": {
+      "name": "Canada",
+      "code": "CAN",
+      "elo": 1901.2,
+      "matches": 469,
+      "lastPlayed": "2026-06-05",
+      "globalRank": 25,
+      "form": {
+        "played": 10,
+        "won": 4,
+        "drawn": 5,
+        "lost": 1,
+        "goalsFor": 11,
+        "goalsAgainst": 4,
+        "recent": [
+          {
+            "date": "2025-09-05",
+            "opp": "Romania",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Wales",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "Australia",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "Colombia",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-13",
+            "opp": "Ecuador",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Venezuela",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-28",
+            "opp": "Iceland",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Tunisia",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-01",
+            "opp": "Uzbekistan",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-05",
+            "opp": "Republic of Ireland",
+            "gf": 1,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "CPV": {
+      "name": "Cape Verde",
+      "code": "CPV",
+      "elo": 1652.5,
+      "matches": 235,
+      "lastPlayed": "2026-06-06",
+      "globalRank": 86,
+      "form": {
+        "played": 10,
+        "won": 4,
+        "drawn": 4,
+        "lost": 2,
+        "goalsFor": 16,
+        "goalsAgainst": 12,
+        "recent": [
+          {
+            "date": "2025-09-04",
+            "opp": "Mauritius",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Cameroon",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-08",
+            "opp": "Libya",
+            "gf": 3,
+            "ga": 3
+          },
+          {
+            "date": "2025-10-13",
+            "opp": "Eswatini",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-13",
+            "opp": "Iran",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-17",
+            "opp": "Egypt",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Chile",
+            "gf": 2,
+            "ga": 4
+          },
+          {
+            "date": "2026-03-30",
+            "opp": "Finland",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-05-31",
+            "opp": "Serbia",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "Bermuda",
+            "gf": 0,
+            "ga": 3
+          }
+        ]
+      }
+    },
+    "COL": {
+      "name": "Colombia",
+      "code": "COL",
+      "elo": 2062.2,
+      "matches": 638,
+      "lastPlayed": "2026-06-07",
+      "globalRank": 6,
+      "form": {
+        "played": 10,
+        "won": 7,
+        "drawn": 1,
+        "lost": 2,
+        "goalsFor": 25,
+        "goalsAgainst": 10,
+        "recent": [
+          {
+            "date": "2025-09-04",
+            "opp": "Bolivia",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Venezuela",
+            "gf": 6,
+            "ga": 3
+          },
+          {
+            "date": "2025-10-11",
+            "opp": "Mexico",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "Canada",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-15",
+            "opp": "New Zealand",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Australia",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-26",
+            "opp": "Croatia",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-29",
+            "opp": "France",
+            "gf": 1,
+            "ga": 3
+          },
+          {
+            "date": "2026-06-01",
+            "opp": "Costa Rica",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-07",
+            "opp": "Jordan",
+            "gf": 2,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "CRO": {
+      "name": "Croatia",
+      "code": "CRO",
+      "elo": 1972,
+      "matches": 396,
+      "lastPlayed": "2026-06-07",
+      "globalRank": 17,
+      "form": {
+        "played": 10,
+        "won": 7,
+        "drawn": 1,
+        "lost": 2,
+        "goalsFor": 19,
+        "goalsAgainst": 10,
+        "recent": [
+          {
+            "date": "2025-09-05",
+            "opp": "Faroe Islands",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-08",
+            "opp": "Montenegro",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-09",
+            "opp": "Czech Republic",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-12",
+            "opp": "Gibraltar",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-14",
+            "opp": "Faroe Islands",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-17",
+            "opp": "Montenegro",
+            "gf": 3,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-26",
+            "opp": "Colombia",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Brazil",
+            "gf": 1,
+            "ga": 3
+          },
+          {
+            "date": "2026-06-02",
+            "opp": "Belgium",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2026-06-07",
+            "opp": "Slovenia",
+            "gf": 2,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "CUR": {
+      "name": "Curaçao",
+      "code": "CUR",
+      "elo": 1612,
+      "matches": 385,
+      "lastPlayed": "2026-06-06",
+      "globalRank": 94,
+      "form": {
+        "played": 10,
+        "won": 4,
+        "drawn": 3,
+        "lost": 3,
+        "goalsFor": 19,
+        "goalsAgainst": 14,
+        "recent": [
+          {
+            "date": "2025-09-05",
+            "opp": "Trinidad and Tobago",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Bermuda",
+            "gf": 3,
+            "ga": 2
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "Jamaica",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "Trinidad and Tobago",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-13",
+            "opp": "Bermuda",
+            "gf": 7,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Jamaica",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "China",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Australia",
+            "gf": 1,
+            "ga": 5
+          },
+          {
+            "date": "2026-05-30",
+            "opp": "Scotland",
+            "gf": 1,
+            "ga": 4
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "Aruba",
+            "gf": 4,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "CZE": {
+      "name": "Czech Republic",
+      "code": "CZE",
+      "elo": 1781.1,
+      "matches": 361,
+      "lastPlayed": "2026-06-11",
+      "globalRank": 47,
+      "form": {
+        "played": 10,
+        "won": 4,
+        "drawn": 4,
+        "lost": 2,
+        "goalsFor": 21,
+        "goalsAgainst": 11,
+        "recent": [
+          {
+            "date": "2025-09-08",
+            "opp": "Saudi Arabia",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-10-09",
+            "opp": "Croatia",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-12",
+            "opp": "Faroe Islands",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2025-11-13",
+            "opp": "San Marino",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-17",
+            "opp": "Gibraltar",
+            "gf": 6,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-26",
+            "opp": "Republic of Ireland",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Denmark",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2026-05-31",
+            "opp": "Kosovo",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-04",
+            "opp": "Guatemala",
+            "gf": 5,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-11",
+            "opp": "South Korea",
+            "gf": 1,
+            "ga": 2
+          }
+        ]
+      }
+    },
+    "COD": {
+      "name": "DR Congo",
+      "code": "COD",
+      "elo": 1762.4,
+      "matches": 524,
+      "lastPlayed": "2026-06-09",
+      "globalRank": 53,
+      "form": {
+        "played": 10,
+        "won": 5,
+        "drawn": 3,
+        "lost": 2,
+        "goalsFor": 11,
+        "goalsAgainst": 5,
+        "recent": [
+          {
+            "date": "2025-11-13",
+            "opp": "Cameroon",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-16",
+            "opp": "Nigeria",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-23",
+            "opp": "Benin",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-12-27",
+            "opp": "Senegal",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-30",
+            "opp": "Botswana",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2026-01-06",
+            "opp": "Algeria",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-25",
+            "opp": "Bermuda",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Jamaica",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-03",
+            "opp": "Denmark",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-09",
+            "opp": "Chile",
+            "gf": 1,
+            "ga": 2
+          }
+        ]
+      }
+    },
+    "ECU": {
+      "name": "Ecuador",
+      "code": "ECU",
+      "elo": 2026.5,
+      "matches": 591,
+      "lastPlayed": "2026-06-07",
+      "globalRank": 8,
+      "form": {
+        "played": 10,
+        "won": 4,
+        "drawn": 6,
+        "lost": 0,
+        "goalsFor": 12,
+        "goalsAgainst": 5,
+        "recent": [
+          {
+            "date": "2025-09-04",
+            "opp": "Paraguay",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Argentina",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "United States",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "Mexico",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-13",
+            "opp": "Canada",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "New Zealand",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Morocco",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Netherlands",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-05-30",
+            "opp": "Saudi Arabia",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-07",
+            "opp": "Guatemala",
+            "gf": 3,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "EGY": {
+      "name": "Egypt",
+      "code": "EGY",
+      "elo": 1808.7,
+      "matches": 756,
+      "lastPlayed": "2026-06-06",
+      "globalRank": 42,
+      "form": {
+        "played": 10,
+        "won": 5,
+        "drawn": 3,
+        "lost": 2,
+        "goalsFor": 13,
+        "goalsAgainst": 6,
+        "recent": [
+          {
+            "date": "2025-12-26",
+            "opp": "South Africa",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-12-29",
+            "opp": "Angola",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-01-05",
+            "opp": "Benin",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2026-01-10",
+            "opp": "Ivory Coast",
+            "gf": 3,
+            "ga": 2
+          },
+          {
+            "date": "2026-01-14",
+            "opp": "Senegal",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2026-01-17",
+            "opp": "Nigeria",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Saudi Arabia",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Spain",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-05-28",
+            "opp": "Russia",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "Brazil",
+            "gf": 1,
+            "ga": 2
+          }
+        ]
+      }
+    },
+    "ENG": {
+      "name": "England",
+      "code": "ENG",
+      "elo": 2093,
+      "matches": 1090,
+      "lastPlayed": "2026-06-10",
+      "globalRank": 4,
+      "form": {
+        "played": 10,
+        "won": 8,
+        "drawn": 1,
+        "lost": 1,
+        "goalsFor": 24,
+        "goalsAgainst": 2,
+        "recent": [
+          {
+            "date": "2025-09-06",
+            "opp": "Andorra",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Serbia",
+            "gf": 5,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-09",
+            "opp": "Wales",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "Latvia",
+            "gf": 5,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-13",
+            "opp": "Serbia",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-16",
+            "opp": "Albania",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Uruguay",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Japan",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "New Zealand",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-10",
+            "opp": "Costa Rica",
+            "gf": 3,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "FRA": {
+      "name": "France",
+      "code": "FRA",
+      "elo": 2127.4,
+      "matches": 935,
+      "lastPlayed": "2026-06-08",
+      "globalRank": 3,
+      "form": {
+        "played": 10,
+        "won": 8,
+        "drawn": 1,
+        "lost": 1,
+        "goalsFor": 25,
+        "goalsAgainst": 9,
+        "recent": [
+          {
+            "date": "2025-09-05",
+            "opp": "Ukraine",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Iceland",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "Azerbaijan",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-13",
+            "opp": "Iceland",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2025-11-13",
+            "opp": "Ukraine",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-16",
+            "opp": "Azerbaijan",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-26",
+            "opp": "Brazil",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-29",
+            "opp": "Colombia",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-04",
+            "opp": "Ivory Coast",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2026-06-08",
+            "opp": "Northern Ireland",
+            "gf": 3,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "GER": {
+      "name": "Germany",
+      "code": "GER",
+      "elo": 1998.7,
+      "matches": 1031,
+      "lastPlayed": "2026-06-06",
+      "globalRank": 10,
+      "form": {
+        "played": 10,
+        "won": 9,
+        "drawn": 0,
+        "lost": 1,
+        "goalsFor": 28,
+        "goalsAgainst": 8,
+        "recent": [
+          {
+            "date": "2025-09-04",
+            "opp": "Slovakia",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2025-09-07",
+            "opp": "Northern Ireland",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "Luxembourg",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-13",
+            "opp": "Northern Ireland",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-14",
+            "opp": "Luxembourg",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-17",
+            "opp": "Slovakia",
+            "gf": 6,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Switzerland",
+            "gf": 4,
+            "ga": 3
+          },
+          {
+            "date": "2026-03-30",
+            "opp": "Ghana",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2026-05-31",
+            "opp": "Finland",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "United States",
+            "gf": 2,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "GHA": {
+      "name": "Ghana",
+      "code": "GHA",
+      "elo": 1624.7,
+      "matches": 671,
+      "lastPlayed": "2026-06-02",
+      "globalRank": 92,
+      "form": {
+        "played": 10,
+        "won": 3,
+        "drawn": 2,
+        "lost": 5,
+        "goalsFor": 11,
+        "goalsAgainst": 14,
+        "recent": [
+          {
+            "date": "2025-09-04",
+            "opp": "Chad",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-09-08",
+            "opp": "Mali",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-08",
+            "opp": "Central African Republic",
+            "gf": 5,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-12",
+            "opp": "Comoros",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-14",
+            "opp": "Japan",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "South Korea",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Austria",
+            "gf": 1,
+            "ga": 5
+          },
+          {
+            "date": "2026-03-30",
+            "opp": "Germany",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2026-05-22",
+            "opp": "Mexico",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2026-06-02",
+            "opp": "Wales",
+            "gf": 1,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "HAI": {
+      "name": "Haiti",
+      "code": "HAI",
+      "elo": 1716.9,
+      "matches": 510,
+      "lastPlayed": "2026-06-05",
+      "globalRank": 66,
+      "form": {
+        "played": 10,
+        "won": 4,
+        "drawn": 3,
+        "lost": 3,
+        "goalsFor": 15,
+        "goalsAgainst": 10,
+        "recent": [
+          {
+            "date": "2025-09-05",
+            "opp": "Honduras",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Costa Rica",
+            "gf": 3,
+            "ga": 3
+          },
+          {
+            "date": "2025-10-09",
+            "opp": "Nicaragua",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-13",
+            "opp": "Honduras",
+            "gf": 0,
+            "ga": 3
+          },
+          {
+            "date": "2025-11-13",
+            "opp": "Costa Rica",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Nicaragua",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-28",
+            "opp": "Tunisia",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Iceland",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-02",
+            "opp": "New Zealand",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-05",
+            "opp": "Peru",
+            "gf": 1,
+            "ga": 2
+          }
+        ]
+      }
+    },
+    "IRN": {
+      "name": "Iran",
+      "code": "IRN",
+      "elo": 1893.1,
+      "matches": 612,
+      "lastPlayed": "2026-06-04",
+      "globalRank": 27,
+      "form": {
+        "played": 10,
+        "won": 5,
+        "drawn": 2,
+        "lost": 3,
+        "goalsFor": 17,
+        "goalsAgainst": 6,
+        "recent": [
+          {
+            "date": "2025-06-05",
+            "opp": "Qatar",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2025-06-10",
+            "opp": "North Korea",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "Russia",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "Tanzania",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-13",
+            "opp": "Cape Verde",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Uzbekistan",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Nigeria",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Costa Rica",
+            "gf": 5,
+            "ga": 0
+          },
+          {
+            "date": "2026-05-29",
+            "opp": "Gambia",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-04",
+            "opp": "Mali",
+            "gf": 2,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "IRQ": {
+      "name": "Iraq",
+      "code": "IRQ",
+      "elo": 1735.3,
+      "matches": 655,
+      "lastPlayed": "2026-06-09",
+      "globalRank": 61,
+      "form": {
+        "played": 10,
+        "won": 5,
+        "drawn": 2,
+        "lost": 3,
+        "goalsFor": 11,
+        "goalsAgainst": 10,
+        "recent": [
+          {
+            "date": "2025-11-13",
+            "opp": "United Arab Emirates",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "United Arab Emirates",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-03",
+            "opp": "Bahrain",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-06",
+            "opp": "Sudan",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-12-09",
+            "opp": "Algeria",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2025-12-12",
+            "opp": "Jordan",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Bolivia",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2026-05-29",
+            "opp": "Andorra",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-04",
+            "opp": "Spain",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-09",
+            "opp": "Venezuela",
+            "gf": 0,
+            "ga": 2
+          }
+        ]
+      }
+    },
+    "CIV": {
+      "name": "Ivory Coast",
+      "code": "CIV",
+      "elo": 1813.4,
+      "matches": 636,
+      "lastPlayed": "2026-06-04",
+      "globalRank": 40,
+      "form": {
+        "played": 10,
+        "won": 7,
+        "drawn": 1,
+        "lost": 2,
+        "goalsFor": 19,
+        "goalsAgainst": 8,
+        "recent": [
+          {
+            "date": "2025-11-14",
+            "opp": "Saudi Arabia",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Oman",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-12-24",
+            "opp": "Mozambique",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-12-28",
+            "opp": "Cameroon",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-31",
+            "opp": "Gabon",
+            "gf": 3,
+            "ga": 2
+          },
+          {
+            "date": "2026-01-06",
+            "opp": "Burkina Faso",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2026-01-10",
+            "opp": "Egypt",
+            "gf": 2,
+            "ga": 3
+          },
+          {
+            "date": "2026-03-28",
+            "opp": "South Korea",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Scotland",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-04",
+            "opp": "France",
+            "gf": 2,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "JPN": {
+      "name": "Japan",
+      "code": "JPN",
+      "elo": 1991.4,
+      "matches": 790,
+      "lastPlayed": "2026-05-31",
+      "globalRank": 11,
+      "form": {
+        "played": 10,
+        "won": 7,
+        "drawn": 2,
+        "lost": 1,
+        "goalsFor": 19,
+        "goalsAgainst": 6,
+        "recent": [
+          {
+            "date": "2025-06-10",
+            "opp": "Indonesia",
+            "gf": 6,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-06",
+            "opp": "Mexico",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "United States",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "Paraguay",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "Brazil",
+            "gf": 3,
+            "ga": 2
+          },
+          {
+            "date": "2025-11-14",
+            "opp": "Ghana",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Bolivia",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-28",
+            "opp": "Scotland",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "England",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-05-31",
+            "opp": "Iceland",
+            "gf": 1,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "JOR": {
+      "name": "Jordan",
+      "code": "JOR",
+      "elo": 1772.9,
+      "matches": 485,
+      "lastPlayed": "2026-06-07",
+      "globalRank": 50,
+      "form": {
+        "played": 10,
+        "won": 5,
+        "drawn": 2,
+        "lost": 3,
+        "goalsFor": 17,
+        "goalsAgainst": 15,
+        "recent": [
+          {
+            "date": "2025-12-03",
+            "opp": "United Arab Emirates",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-06",
+            "opp": "Kuwait",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-09",
+            "opp": "Egypt",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-12-12",
+            "opp": "Iraq",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-12-15",
+            "opp": "Saudi Arabia",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-12-18",
+            "opp": "Morocco",
+            "gf": 2,
+            "ga": 3
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Costa Rica",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Nigeria",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2026-05-31",
+            "opp": "Switzerland",
+            "gf": 1,
+            "ga": 4
+          },
+          {
+            "date": "2026-06-07",
+            "opp": "Colombia",
+            "gf": 0,
+            "ga": 2
+          }
+        ]
+      }
+    },
+    "MEX": {
+      "name": "Mexico",
+      "code": "MEX",
+      "elo": 1991,
+      "matches": 1004,
+      "lastPlayed": "2026-06-11",
+      "globalRank": 12,
+      "form": {
+        "played": 10,
+        "won": 7,
+        "drawn": 2,
+        "lost": 1,
+        "goalsFor": 18,
+        "goalsAgainst": 4,
+        "recent": [
+          {
+            "date": "2025-11-18",
+            "opp": "Paraguay",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2026-01-22",
+            "opp": "Panama",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-01-25",
+            "opp": "Bolivia",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-02-25",
+            "opp": "Iceland",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-28",
+            "opp": "Portugal",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Belgium",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-05-22",
+            "opp": "Ghana",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2026-05-30",
+            "opp": "Australia",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-04",
+            "opp": "Serbia",
+            "gf": 5,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-11",
+            "opp": "South Africa",
+            "gf": 2,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "MAR": {
+      "name": "Morocco",
+      "code": "MAR",
+      "elo": 1983.8,
+      "matches": 617,
+      "lastPlayed": "2026-06-07",
+      "globalRank": 13,
+      "form": {
+        "played": 10,
+        "won": 7,
+        "drawn": 3,
+        "lost": 0,
+        "goalsFor": 22,
+        "goalsAgainst": 3,
+        "recent": [
+          {
+            "date": "2025-12-29",
+            "opp": "Zambia",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2026-01-04",
+            "opp": "Tanzania",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-01-09",
+            "opp": "Cameroon",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2026-01-14",
+            "opp": "Nigeria",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-01-18",
+            "opp": "Senegal",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Ecuador",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Paraguay",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2026-05-26",
+            "opp": "Burundi",
+            "gf": 5,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-02",
+            "opp": "Madagascar",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-07",
+            "opp": "Norway",
+            "gf": 1,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "NED": {
+      "name": "Netherlands",
+      "code": "NED",
+      "elo": 2007.6,
+      "matches": 879,
+      "lastPlayed": "2026-06-08",
+      "globalRank": 9,
+      "form": {
+        "played": 10,
+        "won": 6,
+        "drawn": 3,
+        "lost": 1,
+        "goalsFor": 22,
+        "goalsAgainst": 8,
+        "recent": [
+          {
+            "date": "2025-09-04",
+            "opp": "Poland",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-09-07",
+            "opp": "Lithuania",
+            "gf": 3,
+            "ga": 2
+          },
+          {
+            "date": "2025-10-09",
+            "opp": "Malta",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-12",
+            "opp": "Finland",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-14",
+            "opp": "Poland",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-17",
+            "opp": "Lithuania",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Norway",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Ecuador",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-03",
+            "opp": "Algeria",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-08",
+            "opp": "Uzbekistan",
+            "gf": 2,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "NZL": {
+      "name": "New Zealand",
+      "code": "NZL",
+      "elo": 1717.2,
+      "matches": 416,
+      "lastPlayed": "2026-06-06",
+      "globalRank": 65,
+      "form": {
+        "played": 10,
+        "won": 1,
+        "drawn": 1,
+        "lost": 8,
+        "goalsFor": 7,
+        "goalsAgainst": 18,
+        "recent": [
+          {
+            "date": "2025-09-05",
+            "opp": "Australia",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Australia",
+            "gf": 1,
+            "ga": 3
+          },
+          {
+            "date": "2025-10-09",
+            "opp": "Poland",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "Norway",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-15",
+            "opp": "Colombia",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Ecuador",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Finland",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-30",
+            "opp": "Chile",
+            "gf": 4,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-02",
+            "opp": "Haiti",
+            "gf": 0,
+            "ga": 4
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "England",
+            "gf": 0,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "NOR": {
+      "name": "Norway",
+      "code": "NOR",
+      "elo": 1982,
+      "matches": 872,
+      "lastPlayed": "2026-06-07",
+      "globalRank": 14,
+      "form": {
+        "played": 10,
+        "won": 6,
+        "drawn": 3,
+        "lost": 1,
+        "goalsFor": 31,
+        "goalsAgainst": 8,
+        "recent": [
+          {
+            "date": "2025-09-04",
+            "opp": "Finland",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Moldova",
+            "gf": 11,
+            "ga": 1
+          },
+          {
+            "date": "2025-10-11",
+            "opp": "Israel",
+            "gf": 5,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "New Zealand",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-13",
+            "opp": "Estonia",
+            "gf": 4,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-16",
+            "opp": "Italy",
+            "gf": 4,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Netherlands",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Switzerland",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-01",
+            "opp": "Sweden",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-07",
+            "opp": "Morocco",
+            "gf": 1,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "PAN": {
+      "name": "Panama",
+      "code": "PAN",
+      "elo": 1858.8,
+      "matches": 539,
+      "lastPlayed": "2026-06-06",
+      "globalRank": 32,
+      "form": {
+        "played": 10,
+        "won": 4,
+        "drawn": 4,
+        "lost": 2,
+        "goalsFor": 18,
+        "goalsAgainst": 16,
+        "recent": [
+          {
+            "date": "2025-10-14",
+            "opp": "Suriname",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-13",
+            "opp": "Guatemala",
+            "gf": 3,
+            "ga": 2
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "El Salvador",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2026-01-18",
+            "opp": "Bolivia",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-01-22",
+            "opp": "Mexico",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "South Africa",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "South Africa",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2026-05-31",
+            "opp": "Brazil",
+            "gf": 2,
+            "ga": 6
+          },
+          {
+            "date": "2026-06-03",
+            "opp": "Dominican Republic",
+            "gf": 4,
+            "ga": 2
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "Bosnia and Herzegovina",
+            "gf": 1,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "PAR": {
+      "name": "Paraguay",
+      "code": "PAR",
+      "elo": 1916.5,
+      "matches": 783,
+      "lastPlayed": "2026-06-05",
+      "globalRank": 22,
+      "form": {
+        "played": 10,
+        "won": 4,
+        "drawn": 2,
+        "lost": 4,
+        "goalsFor": 12,
+        "goalsAgainst": 10,
+        "recent": [
+          {
+            "date": "2025-06-10",
+            "opp": "Brazil",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2025-09-04",
+            "opp": "Ecuador",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Peru",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "Japan",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "South Korea",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2025-11-15",
+            "opp": "United States",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Mexico",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Greece",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Morocco",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2026-06-05",
+            "opp": "Nicaragua",
+            "gf": 4,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "POR": {
+      "name": "Portugal",
+      "code": "POR",
+      "elo": 2058.4,
+      "matches": 695,
+      "lastPlayed": "2026-06-10",
+      "globalRank": 7,
+      "form": {
+        "played": 10,
+        "won": 7,
+        "drawn": 2,
+        "lost": 1,
+        "goalsFor": 26,
+        "goalsAgainst": 9,
+        "recent": [
+          {
+            "date": "2025-09-06",
+            "opp": "Armenia",
+            "gf": 5,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Hungary",
+            "gf": 3,
+            "ga": 2
+          },
+          {
+            "date": "2025-10-11",
+            "opp": "Republic of Ireland",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "Hungary",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2025-11-13",
+            "opp": "Republic of Ireland",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2025-11-16",
+            "opp": "Armenia",
+            "gf": 9,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-28",
+            "opp": "Mexico",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "United States",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "Chile",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-10",
+            "opp": "Nigeria",
+            "gf": 2,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "QAT": {
+      "name": "Qatar",
+      "code": "QAT",
+      "elo": 1563.3,
+      "matches": 635,
+      "lastPlayed": "2026-06-06",
+      "globalRank": 105,
+      "form": {
+        "played": 10,
+        "won": 1,
+        "drawn": 4,
+        "lost": 5,
+        "goalsFor": 7,
+        "goalsAgainst": 15,
+        "recent": [
+          {
+            "date": "2025-09-03",
+            "opp": "Bahrain",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2025-09-07",
+            "opp": "Russia",
+            "gf": 1,
+            "ga": 4
+          },
+          {
+            "date": "2025-10-08",
+            "opp": "Oman",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "United Arab Emirates",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-17",
+            "opp": "Zimbabwe",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2025-12-01",
+            "opp": "Palestine",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-04",
+            "opp": "Syria",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-07",
+            "opp": "Tunisia",
+            "gf": 0,
+            "ga": 3
+          },
+          {
+            "date": "2026-05-28",
+            "opp": "Republic of Ireland",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "El Salvador",
+            "gf": 0,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "KSA": {
+      "name": "Saudi Arabia",
+      "code": "KSA",
+      "elo": 1692.7,
+      "matches": 741,
+      "lastPlayed": "2026-06-09",
+      "globalRank": 77,
+      "form": {
+        "played": 10,
+        "won": 4,
+        "drawn": 1,
+        "lost": 5,
+        "goalsFor": 12,
+        "goalsAgainst": 13,
+        "recent": [
+          {
+            "date": "2025-12-02",
+            "opp": "Oman",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-05",
+            "opp": "Comoros",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-08",
+            "opp": "Morocco",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-11",
+            "opp": "Palestine",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-15",
+            "opp": "Jordan",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Egypt",
+            "gf": 0,
+            "ga": 4
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Serbia",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2026-05-30",
+            "opp": "Ecuador",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2026-06-05",
+            "opp": "Puerto Rico",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-09",
+            "opp": "Senegal",
+            "gf": 0,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "SCO": {
+      "name": "Scotland",
+      "code": "SCO",
+      "elo": 1850.6,
+      "matches": 851,
+      "lastPlayed": "2026-06-06",
+      "globalRank": 33,
+      "form": {
+        "played": 10,
+        "won": 6,
+        "drawn": 1,
+        "lost": 3,
+        "goalsFor": 21,
+        "goalsAgainst": 10,
+        "recent": [
+          {
+            "date": "2025-09-05",
+            "opp": "Denmark",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-08",
+            "opp": "Belarus",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-09",
+            "opp": "Greece",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2025-10-12",
+            "opp": "Belarus",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-15",
+            "opp": "Greece",
+            "gf": 2,
+            "ga": 3
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Denmark",
+            "gf": 4,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-28",
+            "opp": "Japan",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Ivory Coast",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2026-05-30",
+            "opp": "Curaçao",
+            "gf": 4,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "Bolivia",
+            "gf": 4,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "SEN": {
+      "name": "Senegal",
+      "code": "SEN",
+      "elo": 1911.8,
+      "matches": 638,
+      "lastPlayed": "2026-06-09",
+      "globalRank": 23,
+      "form": {
+        "played": 10,
+        "won": 6,
+        "drawn": 2,
+        "lost": 2,
+        "goalsFor": 16,
+        "goalsAgainst": 9,
+        "recent": [
+          {
+            "date": "2025-12-27",
+            "opp": "DR Congo",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-30",
+            "opp": "Benin",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2026-01-03",
+            "opp": "Sudan",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2026-01-09",
+            "opp": "Mali",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-01-14",
+            "opp": "Egypt",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-01-18",
+            "opp": "Morocco",
+            "gf": 0,
+            "ga": 3
+          },
+          {
+            "date": "2026-03-28",
+            "opp": "Peru",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Gambia",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2026-05-31",
+            "opp": "United States",
+            "gf": 2,
+            "ga": 3
+          },
+          {
+            "date": "2026-06-09",
+            "opp": "Saudi Arabia",
+            "gf": 0,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "RSA": {
+      "name": "South Africa",
+      "code": "RSA",
+      "elo": 1655.2,
+      "matches": 481,
+      "lastPlayed": "2026-06-11",
+      "globalRank": 83,
+      "form": {
+        "played": 10,
+        "won": 4,
+        "drawn": 2,
+        "lost": 4,
+        "goalsFor": 12,
+        "goalsAgainst": 12,
+        "recent": [
+          {
+            "date": "2025-11-15",
+            "opp": "Zambia",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-22",
+            "opp": "Angola",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-26",
+            "opp": "Egypt",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-29",
+            "opp": "Zimbabwe",
+            "gf": 3,
+            "ga": 2
+          },
+          {
+            "date": "2026-01-04",
+            "opp": "Cameroon",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Panama",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Panama",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2026-05-29",
+            "opp": "Nicaragua",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "Jamaica",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-11",
+            "opp": "Mexico",
+            "gf": 0,
+            "ga": 2
+          }
+        ]
+      }
+    },
+    "KOR": {
+      "name": "South Korea",
+      "code": "KOR",
+      "elo": 1902.4,
+      "matches": 1008,
+      "lastPlayed": "2026-06-11",
+      "globalRank": 24,
+      "form": {
+        "played": 10,
+        "won": 6,
+        "drawn": 1,
+        "lost": 3,
+        "goalsFor": 15,
+        "goalsAgainst": 13,
+        "recent": [
+          {
+            "date": "2025-09-09",
+            "opp": "Mexico",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "Brazil",
+            "gf": 0,
+            "ga": 5
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "Paraguay",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-14",
+            "opp": "Bolivia",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Ghana",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-28",
+            "opp": "Ivory Coast",
+            "gf": 0,
+            "ga": 4
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Austria",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2026-05-30",
+            "opp": "Trinidad and Tobago",
+            "gf": 5,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-03",
+            "opp": "El Salvador",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-11",
+            "opp": "Czech Republic",
+            "gf": 2,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "ESP": {
+      "name": "Spain",
+      "code": "ESP",
+      "elo": 2223.9,
+      "matches": 783,
+      "lastPlayed": "2026-06-08",
+      "globalRank": 1,
+      "form": {
+        "played": 10,
+        "won": 7,
+        "drawn": 3,
+        "lost": 0,
+        "goalsFor": 28,
+        "goalsAgainst": 4,
+        "recent": [
+          {
+            "date": "2025-09-04",
+            "opp": "Bulgaria",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-07",
+            "opp": "Turkey",
+            "gf": 6,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-11",
+            "opp": "Georgia",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "Bulgaria",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-15",
+            "opp": "Georgia",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Turkey",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Serbia",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Egypt",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-04",
+            "opp": "Iraq",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-08",
+            "opp": "Peru",
+            "gf": 3,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "SWE": {
+      "name": "Sweden",
+      "code": "SWE",
+      "elo": 1773.5,
+      "matches": 1101,
+      "lastPlayed": "2026-06-04",
+      "globalRank": 49,
+      "form": {
+        "played": 10,
+        "won": 2,
+        "drawn": 3,
+        "lost": 5,
+        "goalsFor": 13,
+        "goalsAgainst": 20,
+        "recent": [
+          {
+            "date": "2025-09-05",
+            "opp": "Slovenia",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2025-09-08",
+            "opp": "Kosovo",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "Switzerland",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2025-10-13",
+            "opp": "Kosovo",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-15",
+            "opp": "Switzerland",
+            "gf": 1,
+            "ga": 4
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Slovenia",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-26",
+            "opp": "Ukraine",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Poland",
+            "gf": 3,
+            "ga": 2
+          },
+          {
+            "date": "2026-06-01",
+            "opp": "Norway",
+            "gf": 1,
+            "ga": 3
+          },
+          {
+            "date": "2026-06-04",
+            "opp": "Greece",
+            "gf": 2,
+            "ga": 2
+          }
+        ]
+      }
+    },
+    "SUI": {
+      "name": "Switzerland",
+      "code": "SUI",
+      "elo": 1950.1,
+      "matches": 884,
+      "lastPlayed": "2026-06-06",
+      "globalRank": 18,
+      "form": {
+        "played": 10,
+        "won": 5,
+        "drawn": 4,
+        "lost": 1,
+        "goalsFor": 22,
+        "goalsAgainst": 8,
+        "recent": [
+          {
+            "date": "2025-09-05",
+            "opp": "Kosovo",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-08",
+            "opp": "Slovenia",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "Sweden",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-13",
+            "opp": "Slovenia",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-15",
+            "opp": "Sweden",
+            "gf": 4,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Kosovo",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Germany",
+            "gf": 3,
+            "ga": 4
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Norway",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-05-31",
+            "opp": "Jordan",
+            "gf": 4,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "Australia",
+            "gf": 1,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "TUN": {
+      "name": "Tunisia",
+      "code": "TUN",
+      "elo": 1736.5,
+      "matches": 678,
+      "lastPlayed": "2026-06-06",
+      "globalRank": 59,
+      "form": {
+        "played": 10,
+        "won": 3,
+        "drawn": 4,
+        "lost": 3,
+        "goalsFor": 13,
+        "goalsAgainst": 14,
+        "recent": [
+          {
+            "date": "2025-12-04",
+            "opp": "Palestine",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2025-12-07",
+            "opp": "Qatar",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-12-23",
+            "opp": "Uganda",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2025-12-27",
+            "opp": "Nigeria",
+            "gf": 2,
+            "ga": 3
+          },
+          {
+            "date": "2025-12-30",
+            "opp": "Tanzania",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-01-03",
+            "opp": "Mali",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-28",
+            "opp": "Haiti",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Canada",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-01",
+            "opp": "Austria",
+            "gf": 0,
+            "ga": 1
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "Belgium",
+            "gf": 0,
+            "ga": 5
+          }
+        ]
+      }
+    },
+    "TUR": {
+      "name": "Turkey",
+      "code": "TUR",
+      "elo": 1972.8,
+      "matches": 642,
+      "lastPlayed": "2026-06-06",
+      "globalRank": 16,
+      "form": {
+        "played": 10,
+        "won": 8,
+        "drawn": 1,
+        "lost": 1,
+        "goalsFor": 25,
+        "goalsAgainst": 13,
+        "recent": [
+          {
+            "date": "2025-09-04",
+            "opp": "Georgia",
+            "gf": 3,
+            "ga": 2
+          },
+          {
+            "date": "2025-09-07",
+            "opp": "Spain",
+            "gf": 0,
+            "ga": 6
+          },
+          {
+            "date": "2025-10-11",
+            "opp": "Bulgaria",
+            "gf": 6,
+            "ga": 1
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "Georgia",
+            "gf": 4,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-15",
+            "opp": "Bulgaria",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Spain",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-26",
+            "opp": "Romania",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Kosovo",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-01",
+            "opp": "North Macedonia",
+            "gf": 4,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "Venezuela",
+            "gf": 2,
+            "ga": 1
+          }
+        ]
+      }
+    },
+    "USA": {
+      "name": "United States",
+      "code": "USA",
+      "elo": 1826.5,
+      "matches": 790,
+      "lastPlayed": "2026-06-06",
+      "globalRank": 36,
+      "form": {
+        "played": 10,
+        "won": 5,
+        "drawn": 1,
+        "lost": 4,
+        "goalsFor": 18,
+        "goalsAgainst": 17,
+        "recent": [
+          {
+            "date": "2025-09-06",
+            "opp": "South Korea",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Japan",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "Ecuador",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2025-10-14",
+            "opp": "Australia",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-15",
+            "opp": "Paraguay",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Uruguay",
+            "gf": 5,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-28",
+            "opp": "Belgium",
+            "gf": 2,
+            "ga": 5
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Portugal",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2026-05-31",
+            "opp": "Senegal",
+            "gf": 3,
+            "ga": 2
+          },
+          {
+            "date": "2026-06-06",
+            "opp": "Germany",
+            "gf": 1,
+            "ga": 2
+          }
+        ]
+      }
+    },
+    "URY": {
+      "name": "Uruguay",
+      "code": "URY",
+      "elo": 1973.9,
+      "matches": 970,
+      "lastPlayed": "2026-03-31",
+      "globalRank": 15,
+      "form": {
+        "played": 10,
+        "won": 4,
+        "drawn": 4,
+        "lost": 2,
+        "goalsFor": 10,
+        "goalsAgainst": 9,
+        "recent": [
+          {
+            "date": "2025-06-05",
+            "opp": "Paraguay",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2025-06-10",
+            "opp": "Venezuela",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-04",
+            "opp": "Peru",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-09-09",
+            "opp": "Chile",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "Dominican Republic",
+            "gf": 1,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-13",
+            "opp": "Uzbekistan",
+            "gf": 2,
+            "ga": 1
+          },
+          {
+            "date": "2025-11-15",
+            "opp": "Mexico",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "United States",
+            "gf": 1,
+            "ga": 5
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "England",
+            "gf": 1,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-31",
+            "opp": "Algeria",
+            "gf": 0,
+            "ga": 0
+          }
+        ]
+      }
+    },
+    "UZB": {
+      "name": "Uzbekistan",
+      "code": "UZB",
+      "elo": 1817.6,
+      "matches": 354,
+      "lastPlayed": "2026-06-08",
+      "globalRank": 38,
+      "form": {
+        "played": 10,
+        "won": 4,
+        "drawn": 3,
+        "lost": 3,
+        "goalsFor": 14,
+        "goalsAgainst": 9,
+        "recent": [
+          {
+            "date": "2025-06-10",
+            "opp": "Qatar",
+            "gf": 3,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-10",
+            "opp": "Kuwait",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-10-13",
+            "opp": "Uruguay",
+            "gf": 1,
+            "ga": 2
+          },
+          {
+            "date": "2025-11-14",
+            "opp": "Egypt",
+            "gf": 2,
+            "ga": 0
+          },
+          {
+            "date": "2025-11-18",
+            "opp": "Iran",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-01-26",
+            "opp": "China",
+            "gf": 2,
+            "ga": 2
+          },
+          {
+            "date": "2026-03-27",
+            "opp": "Gabon",
+            "gf": 3,
+            "ga": 1
+          },
+          {
+            "date": "2026-03-30",
+            "opp": "Venezuela",
+            "gf": 0,
+            "ga": 0
+          },
+          {
+            "date": "2026-06-01",
+            "opp": "Canada",
+            "gf": 0,
+            "ga": 2
+          },
+          {
+            "date": "2026-06-08",
+            "opp": "Netherlands",
+            "gf": 1,
+            "ga": 2
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,596 @@
+/* ---- ML Predictor tab ---- */
+
+.ml-section {
+  margin: 0 0 34px;
+}
+
+.ml-h2 {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--cream);
+  margin: 0 0 4px;
+}
+
+.ml-h3 {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--gold-soft);
+  margin: 0 0 10px;
+}
+
+.ml-lead {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0 0 14px;
+}
+
+/* picker */
+
+.ml-picker {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.ml-pick-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.ml-pick {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ml-pick-label {
+  font-family: var(--narrow);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.ml-select-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.ml-select-wrap select {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  color: var(--cream);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 700;
+  outline: none;
+  cursor: pointer;
+}
+
+.ml-select-wrap select option {
+  color: #111;
+}
+
+.ml-swap {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--gold);
+  font-size: 18px;
+  cursor: pointer;
+  margin-bottom: 1px;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.ml-swap:hover {
+  background: rgba(230, 179, 55, 0.16);
+  transform: rotate(180deg);
+}
+
+.ml-neutral {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  margin: 12px 0 4px;
+  cursor: pointer;
+}
+
+.ml-neutral input {
+  accent-color: var(--gold);
+}
+
+.ml-result {
+  margin-top: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+.ml-prob-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.ml-prob-team {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.ml-prob-team strong {
+  font-size: 17px;
+  color: var(--cream);
+  font-weight: 800;
+}
+
+.ml-prob-draw {
+  align-items: center;
+}
+
+.ml-prob-right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+/* probability bar */
+
+.ml-bar {
+  display: flex;
+  height: 14px;
+  border-radius: 7px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.ml-bar-sm {
+  height: 9px;
+  border-radius: 5px;
+}
+
+.ml-bar-h {
+  background: var(--gold);
+}
+
+.ml-bar-d {
+  background: var(--dim);
+}
+
+.ml-bar-a {
+  background: #5aa9e6;
+}
+
+.ml-bar span {
+  display: block;
+  height: 100%;
+}
+
+/* stat strip */
+
+.ml-stats {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.ml-stat {
+  flex: 1;
+  min-width: 120px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ml-stat-k {
+  font-family: var(--narrow);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.ml-stat-v {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--cream);
+}
+
+.ml-stat-v em {
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+/* scoreline grid */
+
+.ml-scorelines {
+  margin-top: 16px;
+}
+
+.ml-scorelines-label {
+  font-family: var(--narrow);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.ml-scorelines-hint {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.ml-score-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.ml-score-cell {
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 4px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ml-score-num {
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--cream);
+}
+
+.ml-score-prob {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* how it works cards */
+
+.ml-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.ml-info {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.ml-info-n {
+  display: block;
+  font-family: var(--narrow);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  margin-bottom: 8px;
+}
+
+.ml-info p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.ml-info strong {
+  color: var(--cream);
+}
+
+/* pipeline / worked example */
+
+.ml-pipeline {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--gold);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.ml-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.ml-steps li {
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.6;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.ml-steps li:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.ml-steps strong {
+  color: var(--cream);
+}
+
+.ml-step-k {
+  display: block;
+  font-family: var(--narrow);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  margin-bottom: 3px;
+}
+
+/* how-it-works steps */
+
+.ml-how {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 4px 18px;
+  margin-bottom: 14px;
+}
+
+.ml-how-step {
+  display: flex;
+  gap: 14px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+
+.ml-how-step:first-child {
+  border-top: none;
+}
+
+.ml-how-num {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(230, 179, 55, 0.16);
+  color: var(--gold);
+  font-weight: 800;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.ml-how-body {
+  min-width: 0;
+}
+
+.ml-how-h {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--cream);
+  margin: 4px 0 6px;
+}
+
+.ml-how-body p {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.ml-how-body strong {
+  color: var(--cream);
+}
+
+.ml-how-body em {
+  font-style: italic;
+  color: var(--gold-soft);
+}
+
+.ml-readme {
+  margin-top: 14px;
+}
+
+.ml-readme p {
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 12px 0 0;
+}
+
+.ml-readme p:first-of-type {
+  margin-top: 0;
+}
+
+.ml-readme strong {
+  color: var(--cream);
+}
+
+.ml-readme em {
+  font-style: italic;
+  color: var(--gold-soft);
+}
+
+/* rated fixtures */
+
+.ml-fixtures {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.ml-fixture {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.ml-fix-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cream);
+}
+
+.ml-fix-team {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ml-fix-right {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.ml-fix-meta {
+  font-family: var(--narrow);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--dim);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.ml-fix-probs {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin: 10px 0 5px;
+}
+
+.ml-fix-draw {
+  color: var(--dim);
+}
+
+.ml-fix-score {
+  text-align: center;
+  font-size: 11px;
+  color: var(--dim);
+  margin-top: 6px;
+}
+
+/* tournament odds table */
+
+.ml-odds {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.ml-odds-head,
+.ml-odds-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 70px 70px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+}
+
+.ml-odds-head {
+  font-family: var(--narrow);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+  border-bottom: 1px solid var(--line);
+}
+
+.ml-odds-head span:not(:first-child),
+.ml-odds-v {
+  text-align: right;
+}
+
+.ml-odds-row {
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.ml-odds-row:nth-child(2) {
+  border-top: none;
+}
+
+.ml-odds-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--cream);
+  min-width: 0;
+}
+
+.ml-odds-v {
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.ml-odds-title {
+  color: var(--gold);
+  font-weight: 800;
+}
+
+.ml-foot {
+  font-size: 12px;
+  color: var(--dim);
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  margin-top: 8px;
+}
+
+@media (max-width: 600px) {
+  .ml-cards {
+    grid-template-columns: 1fr;
+  }
+  .ml-fixtures {
+    grid-template-columns: 1fr;
+  }
+  .ml-score-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .ml-odds-head,
+  .ml-odds-row {
+    grid-template-columns: 1fr 56px 52px 52px;
+    font-size: 13px;
+  }
+}

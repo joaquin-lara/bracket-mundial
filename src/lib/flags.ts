@@ -17,6 +17,7 @@ export const FLAG_CODES: Record<string, string> = {
   CPV: 'cv', // Cape Verde Islands
   CRO: 'hr', // Croatia
   CUR: 'cw', // Curaçao
+  CUW: 'cw', // Curaçao (code variant served by football-data)
   CZE: 'cz', // Czechia
   ECU: 'ec', // Ecuador
   EGY: 'eg', // Egypt
