@@ -10,6 +10,8 @@ interface Props {
   match: Match;
   prediction: Prediction | null;
   revealedPicks?: RevealedPick[];
+  /** Guest view: no score inputs, no Save button. */
+  readOnly?: boolean;
 }
 
 function useNow(active: boolean) {
@@ -34,7 +36,7 @@ function formatCountdown(ms: number): string {
   return `Locks in ${sec}s`;
 }
 
-export default function MatchCard({ match, prediction, revealedPicks }: Props) {
+export default function MatchCard({ match, prediction, revealedPicks, readOnly }: Props) {
   const lockAt = lockTime(match.kickoff);
   const finished = match.status === 'FINISHED';
   const live = match.status === 'IN_PLAY' || match.status === 'PAUSED';
@@ -93,6 +95,8 @@ export default function MatchCard({ match, prediction, revealedPicks }: Props) {
           <div className="final-score">
             {match.home_score ?? '–'} : {match.away_score ?? '–'}
           </div>
+        ) : readOnly ? (
+          <div className="final-score muted-score">vs</div>
         ) : (
           <div className="score-inputs">
             <input
@@ -160,7 +164,7 @@ export default function MatchCard({ match, prediction, revealedPicks }: Props) {
           </Link>
         )}
 
-        {!locked && !teamsTbd && (
+        {!locked && !teamsTbd && !readOnly && (
           <button
             className="save-btn"
             onClick={save}

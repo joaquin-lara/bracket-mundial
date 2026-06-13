@@ -1000,6 +1000,60 @@ h1 {
   color: var(--gold);
 }
 
+/* ---- guest browse: login button + read-only bracket ---- */
+
+.guest-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--dim);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 18px 0 14px;
+}
+
+.guest-divider::before,
+.guest-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.guest-divider span {
+  padding: 0 12px;
+}
+
+.guest-btn {
+  width: 100%;
+  background: transparent;
+  color: var(--cream);
+  border: 1px solid rgba(244, 241, 232, 0.25);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.guest-btn:hover:not(:disabled) {
+  border-color: var(--gold);
+  background: rgba(230, 179, 55, 0.08);
+}
+
+.guest-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.muted-score {
+  color: var(--dim);
+  font-weight: 700;
+}
+
 /* ---- points race chart ---- */
 
 .race-card {

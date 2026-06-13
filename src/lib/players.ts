@@ -19,3 +19,15 @@ export function pinPassword(player: string, pin: string): string {
   // Supabase requires 6+ char passwords; pad the 4-digit PIN deterministically.
   return `bm-${pin}-${player.toLowerCase()}`;
 }
+
+// A single shared, view-only account for visitors who just want to look
+// around. It is a real Supabase user (so row-level security still applies),
+// but the app blocks it from editing the bracket or running shootouts.
+export const GUEST_NAME = 'Guest';
+export const GUEST_EMAIL = 'guest@bracketmundial.app';
+export const GUEST_PASSWORD = 'bm-guest-viewer-account';
+
+/** True if this signed-in user is the shared guest account. */
+export function isGuestEmail(email: string | null | undefined): boolean {
+  return (email ?? '').toLowerCase() === GUEST_EMAIL;
+}

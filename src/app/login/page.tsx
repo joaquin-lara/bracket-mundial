@@ -3,7 +3,16 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { flagUrl } from '@/lib/flags';
-import { PLAYER_META, PLAYERS, pinPassword, playerEmail, type Player } from '@/lib/players';
+import {
+  GUEST_EMAIL,
+  GUEST_NAME,
+  GUEST_PASSWORD,
+  PLAYER_META,
+  PLAYERS,
+  pinPassword,
+  playerEmail,
+  type Player,
+} from '@/lib/players';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
@@ -53,6 +62,36 @@ export default function LoginPage() {
     }, 550);
   }
 
+  async function continueAsGuest() {
+    setBusy(true);
+    setError(null);
+
+    const supabase = createClient();
+    // Sign into the shared guest account, creating it the first time.
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: GUEST_EMAIL,
+      password: GUEST_PASSWORD,
+    });
+    if (signInError) {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: GUEST_EMAIL,
+        password: GUEST_PASSWORD,
+        options: { data: { display_name: GUEST_NAME } },
+      });
+      if (signUpError || !data.session) {
+        setError('Could not start a guest session. Try again.');
+        setBusy(false);
+        return;
+      }
+    }
+
+    setLeaving(true);
+    setTimeout(() => {
+      router.push('/');
+      router.refresh();
+    }, 550);
+  }
+
   return (
     <main>
       <div className={`auth-card${leaving ? ' leaving' : ''}`}>
@@ -75,6 +114,14 @@ export default function LoginPage() {
                 </button>
               ))}
             </div>
+
+            <div className="guest-divider">
+              <span>or</span>
+            </div>
+            <button className="guest-btn" onClick={continueAsGuest} disabled={busy}>
+              {busy ? 'Entering…' : 'Browse as guest'}
+            </button>
+            <p className="hint">Just looking? Guests can view everything but can&apos;t fill out a bracket.</p>
           </>
         ) : (
           <form onSubmit={submit}>

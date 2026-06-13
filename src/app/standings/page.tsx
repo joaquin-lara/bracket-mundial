@@ -3,6 +3,7 @@ import PickHeatmap, { type HeatColumn, type HeatRow } from '@/components/PickHea
 import RaceChart, { type RacePoint } from '@/components/RaceChart';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { createClient } from '@/lib/supabase/server';
+import { GUEST_NAME } from '@/lib/players';
 
 export const metadata: Metadata = { title: 'Player Standings' };
 export const dynamic = 'force-dynamic';
@@ -23,7 +24,8 @@ export default async function StandingsPage() {
   if (!user) return null;
 
   const { data } = await supabase.from('standings').select('*');
-  const rows = (data ?? []) as StandingRow[];
+  // The shared guest account is view-only and never competes.
+  const rows = ((data ?? []) as StandingRow[]).filter((r) => r.display_name !== GUEST_NAME);
 
   // Scored predictions (visible to everyone post-kickoff) + kickoff dates
   // feed the points race chart.

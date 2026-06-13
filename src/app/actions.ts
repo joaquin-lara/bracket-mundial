@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { isGuestEmail } from '@/lib/players';
 
 export interface PredictionResult {
   ok: boolean;
@@ -31,6 +32,9 @@ export async function submitPrediction(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: 'Not signed in.' };
+  if (isGuestEmail(user.email)) {
+    return { ok: false, error: 'Guests can view the bracket but not fill one out. Sign in as a player to make picks.' };
+  }
 
   // No predictions on placeholder fixtures (knockout slots without teams).
   const { data: matchRow } = await supabase

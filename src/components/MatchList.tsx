@@ -10,6 +10,8 @@ interface Props {
   revealedPicks?: Record<number, RevealedPick[]>;
   /** Show an Upcoming/Past toggle (past = finished games, most recent first). */
   split?: boolean;
+  /** Guest view: show fixtures but hide the score inputs and Save button. */
+  readOnly?: boolean;
 }
 
 function groupByDay(matches: Match[]) {
@@ -27,7 +29,7 @@ function groupByDay(matches: Match[]) {
 }
 
 /** Groups matches by the viewer's local calendar day. */
-export default function MatchList({ matches, predictions, revealedPicks, split }: Props) {
+export default function MatchList({ matches, predictions, revealedPicks, split, readOnly }: Props) {
   const [view, setView] = useState<'upcoming' | 'past'>('upcoming');
 
   const upcoming = split ? matches.filter((m) => m.status !== 'FINISHED') : matches;
@@ -66,6 +68,7 @@ export default function MatchList({ matches, predictions, revealedPicks, split }
                 match={m}
                 prediction={predictions[m.id] ?? null}
                 revealedPicks={revealedPicks?.[m.id]}
+                readOnly={readOnly}
               />
             ))}
           </section>

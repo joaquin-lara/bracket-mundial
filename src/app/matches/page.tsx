@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import MatchList from '@/components/MatchList';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { createClient } from '@/lib/supabase/server';
+import { isGuestEmail } from '@/lib/players';
 import type { Match, Prediction, RevealedPick } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'Enter your bracket' };
@@ -59,15 +60,25 @@ export default async function EnterBracketPage() {
     }
   }
 
+  const guest = isGuestEmail(user.email);
+
   return (
     <main>
-      <h1>Enter your bracket</h1>
-      <p className="page-intro">
-        Every match in the tournament, ready for your picks. Type the <strong>final score</strong>{' '}
-        you expect and hit <strong>Save</strong>; edit as often as you like until{' '}
-        <strong>10 minutes before kickoff</strong>. Switch to <strong>Past</strong> to see how
-        everyone&apos;s picks compared to the real results.
-      </p>
+      <h1>{guest ? 'The bracket' : 'Enter your bracket'}</h1>
+      {guest ? (
+        <p className="page-intro">
+          You&apos;re browsing as a <strong>guest</strong>. Every fixture is here to look through,
+          and after kickoff you can see how each player&apos;s picks compared. To fill out your own
+          bracket, sign out and sign in as a player.
+        </p>
+      ) : (
+        <p className="page-intro">
+          Every match in the tournament, ready for your picks. Type the <strong>final score</strong>{' '}
+          you expect and hit <strong>Save</strong>; edit as often as you like until{' '}
+          <strong>10 minutes before kickoff</strong>. Switch to <strong>Past</strong> to see how
+          everyone&apos;s picks compared to the real results.
+        </p>
+      )}
       {matchList.length === 0 ? (
         <p className="empty">
           No fixtures yet. They appear after the first sync runs (see README step 5).
@@ -78,6 +89,7 @@ export default async function EnterBracketPage() {
           predictions={predictions}
           revealedPicks={revealedPicks}
           split
+          readOnly={guest}
         />
       )}
     </main>
