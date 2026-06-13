@@ -213,7 +213,7 @@ body:has(.home-intro) .pitch-stripes {
 }
 
 .mobile-menu.open {
-  max-height: min(70vh, 460px);
+  max-height: calc(100dvh - 56px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
