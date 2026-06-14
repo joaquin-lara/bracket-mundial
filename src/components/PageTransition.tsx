@@ -42,7 +42,7 @@ export default function PageTransitionProvider({ children }: { children: React.R
     gsap.ticker.lagSmoothing(0);
 
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-    renderer.setPixelRatio(1);
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(BALL_PX, BALL_PX, false);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
