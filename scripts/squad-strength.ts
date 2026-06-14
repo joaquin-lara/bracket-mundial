@@ -1,10 +1,11 @@
 /**
  * National "talent pool" strength from the sofifa player ratings
- * (eddwebster/football_analytics mirror of the FIFA 15-22 datasets).
+ * (eddwebster/football_analytics mirror for FIFA 15-22; stefanoleone992 / a
+ * sofifa-schema FC 25 export for the newer editions -- see ML_NEXT_STEPS.md).
  *
  * For each FIFA edition we take a country's best 23 players by overall rating
  * and average them -- a snapshot of how strong the available player pool was
- * that year. Because we have eight editions (2014-2021) this is a *historical*
+ * that year. Because we have eleven editions (2014-2024) this is a *historical*
  * feature: for any match we can ask how strong each side's pool was at the time,
  * which is what makes it backtestable rather than a present-day-only prior.
  *

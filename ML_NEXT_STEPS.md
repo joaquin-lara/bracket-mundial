@@ -18,17 +18,20 @@ Measured out-of-sample on competitive matches (test 2015+):
 | **Dixon-Coles online (attack/defense)** | **0.1654** | **0.8454** |
 | Dixon-Coles + recalibration | 0.1654 | 0.8453 |
 
-Squad-value test (same 2,636 matches both teams have a FIFA pool for):
+Squad-value test (now with FIFA 15-25 loaded; 2,677 matches both teams have a
+FIFA pool for, test 2015+):
 
 | model | RPS | log-loss |
 |---|---|---|
-| Dixon-Coles only | 0.1875 | 0.9536 |
-| Squad strength only | 0.1926 | 0.9716 |
-| **Ensemble (DC + squad, 50/50)** | **0.1861** | **0.9504** |
+| Dixon-Coles only | 0.1872 | 0.9516 |
+| Squad strength only | 0.1937 | 0.9738 |
+| Ensemble (DC + squad, fixed 50/50) | 0.1863 | 0.9502 |
 
-Findings: Dixon-Coles beats the shipped Elo model; squad strength is weaker alone
-but **complementary** (ensemble beats DC alone); DC is already well-calibrated so
-temperature recalibration is ~a no-op (T=0.995).
+Findings: Dixon-Coles beats the shipped Elo model; squad strength is weaker alone.
+A **fixed 50/50** ensemble looks like a hair better than DC on the test window
+(RPS 0.1863 vs 0.1872), **but that edge does not survive honest weight tuning** --
+see "Squad ensemble: settled" below. DC is already well-calibrated so temperature
+recalibration is ~a no-op (T=0.995).
 
 ## Wired into the live predictor (done)
 
@@ -45,8 +48,34 @@ The **Dixon-Coles** model now powers the live head-to-head predictor:
   the DC behaviour (draw inflation, home advantage, favourite scores more).
 
 Recalibration was intentionally **not** wired in — DC is already calibrated
-(T≈0.995, a no-op). Squad/ensemble stays research-only (see #1 below: its data is
-stale and not reachable here).
+(T≈0.995, a no-op). Squad/ensemble stays **research-only** — and after the FC
+23/24/25 refresh, that is now a *settled* decision, not a data-blocked one (see
+"Squad ensemble: settled" below).
+
+## Squad ensemble: settled — DC stays solo (2026-06-14)
+
+The Kaggle egress allowlist was opened, so FIFA 23 / EA FC 24 / FC 25 are now
+loaded and the talent-pool feature is **current** (the 2026-06 column finally
+moves past FIFA 22 — e.g. South Korea 73.4→74.6, USA 75.0→75.8). With current
+data we re-ran the question "does DC+squad beat DC alone?" **honestly**:
+
+- A **fixed 50/50** blend edges DC on the *test* window (RPS 0.1863 vs 0.1872) —
+  but a fixed weight chosen with test-set hindsight isn't a fair test.
+- Sweeping the ensemble weight on a real **validation** window (2015–2018, n=652
+  competitive both-pool matches; squad constant fit through 2018, test 2018+):
+  validation RPS is **monotonic in the DC weight and is minimised at wDC = 1.0**
+  (pure DC). i.e. the only data we're allowed to tune on says "use no squad."
+  At that honestly-chosen weight the ensemble *is* DC-only on test (RPS 0.18769).
+  The blend only wins if you peek: the test-window optimum (~wDC 0.7, RPS 0.1859)
+  is exactly the kind of in-sample tuning the validation split exists to forbid.
+
+Conclusion: squad talent-pool strength is a genuine but **weak and redundant**
+signal next to online Dixon-Coles — DC's attack/defence ratings already encode
+roughly what the FIFA pool tells us, and more responsively. So the live predictor
+**stays DC-only**; squad strength remains a research/explainer signal, not a model
+input. (Sweep harness used: a standalone weight grid over the same DC + squad
+models as `scripts/backtest.ts`; not committed, since the conclusion is "don't
+ship it.") This closes to-do #1 and #3 below.
 
 ## Data (gitignored under `/data/`, must be re-fetched per session)
 
@@ -54,84 +83,78 @@ stale and not reachable here).
 # results dataset
 npm run build:elo            # downloads data/results.csv
 
-# FIFA talent-pool ratings (FIFA 15-22), auto-loaded by scripts/squad-strength.ts
+# FIFA talent-pool ratings, auto-loaded by scripts/squad-strength.ts.
+# It reads data/fifa/male_players_<yy>.csv for any edition present, keying on the
+# sofifa columns `overall` + `nationality_name`.
+
+# (a) FIFA 15-22 from the eddwebster GitHub mirror (single-snapshot sofifa CSVs):
 UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36"
 base="https://raw.githubusercontent.com/eddwebster/football_analytics/master/data/fifa/raw"
 mkdir -p data/fifa
 for yy in 15 16 17 18 19 20 21 22; do
   curl -sSL -A "$UA" "$base/male_players_$yy.csv" -o "data/fifa/male_players_$yy.csv"
 done
+
+# (b) FIFA 23 + EA FC 24 from Kaggle. The stefanoleone992 *FC 24* dataset's
+#     male_players.csv is one file covering editions 15-24 (column `fifa_version`,
+#     single update 2.0 each) and is schema-identical to the eddwebster files, so
+#     filter it for versions 23 and 24 -> male_players_23.csv / _24.csv:
+curl -L -u "$KAGGLE_USERNAME:$KAGGLE_KEY" -o /tmp/fc24.zip \
+  "https://www.kaggle.com/api/v1/datasets/download/stefanoleone992/ea-sports-fc-24-complete-player-dataset"
+unzip -o -q /tmp/fc24.zip male_players.csv -d /tmp/fc24x
+python3 - <<'PY'
+import csv
+with open('/tmp/fc24x/male_players.csv', newline='', encoding='utf-8') as f:
+    r = csv.reader(f); header = next(r); iv = header.index('fifa_version')
+    keep = {'23': [], '24': []}
+    for row in r:
+        v = row[iv].split('.')[0]
+        if v in keep: keep[v].append(row)
+for yy, rows in keep.items():
+    with open(f'data/fifa/male_players_{yy}.csv', 'w', newline='', encoding='utf-8') as o:
+        w = csv.writer(o); w.writerow(header); w.writerows(rows)
+PY
+
+# (c) EA FC 25 — no stefanoleone992 FC25 dataset exists. Use a sofifa-style FC25
+#     export and rename its columns to the sofifa schema. nyagami's dataset has
+#     the widest coverage (~16k players, `OVR` + `Nation`):
+curl -L -u "$KAGGLE_USERNAME:$KAGGLE_KEY" -o /tmp/fc25.zip \
+  "https://www.kaggle.com/api/v1/datasets/download/nyagami/ea-sports-fc-25-database-ratings-and-stats"
+unzip -o -q /tmp/fc25.zip male_players.csv -d /tmp/fc25x
+python3 - <<'PY'
+import csv
+with open('/tmp/fc25x/male_players.csv', newline='', encoding='utf-8') as f:
+    r = csv.reader(f); h = next(r)
+    iN, iO, iNat = h.index('Name'), h.index('OVR'), h.index('Nation')
+    out = [[row[iN], row[iO], row[iNat]] for row in r
+           if len(row) > max(iN, iO, iNat) and row[iO].strip().isdigit() and row[iNat].strip()]
+with open('data/fifa/male_players_25.csv', 'w', newline='', encoding='utf-8') as o:
+    w = csv.writer(o); w.writerow(['short_name', 'overall', 'nationality_name']); w.writerows(out)
+PY
 ```
 
 ## Remaining to-do
 
-**Network reality (re-checked 2026-06-14):** the Kaggle creds ARE now set
-(`KAGGLE_USERNAME` + `KAGGLE_KEY` both present and valid). The blocker is **not**
-auth and **not** the dataset slug — it is this environment's **network egress
-allowlist**. Every Kaggle request returns, at the proxy layer:
+**Kaggle egress: RESOLVED (2026-06-14).** `www.kaggle.com` (and the
+`storage.googleapis.com` download-redirect target) are now on the network egress
+allowlist, and `KAGGLE_USERNAME` / `KAGGLE_KEY` are set, so FIFA 23 / FC 24 / FC 25
+are reachable and now loaded (see the Data section for the exact, working fetch).
+Slug notes for next time: `stefanoleone992/fifa-23-complete-player-dataset` and
+`.../ea-sports-fc-24-complete-player-dataset` exist; **there is no stefanoleone992
+FC25 dataset** (the guessed `.../ea-sports-fc-25-complete-player-dataset` 404s).
+The FC24 dataset's male_players.csv already spans editions 15-24, so it supplies
+both 23 and 24; FC25 comes from `nyagami/ea-sports-fc-25-database-ratings-and-stats`
+(non-sofifa header, renamed in the fetch script).
 
-```
-HTTP 403  Host not in allowlist: www.kaggle.com. Add this host to your network
-          egress settings to allow access.
-```
-
-Probed this session: the allowlist is effectively **GitHub-only**
-(`github.com`, `raw.githubusercontent.com`, `media.githubusercontent.com`,
-`objects.githubusercontent.com`) **plus `storage.googleapis.com`**. Blocked:
-`kaggle.com`, `www.kaggle.com`, `huggingface.co`, `zenodo.org`, `figshare.com`.
-Kaggle dataset files live on GCS (which IS reachable), but the download endpoint
-must first 302-redirect through `www.kaggle.com` to mint a signed GCS URL — so the
-open GCS host alone doesn't help. The eddwebster GitHub mirror still stops at FIFA
-22 (23/24/25 → 404), and a GitHub repo/code search turned up no public mirror that
-*commits* the full multi-nation FC23/24/25 sofifa CSV (repos that use the dataset
-reference Kaggle or host only a small single-league subset).
-
-**Resolution chosen by user (2026-06-14): add `www.kaggle.com` to the egress
-allowlist.** The network policy is fixed at container start, so the edit only
-takes effect in a **new session** — it did NOT propagate to the session that hit
-this. `storage.googleapis.com` is already allowed (the download redirect target),
-so adding `www.kaggle.com` (and `kaggle.com`) should be sufficient.
-
-**Next session (once kaggle.com is allowed), run exactly:**
-
-```bash
-npm install && npm run build:elo            # deps + data/results.csv
-# FIFA 15-22 (eddwebster mirror):
-UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36"
-base="https://raw.githubusercontent.com/eddwebster/football_analytics/master/data/fifa/raw"
-mkdir -p data/fifa
-for yy in 15 16 17 18 19 20 21 22; do
-  curl -sSL -A "$UA" "$base/male_players_$yy.csv" -o "data/fifa/male_players_$yy.csv"
-done
-# FIFA 23 / FC 24 / FC 25 from Kaggle (unzip, find the male players CSV, place as
-# data/fifa/male_players_23.csv / _24.csv / _25.csv; confirm header has
-# `overall` and `nationality_name`):
-for slug_out in \
-  "stefanoleone992/fifa-23-complete-player-dataset:23" \
-  "stefanoleone992/ea-sports-fc-24-complete-player-dataset:24" \
-  "stefanoleone992/ea-sports-fc-25-complete-player-dataset:25"; do
-  slug=${slug_out%:*}; yy=${slug_out#*:}
-  curl -L -u "$KAGGLE_USERNAME:$KAGGLE_KEY" -o /tmp/fc$yy.zip \
-    "https://www.kaggle.com/api/v1/datasets/download/$slug"
-  # unzip /tmp/fc$yy.zip -d /tmp/fc$yy && locate the male players csv -> data/fifa/male_players_$yy.csv
-done
-npx tsx scripts/squad-strength.ts   # should now list editions incl. 23/24/25
-npm run backtest                     # compare Ensemble (DC+squad) vs Dixon-Coles only
-```
-
-1. **Newer squad snapshots (blocked on egress allowlist, NOT auth).** Add FIFA 23 /
-   FC 24 / FC 25. `scripts/squad-strength.ts` already auto-loads
-   `male_players_23/24/25.csv` from `data/fifa/` (sofifa schema: `overall` +
-   `nationality_name`). Creds are set; the only missing piece is `www.kaggle.com`
-   in the egress allowlist (user is adding it; needs a fresh session). Then re-run
-   `npm run backtest`. Note: squad is only a complementary signal; **DC alone
-   already ships and beats the old model**, so the live predictor is unaffected
-   until/unless the ensemble proves a meaningful win.
+1. ~~**Newer squad snapshots.**~~ **Done (2026-06-14).** FIFA 23/24/25 loaded;
+   feature is current. Outcome: the ensemble does **not** robustly beat DC-alone
+   (see "Squad ensemble: settled" above), so nothing was wired into the live model.
 2. **Transfermarkt squad values (blocked on bot protection).** Alternative
    strength signal; TM 403s anonymous requests. Would need a gentler fetch path /
    credential.
-3. **Tune the ensemble weight** (currently fixed 50/50) on the validation window —
-   only worth doing once #1 lands and the ensemble is a ship candidate.
+3. ~~**Tune the ensemble weight.**~~ **Done (2026-06-14).** Validation picks
+   wDC = 1.0 (pure DC); the blend is not a ship candidate. See "Squad ensemble:
+   settled" above.
 4. ~~**Wire the winner into the live predictor.**~~ **Done** — Dixon-Coles is
    live (see "Wired into the live predictor" above).
 5. **Live lineups** for upcoming fixtures: free lineup API, **production only**
@@ -139,11 +162,8 @@ npm run backtest                     # compare Ensemble (DC+squad) vs Dixon-Cole
    API key as a Vercel env var. UI note: squad strength feeds in near kickoff.
 
 ## User actions that may be needed next session
-- **Add `www.kaggle.com` (and `kaggle.com`) to the environment's network egress
-  allowlist**, then start a **new session** (the policy is set at container start
-  and won't hot-reload). Kaggle creds are already set, so that's the only blocker
-  for FC 23/24/25. `storage.googleapis.com` is already allowed. (If you'd rather
-  not touch the allowlist, paste direct GitHub-raw CSV links for the FC23/24/25
-  male-players files instead — those hosts are reachable today.)
+- Nothing for the squad feature — Kaggle egress is sorted and the FC 23/24/25
+  question is settled (DC stays solo). The data lives under gitignored `data/`,
+  so re-run the Data-section fetch each fresh session if you want to reproduce.
 - Later, a **free lineup-API key** as a Vercel env var for the live-lineup
   feature (production only).
