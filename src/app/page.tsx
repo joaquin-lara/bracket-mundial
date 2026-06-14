@@ -53,11 +53,11 @@ export default async function HomePage() {
             Cup Bracket.
           </h1>
 
-          <p className="hero-tag">El que sale último es el más pendejo.</p>
+          <p className="hero-tag">Predict the scores. Most points after the Final wins.</p>
 
           <div className="cta-row">
             <Link href="/matches" className="btn-gold">
-              Edit your bracket →
+              View/edit your bracket →
             </Link>
             <Link href="/standings" className="btn-ghost">
               Player standings

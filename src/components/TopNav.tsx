@@ -7,10 +7,10 @@ import TransitionLink from './TransitionLink';
 
 const LINKS = [
   ['/rules', 'Rules'],
-  ['/matches', 'Edit your bracket'],
+  ['/schedule', 'Game schedule'],
+  ['/matches', 'View/edit your bracket'],
   ['/standings', 'Player Standings'],
   ['/bracket', 'Group and Bracket Tracker'],
-  ['/schedule', 'Game schedule'],
   ['/predictor', 'ML Predictor'],
   ['/duels', 'Penalty Shootouts'],
 ] as const;
