@@ -65,20 +65,68 @@ done
 
 ## Remaining to-do
 
-**Network reality (checked this session):** the Custom policy reaches more than
-GitHub, but the squad sources are still effectively walled. `dagshub.com` resolves
-but the FC24 mirror repo redirects to a sign-in; `sofifa.com` / `kaggle.com` /
-`transfermarkt.com` all return **403** (reachable at the network layer, refused at
-the app layer — bot protection / auth). The eddwebster GitHub mirror still stops
-at FIFA 22. So #1 and #2 below remain blocked without a credential or a direct
-CSV link from the user.
+**Network reality (re-checked 2026-06-14):** the Kaggle creds ARE now set
+(`KAGGLE_USERNAME` + `KAGGLE_KEY` both present and valid). The blocker is **not**
+auth and **not** the dataset slug — it is this environment's **network egress
+allowlist**. Every Kaggle request returns, at the proxy layer:
 
-1. **Newer squad snapshots (blocked on auth).** Add FIFA 23 / FC 24 / FC 25.
-   `scripts/squad-strength.ts` already auto-loads `male_players_23/24/25.csv` from
-   `data/fifa/` (sofifa schema: `overall` + `nationality_name`). Needs a **Kaggle
-   API token** (`KAGGLE_USERNAME`/`KAGGLE_KEY`) or a **direct CSV link** from the
-   user. Then re-run `npm run backtest`. Note: squad is only a complementary
-   signal; **DC alone already ships and beats the old model.**
+```
+HTTP 403  Host not in allowlist: www.kaggle.com. Add this host to your network
+          egress settings to allow access.
+```
+
+Probed this session: the allowlist is effectively **GitHub-only**
+(`github.com`, `raw.githubusercontent.com`, `media.githubusercontent.com`,
+`objects.githubusercontent.com`) **plus `storage.googleapis.com`**. Blocked:
+`kaggle.com`, `www.kaggle.com`, `huggingface.co`, `zenodo.org`, `figshare.com`.
+Kaggle dataset files live on GCS (which IS reachable), but the download endpoint
+must first 302-redirect through `www.kaggle.com` to mint a signed GCS URL — so the
+open GCS host alone doesn't help. The eddwebster GitHub mirror still stops at FIFA
+22 (23/24/25 → 404), and a GitHub repo/code search turned up no public mirror that
+*commits* the full multi-nation FC23/24/25 sofifa CSV (repos that use the dataset
+reference Kaggle or host only a small single-league subset).
+
+**Resolution chosen by user (2026-06-14): add `www.kaggle.com` to the egress
+allowlist.** The network policy is fixed at container start, so the edit only
+takes effect in a **new session** — it did NOT propagate to the session that hit
+this. `storage.googleapis.com` is already allowed (the download redirect target),
+so adding `www.kaggle.com` (and `kaggle.com`) should be sufficient.
+
+**Next session (once kaggle.com is allowed), run exactly:**
+
+```bash
+npm install && npm run build:elo            # deps + data/results.csv
+# FIFA 15-22 (eddwebster mirror):
+UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36"
+base="https://raw.githubusercontent.com/eddwebster/football_analytics/master/data/fifa/raw"
+mkdir -p data/fifa
+for yy in 15 16 17 18 19 20 21 22; do
+  curl -sSL -A "$UA" "$base/male_players_$yy.csv" -o "data/fifa/male_players_$yy.csv"
+done
+# FIFA 23 / FC 24 / FC 25 from Kaggle (unzip, find the male players CSV, place as
+# data/fifa/male_players_23.csv / _24.csv / _25.csv; confirm header has
+# `overall` and `nationality_name`):
+for slug_out in \
+  "stefanoleone992/fifa-23-complete-player-dataset:23" \
+  "stefanoleone992/ea-sports-fc-24-complete-player-dataset:24" \
+  "stefanoleone992/ea-sports-fc-25-complete-player-dataset:25"; do
+  slug=${slug_out%:*}; yy=${slug_out#*:}
+  curl -L -u "$KAGGLE_USERNAME:$KAGGLE_KEY" -o /tmp/fc$yy.zip \
+    "https://www.kaggle.com/api/v1/datasets/download/$slug"
+  # unzip /tmp/fc$yy.zip -d /tmp/fc$yy && locate the male players csv -> data/fifa/male_players_$yy.csv
+done
+npx tsx scripts/squad-strength.ts   # should now list editions incl. 23/24/25
+npm run backtest                     # compare Ensemble (DC+squad) vs Dixon-Coles only
+```
+
+1. **Newer squad snapshots (blocked on egress allowlist, NOT auth).** Add FIFA 23 /
+   FC 24 / FC 25. `scripts/squad-strength.ts` already auto-loads
+   `male_players_23/24/25.csv` from `data/fifa/` (sofifa schema: `overall` +
+   `nationality_name`). Creds are set; the only missing piece is `www.kaggle.com`
+   in the egress allowlist (user is adding it; needs a fresh session). Then re-run
+   `npm run backtest`. Note: squad is only a complementary signal; **DC alone
+   already ships and beats the old model**, so the live predictor is unaffected
+   until/unless the ensemble proves a meaningful win.
 2. **Transfermarkt squad values (blocked on bot protection).** Alternative
    strength signal; TM 403s anonymous requests. Would need a gentler fetch path /
    credential.
@@ -91,7 +139,11 @@ CSV link from the user.
    API key as a Vercel env var. UI note: squad strength feeds in near kickoff.
 
 ## User actions that may be needed next session
-- A **free Kaggle API token** (or a direct GitHub/CSV link) to unblock #1 (FC
-  23/24/25). Skip if DC-only is enough.
+- **Add `www.kaggle.com` (and `kaggle.com`) to the environment's network egress
+  allowlist**, then start a **new session** (the policy is set at container start
+  and won't hot-reload). Kaggle creds are already set, so that's the only blocker
+  for FC 23/24/25. `storage.googleapis.com` is already allowed. (If you'd rather
+  not touch the allowlist, paste direct GitHub-raw CSV links for the FC23/24/25
+  male-players files instead — those hosts are reachable today.)
 - Later, a **free lineup-API key** as a Vercel env var for the live-lineup
   feature (production only).
