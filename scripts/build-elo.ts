@@ -155,6 +155,27 @@ function main() {
   let sumHomeMargin = 0;
   let nonNeutral = 0;
 
+  // --- Dixon-Coles online model (the live predictor's goal model) ------------
+  // Each team carries a log-scale attack and defense rating; goal means are
+  //   lambdaHome = exp(base + homeAdv + att_home - def_away)
+  //   lambdaAway = exp(base +          att_away - def_home)
+  // After each match the ratings take a gradient step on the Poisson
+  // log-likelihood (observed - expected goals), so this is "Elo for goals". It
+  // beat the Elo+independent-Poisson model out of sample in scripts/backtest.ts
+  // (RPS 0.1654 vs 0.1672), so it is what ships. Hyperparameters match that
+  // harness exactly; the only difference is we run over the full history here.
+  const dcAtt = new Map<string, number>();
+  const dcDef = new Map<string, number>();
+  let dcBase = Math.log(1.35); // ~log(avg goals per team); drifts online
+  let dcHome = 0.25; // home advantage in log-goal space
+  const DC_LR_TEAM = 0.05;
+  const DC_LR_GLOBAL = 0.004;
+  const DC_RHO = -0.07; // low-score correction (negative inflates draws)
+  const DC_SHRINK = 0.0015; // pull ratings toward 0: regularize + time-decay
+  const DC_FRIENDLY_W = 0.5;
+  const aOf = (t: string) => dcAtt.get(t) ?? 0;
+  const dOf = (t: string) => dcDef.get(t) ?? 0;
+
   for (const r of rows) {
     const h = get(r.home);
     const a = get(r.away);
@@ -179,6 +200,20 @@ function main() {
       sumHomeMargin += goalDiff;
       nonNeutral++;
     }
+
+    // Dixon-Coles online step (predict-then-update, same as the backtest).
+    const lh = Math.exp(dcBase + (r.neutral ? 0 : dcHome) + aOf(r.home) - dOf(r.away));
+    const la = Math.exp(dcBase + aOf(r.away) - dOf(r.home));
+    const w = r.tournament.toLowerCase() === 'friendly' ? DC_FRIENDLY_W : 1;
+    const eh = r.hs - lh; // gradient of att_home / -def_away
+    const ea = r.as - la; // gradient of att_away / -def_home
+    const lr = DC_LR_TEAM * w;
+    dcAtt.set(r.home, aOf(r.home) * (1 - DC_SHRINK) + lr * eh);
+    dcDef.set(r.away, dOf(r.away) * (1 - DC_SHRINK) - lr * eh);
+    dcAtt.set(r.away, aOf(r.away) * (1 - DC_SHRINK) + lr * ea);
+    dcDef.set(r.home, dOf(r.home) * (1 - DC_SHRINK) - lr * ea);
+    dcBase += DC_LR_GLOBAL * w * (eh + ea);
+    if (!r.neutral) dcHome += DC_LR_GLOBAL * w * eh;
 
     for (const [side, gf, ga, opp] of [
       [h, r.hs, r.as, r.away],
@@ -212,6 +247,13 @@ function main() {
       avgTotalGoals: round(avgTotalGoals, 4),
       homeMarginGoals: round(homeMarginGoals, 4),
       eloBaseline: 1500,
+      // Dixon-Coles global params the live predictor needs to turn the per-team
+      // attack/defense ratings into goal means and corrected scorelines.
+      dc: {
+        base: round(dcBase, 6),
+        home: round(dcHome, 6),
+        rho: DC_RHO,
+      },
     },
     totalRankedTeams: totalRanked,
     teams: {} as Record<string, unknown>,
@@ -236,6 +278,10 @@ function main() {
       matches: t.matches,
       lastPlayed: t.lastPlayed,
       globalRank: rankOf.get(name) ?? null,
+      // Dixon-Coles attack (goals scored) and defense (goals prevented) ratings
+      // in log-goal space, learned over the full history. The live goal model.
+      dcAtt: round(dcAtt.get(name) ?? 0, 4),
+      dcDef: round(dcDef.get(name) ?? 0, 4),
       form: {
         played: last10.length,
         won: w, drawn: d, lost: l,

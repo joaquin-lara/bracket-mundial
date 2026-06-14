@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { predict, expectedWin, expectedGoals, pct } from './model';
+import { predict, expectedWin, expectedGoals, dcGoals, pct } from './model';
+import { scoreGrid } from './poisson';
 import { lookup, TEAMS } from './teams';
 
 describe('team lookup', () => {
@@ -73,6 +74,30 @@ describe('predict', () => {
     expect(r.topScores).toHaveLength(6);
     expect(r.topScores[0].prob).toBeGreaterThanOrEqual(r.topScores[1].prob);
     expect(r.mostLikelyScore.prob).toBeCloseTo(r.topScores[0].prob, 6);
+  });
+});
+
+describe('dixon-coles goal model', () => {
+  it('pits attack against the opposite defense; favourite scores more', () => {
+    const arg = lookup('ARG')!;
+    const hai = lookup('HAI')!;
+    const { lambdaHome, lambdaAway } = dcGoals(arg, hai, true);
+    expect(lambdaHome).toBeGreaterThan(lambdaAway);
+    expect(lambdaAway).toBeGreaterThan(0);
+  });
+
+  it('home advantage lifts the home goal mean on a non-neutral ground', () => {
+    const mex = lookup('MEX')!;
+    const can = lookup('CAN')!;
+    expect(dcGoals(mex, can, false).lambdaHome).toBeGreaterThan(
+      dcGoals(mex, can, true).lambdaHome
+    );
+  });
+
+  it('inflates draws vs an independent Poisson at the same goal means', () => {
+    const r = predict({ home: 'ESP', away: 'FRA', neutral: true })!;
+    const independent = scoreGrid(r.lambdaHome, r.lambdaAway).pDraw;
+    expect(r.probDraw).toBeGreaterThan(independent);
   });
 });
 
