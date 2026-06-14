@@ -91,37 +91,40 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
           <span>{match.home_team}</span>
         </div>
 
-        {started ? (
-          <div className="final-score">
-            {match.home_score ?? '–'} : {match.away_score ?? '–'}
-          </div>
-        ) : readOnly ? (
-          <div className="final-score muted-score">vs</div>
-        ) : (
-          <div className="score-inputs">
-            <input
-              type="number"
-              min={0}
-              max={20}
-              inputMode="numeric"
-              value={home}
-              disabled={locked || teamsTbd}
-              onChange={(e) => setHome(e.target.value)}
-              aria-label={`${match.home_team} goals`}
-            />
-            <span className="dash">:</span>
-            <input
-              type="number"
-              min={0}
-              max={20}
-              inputMode="numeric"
-              value={away}
-              disabled={locked || teamsTbd}
-              onChange={(e) => setAway(e.target.value)}
-              aria-label={`${match.away_team} goals`}
-            />
-          </div>
-        )}
+        <div className="match-center">
+          {match.venue && <span className="match-venue">{match.venue}</span>}
+          {started ? (
+            <div className="final-score">
+              {match.home_score ?? '–'} : {match.away_score ?? '–'}
+            </div>
+          ) : readOnly ? (
+            <div className="final-score muted-score">vs</div>
+          ) : (
+            <div className="score-inputs">
+              <input
+                type="number"
+                min={0}
+                max={20}
+                inputMode="numeric"
+                value={home}
+                disabled={locked || teamsTbd}
+                onChange={(e) => setHome(e.target.value)}
+                aria-label={`${match.home_team} goals`}
+              />
+              <span className="dash">:</span>
+              <input
+                type="number"
+                min={0}
+                max={20}
+                inputMode="numeric"
+                value={away}
+                disabled={locked || teamsTbd}
+                onChange={(e) => setAway(e.target.value)}
+                aria-label={`${match.away_team} goals`}
+              />
+            </div>
+          )}
+        </div>
 
         <div className="team away">
           <span>{match.away_team}</span>

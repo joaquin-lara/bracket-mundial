@@ -1,5 +1,6 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import ChallengeWatcher from '@/components/ChallengeWatcher';
+import ViewportLock from '@/components/ViewportLock';
 import HomeOnRefresh from '@/components/HomeOnRefresh';
 import PageTransitionProvider from '@/components/PageTransition';
 import TopNav from '@/components/TopNav';
@@ -14,6 +15,11 @@ export const metadata: Metadata = {
   description: 'World Cup 2026 prediction game',
 };
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
   const {
@@ -24,6 +30,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en">
       <body>
         <PageTransitionProvider>
+          <ViewportLock />
           <HomeOnRefresh />
           {user && <TopNav />}
           {user && <ChallengeWatcher me={user.id} />}

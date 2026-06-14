@@ -81,7 +81,7 @@ const ALIASES: Record<string, string> = {
   caboverde: 'CPV', capeverde: 'CPV', capeverdeislands: 'CPV',
   bosniaherzegovina: 'BIH', bosniaandherzegovina: 'BIH',
   drcongo: 'COD', congodr: 'COD', democraticrepublicofthecongo: 'COD', congodemocraticrepublic: 'COD',
-  curacao: 'CUR',
+  curacao: 'CUR', cuw: 'CUR', // football-data serves Curaçao's TLA as CUW; dataset uses CUR
   saudiarabia: 'KSA',
   southafrica: 'RSA',
   newzealand: 'NZL',

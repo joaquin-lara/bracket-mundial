@@ -733,6 +733,23 @@ h1 {
   color: var(--gold);
 }
 
+.match-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.match-venue {
+  font-family: var(--narrow);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--dim);
+  text-align: center;
+  white-space: nowrap;
+}
+
 .match-footer {
   position: relative;
   display: flex;
@@ -889,6 +906,16 @@ h1 {
   justify-content: flex-end;
 }
 
+.sched-venue {
+  padding: 0 16px 9px;
+  margin-top: -2px;
+  text-align: center;
+  font-family: var(--narrow);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
 
 .sched-time {
   font-family: var(--narrow);
