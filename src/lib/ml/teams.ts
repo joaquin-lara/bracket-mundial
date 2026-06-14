@@ -21,7 +21,17 @@ export interface TeamRating {
   matches: number;
   lastPlayed: string;
   globalRank: number | null;
+  /** Dixon-Coles attack rating (log-goal space): higher = scores more. */
+  dcAtt: number;
+  /** Dixon-Coles defense rating (log-goal space): higher = concedes less. */
+  dcDef: number;
   form: TeamForm;
+}
+
+export interface DixonColesConstants {
+  base: number; // log baseline goals per team
+  home: number; // home advantage in log-goal space
+  rho: number; // low-score (draw) correction
 }
 
 export interface ModelConstants {
@@ -30,6 +40,7 @@ export interface ModelConstants {
   avgTotalGoals: number;
   homeMarginGoals: number;
   eloBaseline: number;
+  dc: DixonColesConstants;
 }
 
 export const MODEL: ModelConstants = ratings.model;

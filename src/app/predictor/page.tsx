@@ -51,8 +51,6 @@ export default async function PredictorPage() {
 
   // Live worked example for the explainer: a marquee matchup.
   const example = predict({ home: 'ARG', away: 'BRA', neutral: true })!;
-  const exHalf = (MODEL.avgTotalGoals / 2).toFixed(2);
-  const exSupremacy = (example.eloGap * MODEL.goalsPerElo).toFixed(2);
 
   const lastUpdated = new Date(DATASET.generatedAt).toLocaleDateString(undefined, {
     year: 'numeric',
@@ -89,8 +87,8 @@ export default async function PredictorPage() {
 
         <p className="ml-lead">
           The model never watches a game. It does three simple things: rate how strong each team is,
-          use the gap between two teams to estimate goals, then turn those goals into win chances.
-          Here is each step.
+          work out how many goals each side is likely to score, then turn those goals into win
+          chances. Here is each step.
         </p>
 
         <div className="ml-how">
@@ -115,15 +113,16 @@ export default async function PredictorPage() {
           <div className="ml-how-step">
             <span className="ml-how-num">2</span>
             <div className="ml-how-body">
-              <h3 className="ml-how-h">Use the gap to estimate goals</h3>
+              <h3 className="ml-how-h">Work out how many goals each side scores</h3>
               <p>
-                For a single match, only the <em>gap</em> between the two ratings matters, not the raw
-                numbers. The model starts from one fact taken straight from history: an average
-                international has about {MODEL.avgTotalGoals.toFixed(1)} goals in it. It splits those
-                goals between the two teams, then slides them toward the stronger side in proportion to
-                the gap, where every 100 Elo points is worth roughly half a goal. Out comes an expected
-                goal count for each team: something like 2.8 to 0.9 in a mismatch, or 1.5 to 1.3 in a
-                close game.
+                From the same history, the model also learns two more numbers for every team: an{' '}
+                <strong>attack</strong> rating (how many goals it tends to score) and a{' '}
+                <strong>defence</strong> rating (how few it tends to concede). A match&apos;s expected
+                goals come from pitting one side&apos;s attack against the other&apos;s defence: a great
+                attack facing a leaky defence produces a high number, two strong defences produce a low
+                one. Out comes an expected goal count for each team — something like 2.7 to 0.5 in a
+                mismatch, or 1.3 to 0.9 in a close game. (On a true home ground, the host gets a small
+                extra bump; at a neutral World Cup venue, neither side does.)
               </p>
             </div>
           </div>
@@ -135,11 +134,12 @@ export default async function PredictorPage() {
               <p>
                 A team expected to score 1.8 goals will not score exactly 1.8; real games end on 1, or
                 2, or 0. So the model treats each team&apos;s goal count as a range of possibilities and
-                works out the odds of every realistic score: 1–0, 2–1, 0–0, and so on. Then it adds up
-                all the scores where the first team wins, all the draws, and all the scores where the
-                second team wins. Those three totals are the <strong>win / draw / win</strong>{' '}
-                percentages you see. Because goals involve luck, the model never says a result{' '}
-                <em>will</em> happen, only how likely each one is.
+                works out the odds of every realistic score: 1–0, 2–1, 0–0, and so on. It also nudges
+                the low-scoring draws (0–0, 1–1) up a touch, because tight games end level more often
+                than pure chance suggests. Then it adds up all the scores where the first team wins, all
+                the draws, and all the scores where the second team wins. Those three totals are the{' '}
+                <strong>win / draw / win</strong> percentages you see. Because goals involve luck, the
+                model never says a result <em>will</em> happen, only how likely each one is.
               </p>
             </div>
           </div>
@@ -159,10 +159,11 @@ export default async function PredictorPage() {
             </li>
             <li>
               <span className="ml-step-k">Step 2 · Estimate the goals</span>
-              Start with the average {MODEL.avgTotalGoals.toFixed(1)} goals, split evenly ({exHalf}{' '}
-              each), then slide {exSupremacy} of a goal toward the stronger side. Expected goals come
-              out at <strong>{example.lambdaHome.toFixed(1)}</strong> for {example.home.name} and{' '}
-              <strong>{example.lambdaAway.toFixed(1)}</strong> for {example.away.name}.
+              Pitting {example.home.name}&apos;s attack against {example.away.name}&apos;s defence (and
+              vice versa) gives expected goals of{' '}
+              <strong>{example.lambdaHome.toFixed(1)}</strong> for {example.home.name} and{' '}
+              <strong>{example.lambdaAway.toFixed(1)}</strong> for {example.away.name} — a tight game,
+              with {example.home.name} a shade ahead.
             </li>
             <li>
               <span className="ml-step-k">Step 3 · Work out the chances</span>
@@ -241,8 +242,9 @@ export default async function PredictorPage() {
       )}
 
       <p className="ml-foot">
-        Model and ratings rebuilt {lastUpdated} from {DATASET.source}. Elo + Poisson, computed in
-        your browser and on the server. No external prediction service.
+        Model and ratings rebuilt {lastUpdated} from {DATASET.source}. Dixon-Coles attack/defence with
+        a low-score correction (Elo shown for overall strength), computed in your browser and on the
+        server. No external prediction service.
       </p>
     </main>
   );
