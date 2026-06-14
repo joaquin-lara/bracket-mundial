@@ -22,6 +22,7 @@ import { readFileSync, existsSync } from 'fs';
 import path from 'path';
 import { scoreGrid } from '../src/lib/ml/poisson';
 import { strengthAsOf, squadDataAvailable } from './squad-strength';
+import { xiStrength, lineupDataAvailable, type PlayerLite } from './lineup-strength';
 
 const ROOT = process.cwd();
 const CSV_PATH = path.join(ROOT, 'data', 'results.csv');
@@ -228,16 +229,23 @@ class DixonColesOnline implements Predictor {
     /* nothing to freeze: the model learns online through the training prefix */
   }
 
+  /** Goal means for a match, or null if either side lacks enough history. */
+  meansFor(r: Row): [number, number] | null {
+    if ((this.played.get(r.home) ?? 0) < MIN_HISTORY) return null;
+    if ((this.played.get(r.away) ?? 0) < MIN_HISTORY) return null;
+    return this.means(r);
+  }
+
   private means(r: Row): [number, number] {
     const lh = Math.exp(this.base + (r.neutral ? 0 : this.home) + this.a(r.home) - this.d(r.away));
     const la = Math.exp(this.base + this.a(r.away) - this.d(r.home));
     return [lh, la];
   }
 
-  predict(r: Row): Probs | null {
-    if ((this.played.get(r.home) ?? 0) < MIN_HISTORY) return null;
-    if ((this.played.get(r.away) ?? 0) < MIN_HISTORY) return null;
-    const [lh, la] = this.means(r);
+  /** H/D/A from goal means with the Dixon-Coles low-score correction. Pure
+   * function of (lh, la, rho), so it is safe to call after the walk-forward
+   * loop with means captured at prediction time (the lineup experiment does). */
+  scoreProbs(lh: number, la: number): Probs {
     const g = scoreGrid(lh, la, MAX_GOALS);
     let pH = 0,
       pD = 0,
@@ -256,6 +264,12 @@ class DixonColesOnline implements Predictor {
       else pA += p;
     }
     return { H: pH / tot, D: pD / tot, A: pA / tot };
+  }
+
+  predict(r: Row): Probs | null {
+    const m = this.meansFor(r);
+    if (!m) return null;
+    return this.scoreProbs(m[0], m[1]);
   }
 
   update(r: Row): void {
@@ -475,6 +489,153 @@ class Metrics {
   }
 }
 
+// --- lineup feature: actual XI strength vs full-strength reference ----------
+// The orthogonal signal DC can't see: a team fielding a depleted XI tonight
+// (injuries/suspensions/rotation). For each lineup-covered match we precompute
+// each side's depletion delta (matched-starter mean overall - top-11 reference)
+// and key it by date+teams so the walk-forward loop can attach it to the right
+// results.csv row. Requires a minimum matched fraction per team, else we treat
+// the match as having no usable lineup (graceful fallback to pure DC).
+const MIN_MATCHED = 8; // of 11 starters; below this the XI estimate is too holey
+
+// StatsBomb spelling -> results.csv spelling, for the few that differ.
+const TEAM_ALIASES: Record<string, string> = {
+  cotedivoire: 'ivorycoast',
+  congodr: 'drcongo',
+  capeverdeislands: 'capeverde',
+};
+function teamKey(name: string): string {
+  const n = name
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+  return TEAM_ALIASES[n] ?? n;
+}
+// Key by an UNORDERED team pair so the join survives home/away being assigned
+// differently at neutral-site tournaments. The value maps each team's key to its
+// depletion delta, so we re-orient to the results.csv row's home/away.
+function pairKey(date: string, t1: string, t2: string): string {
+  return `${date}|${[teamKey(t1), teamKey(t2)].sort().join('|')}`;
+}
+function shiftDate(date: string, days: number): string {
+  const d = new Date(`${date}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function loadLineupDeltas(): Map<string, Record<string, number>> {
+  const file = path.join(ROOT, 'data-lineups', 'lineups.json');
+  const map = new Map<string, Record<string, number>>();
+  if (!existsSync(file) || !lineupDataAvailable()) return map;
+  const data = JSON.parse(readFileSync(file, 'utf8')).matches as {
+    date: string;
+    home: string;
+    away: string;
+    home_xi: PlayerLite[];
+    away_xi: PlayerLite[];
+  }[];
+  let usable = 0;
+  for (const m of data) {
+    const h = xiStrength(m.home, m.date, m.home_xi);
+    const a = xiStrength(m.away, m.date, m.away_xi);
+    if (h.delta == null || a.delta == null) continue;
+    if (h.matched < MIN_MATCHED || a.matched < MIN_MATCHED) continue;
+    map.set(pairKey(m.date, m.home, m.away), {
+      [teamKey(m.home)]: h.delta,
+      [teamKey(m.away)]: a.delta,
+    });
+    usable++;
+  }
+  console.log(`Lineup data: ${data.length} matches scraped, ${usable} usable (both XIs >=${MIN_MATCHED}/11 matched + a full-XI reference).`);
+  return map;
+}
+
+// One captured lineup-covered prediction: DC goal means at predict time (so the
+// adjustment is leakage-free) plus the two depletion deltas and the outcome.
+interface LineupEntry {
+  date: string;
+  lh: number;
+  la: number;
+  dH: number;
+  dA: number;
+  o: Outcome;
+}
+
+/** DC + lineup adjustment: tilt the goal supremacy by k*(dH - dA) in log space.
+ * If home is more depleted than away (dH < dA) home scores less, away more. */
+function adjustedProbs(dc: DixonColesOnline, e: LineupEntry, k: number): Probs {
+  const shift = k * (e.dH - e.dA);
+  return dc.scoreProbs(e.lh * Math.exp(shift / 2), e.la * Math.exp(-shift / 2));
+}
+
+function rpsOf(p: Probs, o: Outcome): number {
+  const cum1 = p.H;
+  const cum2 = p.H + p.D;
+  const e1 = o === 'H' ? 1 : 0;
+  const e2 = o === 'A' ? 0 : 1;
+  return 0.5 * ((cum1 - e1) ** 2 + (cum2 - e2) ** 2);
+}
+function loglossOf(p: Probs, o: Outcome): number {
+  const pa = o === 'H' ? p.H : o === 'D' ? p.D : p.A;
+  return -Math.log(Math.max(pa, 1e-15));
+}
+
+/** Tune k on validation RPS, then report DC-alone vs DC+lineup on test.
+ * Validation = entries before LINEUP_TEST_START; test = on/after it. */
+function runLineupExperiment(dc: DixonColesOnline, entries: LineupEntry[], testStart: string): void {
+  const valid = entries.filter((e) => e.date < testStart);
+  const test = entries.filter((e) => e.date >= testStart);
+  if (test.length < 30 || valid.length < 30) {
+    console.log(`\nLINEUP TEST skipped: too few covered matches (valid=${valid.length}, test=${test.length}).`);
+    return;
+  }
+
+  const meanRps = (es: LineupEntry[], k: number) =>
+    es.reduce((s, e) => s + rpsOf(adjustedProbs(dc, e, k), e.o), 0) / es.length;
+  const meanLL = (es: LineupEntry[], k: number) =>
+    es.reduce((s, e) => s + loglossOf(adjustedProbs(dc, e, k), e.o), 0) / es.length;
+
+  // sweep the lineup weight on the validation window only. Sweep NEGATIVE k too,
+  // so a sign-flipped-but-real signal would show up as a negative optimum rather
+  // than be hidden by clamping at 0.
+  let bestK = 0;
+  let bestVal = Infinity;
+  const grid: { k: number; val: number }[] = [];
+  for (let k = -0.3; k <= 0.301; k += 0.01) {
+    const kk = Math.round(k * 100) / 100;
+    const val = meanRps(valid, kk);
+    grid.push({ k: kk, val });
+    if (val < bestVal) {
+      bestVal = val;
+      bestK = kk;
+    }
+  }
+
+  console.log(`\n=== LINEUP TEST -- does actual-XI depletion improve on Dixon-Coles? ===`);
+  console.log(`Covered matches: ${entries.length} (validation <${testStart}: ${valid.length}, test: ${test.length})`);
+  console.log(`Adjustment: lambda_home *= exp(k*(dH-dA)/2), lambda_away *= exp(-k*(dH-dA)/2); dX = actualXI-fullXI.`);
+  console.log(`Validation-tuned weight: k* = ${bestK.toFixed(2)} (val RPS ${bestVal.toFixed(5)}; k=0 val RPS ${meanRps(valid, 0).toFixed(5)})`);
+  const fmt = (es: LineupEntry[], k: number) => `RPS ${meanRps(es, k).toFixed(5)}  logloss ${meanLL(es, k).toFixed(5)}`;
+  console.log(`\nTEST window (${test.length} matches, identical match set):`);
+  console.log(`  DC alone        : ${fmt(test, 0)}`);
+  console.log(`  DC + lineup(k*) : ${fmt(test, bestK)}`);
+  console.log(`\nFor reference -- ALL covered matches (${entries.length}):`);
+  console.log(`  DC alone        : ${fmt(entries, 0)}`);
+  console.log(`  DC + lineup(k*) : ${fmt(entries, bestK)}`);
+  // also show the test-window optimum (the peeking number, for honesty about the gap)
+  let tBestK = 0;
+  let tBest = Infinity;
+  for (const { k } of grid) {
+    const v = meanRps(test, k);
+    if (v < tBest) {
+      tBest = v;
+      tBestK = k;
+    }
+  }
+  console.log(`\n(In-sample peek, NOT a fair result: test-window optimum k=${tBestK.toFixed(2)} -> RPS ${tBest.toFixed(5)}.)`);
+}
+
 // --- walk-forward loop ------------------------------------------------------
 function main(): void {
   if (!existsSync(CSV_PATH)) {
@@ -505,6 +666,13 @@ function main(): void {
   // have a FIFA pool and it's competitive): does adding squad info beat DC alone?
   const matchedNames = ['Dixon-Coles only', 'Squad only', 'Ensemble (DC+squad)'];
   const matched = matchedNames.map(() => new Metrics());
+
+  // lineup experiment: depletion deltas keyed by match, captured at predict time
+  const lineupMap = loadLineupDeltas();
+  const lineupEntries: LineupEntry[] = [];
+  // validation = lineup-covered matches before this date (WC2018 + Euro2020),
+  // test = on/after (WC2022 + Euro2024 + Copa America 2024 + AFCON sides).
+  const LINEUP_TEST_START = '2022-01-01';
 
   let constFrozen = false;
   let lateFrozen = false;
@@ -554,6 +722,24 @@ function main(): void {
         }
       }
     }
+    // capture the lineup-covered prediction BEFORE DC updates on this row, so
+    // the depletion adjustment is leakage-free (DC has not seen this match yet).
+    if (lineupMap.size) {
+      // tolerate a +/-1 day offset (late US kickoffs cross the UTC date line, so
+      // StatsBomb and results.csv can disagree by one calendar day).
+      const rec =
+        lineupMap.get(pairKey(r.date, r.home, r.away)) ??
+        lineupMap.get(pairKey(shiftDate(r.date, -1), r.home, r.away)) ??
+        lineupMap.get(pairKey(shiftDate(r.date, 1), r.home, r.away));
+      if (rec) {
+        const dH = rec[teamKey(r.home)];
+        const dA = rec[teamKey(r.away)];
+        const m = dc.meansFor(r);
+        if (m && dH !== undefined && dA !== undefined) {
+          lineupEntries.push({ date: r.date, lh: m[0], la: m[1], dH, dA, o: outcomeOf(r.hs, r.as) });
+        }
+      }
+    }
     // each base model accumulates fit stats up to its own freeze point
     for (const m of base) {
       const cutoff = lateFreeze.has(m) ? EVAL_START : VALID_START;
@@ -581,6 +767,10 @@ function main(): void {
     console.log('(identical match set for all three rows, so RPS is directly comparable)');
     console.log(header);
     matched.forEach((m, i) => console.log(`${m.row()}  ${matchedNames[i]}`));
+  }
+
+  if (lineupEntries.length) {
+    runLineupExperiment(dc, lineupEntries, LINEUP_TEST_START);
   }
 
   const dcCalIdx = base.length; // first calibrated wrapper = recalibrated DC

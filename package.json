@@ -11,7 +11,9 @@
     "test:db": "vitest run tests/db.test.ts",
     "seed:openfootball": "tsx scripts/seed-openfootball.ts",
     "build:elo": "tsx scripts/build-elo.ts",
-    "backtest": "tsx scripts/backtest.ts"
+    "backtest": "tsx scripts/backtest.ts",
+    "fetch:lineups": "tsx scripts/fetch-lineups.ts",
+    "lineup-strength": "tsx scripts/lineup-strength.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

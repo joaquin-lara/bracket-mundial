@@ -52,6 +52,98 @@ Recalibration was intentionally **not** wired in — DC is already calibrated
 23/24/25 refresh, that is now a *settled* decision, not a data-blocked one (see
 "Squad ensemble: settled" below).
 
+## Actual starting lineups: tested, no improvement over DC (2026-06-14)
+
+The orthogonal idea to squad averages: who is **literally on the pitch tonight**
+(injuries / suspensions / rotation) is information DC cannot have. We tested it on
+**historical** lineups so it's backtestable. Verdict: on the data we could get
+(major-tournament matches), actual-XI depletion does **not** beat Dixon-Coles.
+
+### Data source: fbref was blocked; pivoted to StatsBomb open data
+The prescribed source, **fbref.com, is unscrapable from the web sandbox.** It is
+on the egress allowlist (ESPN etc. return a clean `Host not in allowlist`; fbref
+does not), but it sits behind a **Cloudflare "Verify you are human" Turnstile**,
+and the sandbox egress gateway **terminates TLS itself** (the cert fbref serves is
+issued by `O = Anthropic, CN = Egress Gateway SDS Issuing CA`). So Cloudflare only
+ever sees the gateway's TLS fingerprint, flags it as a bot, and serves an
+interactive challenge that **never issues a `cf_clearance` cookie**. Every method
+failed: curl + full browser headers, `cloudscraper`, real headless Chromium
+(ignoring the MITM cert), headful Chromium under xvfb + stealth, and even
+programmatically clicking the Turnstile checkbox. This is not fixable from inside
+the sandbox — it needs a different egress path (residential/HTTP proxy, a
+Cloudflare-bypass service, or pre-fetched HTML). **Next session: don't re-spend an
+hour rediscovering this — fbref is a dead end here until egress changes.**
+
+**StatsBomb open data** (`raw.githubusercontent.com/statsbomb/open-data`, no
+Cloudflare) publishes real starting XIs as clean JSON and covers the core men's
+internationals. We scraped 6 tournaments (`npm run fetch:lineups`, resumable,
+cached under gitignored `data/sb-cache/`, committed compact output to
+`data-lineups/lineups.json` — 314 matches, every confederation):
+
+| tournament | matches | tournament | matches |
+|---|---|---|---|
+| FIFA World Cup 2018 | 64 | FIFA World Cup 2022 | 64 |
+| UEFA Euro 2020 | 51 | UEFA Euro 2024 | 51 |
+| African Cup of Nations 2023 | 52 | Copa América 2024 | 32 |
+
+What StatsBomb does **not** cover (so vs the prescribed ~540-game plan we lost
+these): 2026 WC qualifiers, Gold Cup 2025, UEFA Nations League, AFCON *2025*, and
+the 2025-26 tail. Its lineups also carry no DOB, so the FIFA join is name +
+nationality, not name + DOB.
+
+### Name → FIFA rating join (`scripts/lineup-strength.ts`)
+Multi-key match within the player's nationality: StatsBomb full name ↔ sofifa
+`long_name`, plus nickname and "initial + surname" bridges to `short_name`, plus
+transliteration of non-combining specials (ø, æ, ı, …) so names like *Højbjerg*
+don't get split mid-word. FC edition is chosen by match date (FIFA18 for 2018,
+FIFA21 for Euro 2020, FIFA23 for WC 2022, FIFA24 for the 2024 tournaments).
+
+- **Overall starter match rate: 85.2%** (5889/6908 starters).
+- **Within the matches actually used: 94.3%** (≥8/11 matched both sides).
+- Stars are **not** systematically dropping for well-covered confederations
+  (spot-checks: France 11/11, Argentina 11/11, Spain 10/11). Unmatched starters
+  concentrate in **thin-coverage sub-Saharan AFCON sides** (South Africa had 8
+  starters absent from sofifa) plus a few genuine data gaps (James Rodríguez is
+  simply not in the FC24 export). The backtest **guards** against this: a match
+  contributes the lineup feature only if **both** teams have ≥8/11 starters
+  matched and a full-XI reference — so the holey sides fall back to pure DC
+  rather than getting a garbage strength. 235 of 314 matches pass the guard.
+
+### The test (extended in `scripts/backtest.ts`, run `npm run backtest`)
+Feature per team = `delta = actualXI − fullXI`, where `actualXI` = mean sofifa
+`overall` of the matched starters and `fullXI` = mean of the nation's top-11 by
+overall in that edition (the "full strength they COULD field"). `delta ≤ 0`
+measures how depleted tonight's XI is — the part DC can't see. Adjustment:
+`λ_home *= exp(k·(dH−dA)/2)`, `λ_away *= exp(−k·(dH−dA)/2)` on DC's goal means,
+fall back to pure DC when no lineup. Weight `k` tuned on a **validation** split
+(WC 2018 + Euro 2020, n=101), scored on a held-out **test** split (WC 2022 + Euro
+2024 + Copa América 2024, n=134). DC means captured at predict-time, so the
+adjustment is leakage-free. Identical match set for both rows:
+
+| model (test window, n=134) | RPS | log-loss |
+|---|---|---|
+| Dixon-Coles alone | 0.19974 | 1.01001 |
+| DC + lineup (validation-tuned k* = −0.02) | 0.19938 | 1.00955 |
+
+Honest validation tuning picks **k* = −0.02** — i.e. essentially zero, and with
+the **wrong sign** (a real depletion effect would want k > 0: a weakened XI scores
+fewer / concedes more). The test "gain" is 0.0004 RPS, well inside noise, and even
+**peeking at the test window** the optimum is only k = −0.10 → RPS 0.19873 (still
+wrong-signed, still ~0.001). A wrong-signed micro-gain is the signature of noise,
+not signal.
+
+**Verdict: actual starting-XI depletion does NOT improve on Dixon-Coles** on
+major-tournament matches — the same conclusion as squad averages, and if anything
+cleaner (squad at least had a *positive*-signed in-sample peek; this doesn't).
+DC's online attack/defence ratings already encode team strength, and in *finals
+tournaments* teams field near-full strength (median depletion only −2.3 overall
+points, modest variance), so "who's resting tonight" has little exploitable info
+*here*. The signal could still be larger in dead-rubber **qualifiers / friendlies**
+where rotation is heavy — but those are exactly the matches fbref would have
+supplied and Cloudflare blocked, so that remains untested. The live-lineup
+production feature (to-do #5) should be treated as **unproven**, not assumed
+helpful, until it can be backtested on rotation-heavy fixtures.
+
 ## Squad ensemble: settled — DC stays solo (2026-06-14)
 
 The Kaggle egress allowlist was opened, so FIFA 23 / EA FC 24 / FC 25 are now
@@ -160,6 +252,16 @@ both 23 and 24; FC25 comes from `nyagami/ea-sports-fc-25-database-ratings-and-st
 5. **Live lineups** for upcoming fixtures: free lineup API, **production only**
    (Vercel egress is open; this sandbox can't test the live call). Needs a free
    API key as a Vercel env var. UI note: squad strength feeds in near kickoff.
+   **Caveat (2026-06-14):** the historical backtest of this exact idea found
+   actual-XI depletion does **not** beat DC on major-tournament matches (see
+   "Actual starting lineups" above) — so treat the live feature as *unproven*.
+   It might still help on rotation-heavy qualifiers/friendlies, which we couldn't
+   test because fbref is Cloudflare-blocked from the sandbox (also documented
+   above). Backtest on those fixture types before shipping a lineup adjustment.
+6. **Lineup signal on rotation-heavy matches.** The orthogonal-lineup idea is
+   only fairly tested if it includes qualifiers / friendlies (heavy rotation),
+   not just finals tournaments. Blocked on a non-Cloudflare lineup source for
+   those (fbref is unreachable here; StatsBomb open data is tournaments only).
 
 ## User actions that may be needed next session
 - Nothing for the squad feature — Kaggle egress is sorted and the FC 23/24/25
