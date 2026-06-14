@@ -6,13 +6,13 @@ import { signOut } from '@/app/actions';
 import TransitionLink from './TransitionLink';
 
 const LINKS = [
+  ['/rules', 'Rules'],
   ['/matches', 'Edit your bracket'],
+  ['/standings', 'Player Standings'],
   ['/bracket', 'Group and Bracket Tracker'],
   ['/schedule', 'Game schedule'],
-  ['/standings', 'Player Standings'],
   ['/predictor', 'ML Predictor'],
   ['/duels', 'Penalty Shootouts'],
-  ['/rules', 'Rules'],
 ] as const;
 
 export default function TopNav() {
