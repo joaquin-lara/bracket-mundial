@@ -26,6 +26,10 @@ import { strengthAsOf, squadDataAvailable } from './squad-strength';
 const ROOT = process.cwd();
 const CSV_PATH = path.join(ROOT, 'data', 'results.csv');
 const EVAL_START = process.argv[2] ?? '2015-01-01';
+// Validation window [VALID_START, EVAL_START): used to fit recalibration only,
+// never scored. Model constants are fitted before VALID_START; calibration on
+// the validation window; final metrics on the eval window. A clean 3-way split.
+const VALID_START = process.argv[3] ?? '2013-01-01';
 const HOME_ADV = 100; // matches build-elo
 const MAX_GOALS = 8;
 const MIN_HISTORY = 5; // a model abstains until both teams have this many games
@@ -340,6 +344,73 @@ class EnsembleModel implements Predictor {
   update(): void {}
 }
 
+// --- probability recalibration (temperature scaling) ------------------------
+// Rescale a probability vector by a single temperature T. T<1 sharpens (more
+// confident), T>1 softens. Monotonic, so it never reorders the outcomes.
+function applyTemp(p: Probs, T: number): Probs {
+  const a = Math.pow(Math.max(p.H, 1e-15), 1 / T);
+  const b = Math.pow(Math.max(p.D, 1e-15), 1 / T);
+  const c = Math.pow(Math.max(p.A, 1e-15), 1 / T);
+  const s = a + b + c;
+  return { H: a / s, D: b / s, A: c / s };
+}
+
+function valLogloss(pairs: { p: Probs; o: Outcome }[], T: number): number {
+  let s = 0;
+  for (const { p, o } of pairs) {
+    const q = applyTemp(p, T);
+    const pa = o === 'H' ? q.H : o === 'D' ? q.D : q.A;
+    s += -Math.log(Math.max(pa, 1e-15));
+  }
+  return s / pairs.length;
+}
+
+/** Temperature that minimises validation log-loss (coarse grid, then refine). */
+function fitTemperature(pairs: { p: Probs; o: Outcome }[]): number {
+  if (pairs.length < 50) return 1;
+  let best = 1;
+  let bestLL = Infinity;
+  for (let T = 0.5; T <= 2.0001; T += 0.05) {
+    const l = valLogloss(pairs, T);
+    if (l < bestLL) {
+      bestLL = l;
+      best = T;
+    }
+  }
+  for (let T = best - 0.05; T <= best + 0.05; T += 0.005) {
+    if (T <= 0.05) continue;
+    const l = valLogloss(pairs, T);
+    if (l < bestLL) {
+      bestLL = l;
+      best = T;
+    }
+  }
+  return best;
+}
+
+// Wraps a base model and rescales its output by a temperature fitted on the
+// validation window only, so the test window stays untouched.
+class CalibratedModel implements Predictor {
+  readonly name: string;
+  T = 1;
+  private pairs: { p: Probs; o: Outcome }[] = [];
+  constructor(private base: Predictor) {
+    this.name = `${base.name} + recalibration`;
+  }
+  collect(r: Row, o: Outcome): void {
+    const p = this.base.predict(r);
+    if (p) this.pairs.push({ p, o });
+  }
+  freeze(): void {
+    this.T = fitTemperature(this.pairs);
+  }
+  predict(r: Row): Probs | null {
+    const p = this.base.predict(r);
+    return p ? applyTemp(p, this.T) : null;
+  }
+  update(): void {} // the wrapped base model updates itself via the models list
+}
+
 // --- metrics ----------------------------------------------------------------
 const BINS = 10;
 class Metrics {
@@ -416,8 +487,16 @@ function main(): void {
   const dc = new DixonColesOnline();
   const squad = new SquadModel();
   const ensemble = new EnsembleModel(dc, squad, 0.5);
-  const models: Predictor[] = [dc, new EloPoissonModel(), new BaseRateModel()];
-  if (hasSquad) models.push(squad, ensemble);
+  // base models update their internal state; calibrated wrappers reuse them.
+  const base: Predictor[] = [dc, new EloPoissonModel(), new BaseRateModel()];
+  if (hasSquad) base.push(squad, ensemble);
+  const dcCal = new CalibratedModel(dc);
+  const calibrated: CalibratedModel[] = [dcCal];
+  // calibrated wrappers are scored like any model, but don't update base state
+  const models: Predictor[] = [...base, ...calibrated];
+  // Squad strength only exists from 2014, so it can't fit its constant on the
+  // pre-VALID prefix like the others; let it train through to EVAL_START.
+  const lateFreeze = new Set<Predictor>(hasSquad ? [squad] : []);
 
   // one metrics bucket per model, for all eval games and competitive-only games
   const all = models.map(() => new Metrics());
@@ -427,13 +506,32 @@ function main(): void {
   const matchedNames = ['Dixon-Coles only', 'Squad only', 'Ensemble (DC+squad)'];
   const matched = matchedNames.map(() => new Metrics());
 
-  let frozen = false;
+  let constFrozen = false;
+  let lateFrozen = false;
+  let calFrozen = false;
   let evalCount = 0;
   for (const r of rows) {
+    const inValid = r.date >= VALID_START && r.date < EVAL_START;
     const inEval = r.date >= EVAL_START;
-    if (inEval && !frozen) {
-      for (const m of models) m.freeze();
-      frozen = true;
+    // 1) freeze most model constants once the training prefix ends...
+    if (r.date >= VALID_START && !constFrozen) {
+      for (const m of base) if (!lateFreeze.has(m)) m.freeze();
+      constFrozen = true;
+    }
+    // 2) collect validation predictions to fit recalibration
+    if (inValid) {
+      const o = outcomeOf(r.hs, r.as);
+      for (const c of calibrated) c.collect(r, o);
+    }
+    // 3) ...but late-freeze models (squad) train right up to the test window
+    if (inEval && !lateFrozen) {
+      for (const m of base) if (lateFreeze.has(m)) m.freeze();
+      lateFrozen = true;
+    }
+    // 4) freeze recalibration once the validation window ends
+    if (inEval && !calFrozen) {
+      for (const c of calibrated) c.freeze();
+      calFrozen = true;
     }
     if (inEval) {
       evalCount++;
@@ -456,13 +554,18 @@ function main(): void {
         }
       }
     }
-    for (const m of models) m.update(r, !inEval);
+    // each base model accumulates fit stats up to its own freeze point
+    for (const m of base) {
+      const cutoff = lateFreeze.has(m) ? EVAL_START : VALID_START;
+      m.update(r, r.date < cutoff);
+    }
   }
 
   const header =
     '       n       RPS    logloss     Brier      acc   model';
-  console.log(`\nWalk-forward backtest  (eval from ${EVAL_START})`);
-  console.log(`Total matches: ${rows.length.toLocaleString()}  |  in eval window: ${evalCount.toLocaleString()}`);
+  console.log(`\nWalk-forward backtest  (constants <${VALID_START} | calibrate ${VALID_START}..${EVAL_START} | test ${EVAL_START}+)`);
+  console.log(`Total matches: ${rows.length.toLocaleString()}  |  in test window: ${evalCount.toLocaleString()}`);
+  console.log(`Fitted recalibration temperature: ${calibrated.map((c) => `${c.name.replace(' + recalibration', '')}=${c.T.toFixed(3)}`).join(', ')}`);
   console.log('Lower RPS / log-loss / Brier is better. Accuracy shown for intuition only.\n');
 
   console.log('ALL evaluation matches');
@@ -480,9 +583,12 @@ function main(): void {
     matched.forEach((m, i) => console.log(`${m.row()}  ${matchedNames[i]}`));
   }
 
-  console.log(`\nCalibration of home-win probability -- ${models[0].name}`);
-  console.log('(pred = mean predicted P(home win); obs = actual home-win rate; want pred ~= obs)');
+  const dcCalIdx = base.length; // first calibrated wrapper = recalibrated DC
+  console.log('\nCalibration of home-win probability (pred should track obs)');
+  console.log(`-- before: ${models[0].name}`);
   console.log(all[0].calibration());
+  console.log(`-- after:  ${models[dcCalIdx].name}`);
+  console.log(all[dcCalIdx].calibration());
   console.log('');
 }
 
