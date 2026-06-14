@@ -2,9 +2,7 @@ import type { Metadata } from 'next';
 import ChallengeWatcher from '@/components/ChallengeWatcher';
 import HomeOnRefresh from '@/components/HomeOnRefresh';
 import PageTransitionProvider from '@/components/PageTransition';
-import PickReminder from '@/components/PickReminder';
 import TopNav from '@/components/TopNav';
-import { isGuestEmail } from '@/lib/players';
 import { createClient } from '@/lib/supabase/server';
 import './globals.css';
 
@@ -29,7 +27,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <HomeOnRefresh />
           {user && <TopNav />}
           {user && <ChallengeWatcher me={user.id} />}
-          {user && <PickReminder me={user.id} isGuest={isGuestEmail(user.email)} />}
           {children}
         </PageTransitionProvider>
       </body>
