@@ -21,6 +21,7 @@
 import { readFileSync, existsSync } from 'fs';
 import path from 'path';
 import { scoreGrid } from '../src/lib/ml/poisson';
+import { strengthAsOf, squadDataAvailable } from './squad-strength';
 
 const ROOT = process.cwd();
 const CSV_PATH = path.join(ROOT, 'data', 'results.csv');
@@ -270,6 +271,75 @@ class DixonColesOnline implements Predictor {
   }
 }
 
+// --- model 4: squad strength only (FIFA talent pool) ------------------------
+// Same goals->probabilities machinery as the Elo model, but the strength gap
+// comes from the FIFA talent-pool ratings instead of results. Its own
+// goals-per-strength-point constant is fitted on the training prefix. Abstains
+// when either side has no rated pool for that date.
+class SquadModel implements Predictor {
+  readonly name = 'Squad strength only (FIFA talent pool)';
+  private sDiffXStr = 0;
+  private sStrSq = 0;
+  private sTotal = 0;
+  private nFit = 0;
+  private goalsPerStr = 0;
+  private avgTotalGoals = 0;
+
+  freeze(): void {
+    this.goalsPerStr = this.sDiffXStr / this.sStrSq;
+    this.avgTotalGoals = this.sTotal / this.nFit;
+  }
+
+  private gap(r: Row): number | null {
+    const h = strengthAsOf(r.home, r.date);
+    const a = strengthAsOf(r.away, r.date);
+    if (h == null || a == null) return null;
+    return h - a;
+  }
+
+  predict(r: Row): Probs | null {
+    const g = this.gap(r);
+    if (g == null) return null;
+    const sup = g * this.goalsPerStr;
+    const half = this.avgTotalGoals / 2;
+    const lh = Math.max(0.15, half + sup / 2);
+    const la = Math.max(0.15, half - sup / 2);
+    const grid = scoreGrid(lh, la, MAX_GOALS);
+    return { H: grid.pHome, D: grid.pDraw, A: grid.pAway };
+  }
+
+  update(r: Row, inTrain: boolean): void {
+    if (!inTrain) return;
+    const g = this.gap(r);
+    if (g == null) return;
+    this.sDiffXStr += g * (r.hs - r.as);
+    this.sStrSq += g * g;
+    this.sTotal += r.hs + r.as;
+    this.nFit++;
+  }
+}
+
+// --- model 5: ensemble of two predictors (simple probability average) -------
+class EnsembleModel implements Predictor {
+  readonly name: string;
+  constructor(private a: Predictor, private b: Predictor, private wa = 0.5) {
+    this.name = `Ensemble (${Math.round(wa * 100)}% DC + ${Math.round((1 - wa) * 100)}% squad)`;
+  }
+  freeze(): void {}
+  predict(r: Row): Probs | null {
+    const pa = this.a.predict(r);
+    const pb = this.b.predict(r);
+    if (!pa || !pb) return null;
+    const wb = 1 - this.wa;
+    return {
+      H: this.wa * pa.H + wb * pb.H,
+      D: this.wa * pa.D + wb * pb.D,
+      A: this.wa * pa.A + wb * pb.A,
+    };
+  }
+  update(): void {}
+}
+
 // --- metrics ----------------------------------------------------------------
 const BINS = 10;
 class Metrics {
@@ -342,14 +412,20 @@ function main(): void {
   }
   const rows = parseCsv(readFileSync(CSV_PATH, 'utf8'));
 
-  const models: Predictor[] = [
-    new DixonColesOnline(),
-    new EloPoissonModel(),
-    new BaseRateModel(),
-  ];
+  const hasSquad = squadDataAvailable();
+  const dc = new DixonColesOnline();
+  const squad = new SquadModel();
+  const ensemble = new EnsembleModel(dc, squad, 0.5);
+  const models: Predictor[] = [dc, new EloPoissonModel(), new BaseRateModel()];
+  if (hasSquad) models.push(squad, ensemble);
+
   // one metrics bucket per model, for all eval games and competitive-only games
   const all = models.map(() => new Metrics());
   const comp = models.map(() => new Metrics());
+  // fair head-to-head on the SAME matches the squad model can rate (both teams
+  // have a FIFA pool and it's competitive): does adding squad info beat DC alone?
+  const matchedNames = ['Dixon-Coles only', 'Squad only', 'Ensemble (DC+squad)'];
+  const matched = matchedNames.map(() => new Metrics());
 
   let frozen = false;
   let evalCount = 0;
@@ -369,6 +445,16 @@ function main(): void {
         all[i].add(p, o);
         if (competitive) comp[i].add(p, o);
       });
+      if (hasSquad && competitive) {
+        const pDc = dc.predict(r);
+        const pSq = squad.predict(r);
+        const pEn = ensemble.predict(r);
+        if (pDc && pSq && pEn) {
+          matched[0].add(pDc, o);
+          matched[1].add(pSq, o);
+          matched[2].add(pEn, o);
+        }
+      }
     }
     for (const m of models) m.update(r, !inEval);
   }
@@ -386,6 +472,13 @@ function main(): void {
   console.log('\nCOMPETITIVE matches only (friendlies excluded)');
   console.log(header);
   models.forEach((m, i) => console.log(`${comp[i].row()}  ${m.name}`));
+
+  if (hasSquad) {
+    console.log('\nSQUAD-VALUE TEST -- competitive matches both teams have a FIFA pool for');
+    console.log('(identical match set for all three rows, so RPS is directly comparable)');
+    console.log(header);
+    matched.forEach((m, i) => console.log(`${m.row()}  ${matchedNames[i]}`));
+  }
 
   console.log(`\nCalibration of home-win probability -- ${models[0].name}`);
   console.log('(pred = mean predicted P(home win); obs = actual home-win rate; want pred ~= obs)');
