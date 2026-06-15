@@ -76,6 +76,7 @@ const ALIASES: Record<string, string> = {
   korearepublic: 'KOR', southkorea: 'KOR', republicofkorea: 'KOR',
   irian: 'IRN', iran: 'IRN', iririan: 'IRN', islamicrepublicofiran: 'IRN',
   cotedivoire: 'CIV', ivorycoast: 'CIV',
+  ecuador: 'ECU',
   czechia: 'CZE', czechrepublic: 'CZE',
   turkiye: 'TUR', turkey: 'TUR',
   caboverde: 'CPV', capeverde: 'CPV', capeverdeislands: 'CPV',
