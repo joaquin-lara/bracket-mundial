@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import ChallengeWatcher from '@/components/ChallengeWatcher';
 import ViewportLock from '@/components/ViewportLock';
+import PullToRefresh from '@/components/PullToRefresh';
 import HomeOnRefresh from '@/components/HomeOnRefresh';
 import PageTransitionProvider from '@/components/PageTransition';
 import TopNav from '@/components/TopNav';
@@ -31,6 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <PageTransitionProvider>
           <ViewportLock />
+          <PullToRefresh />
           <HomeOnRefresh />
           {user && <TopNav />}
           {user && <ChallengeWatcher me={user.id} />}

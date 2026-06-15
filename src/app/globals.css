@@ -31,6 +31,44 @@ body {
   color: var(--cream);
   font-family: var(--sans);
   line-height: 1.5;
+  /* The app provides its own pull-to-refresh; suppress the browser's native one. */
+  overscroll-behavior-y: contain;
+}
+
+/* ---- pull-to-refresh indicator ---- */
+.ptr {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  z-index: 200;
+  width: 34px;
+  height: 34px;
+  margin-top: -46px; /* parked just above the viewport until pulled down */
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #0a3526;
+  border: 1px solid var(--line);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.ptr-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(244, 241, 232, 0.25);
+  border-top-color: var(--gold);
+}
+
+.ptr-spinner.spin {
+  animation: ptr-rot 0.7s linear infinite;
+}
+
+@keyframes ptr-rot {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 a {
