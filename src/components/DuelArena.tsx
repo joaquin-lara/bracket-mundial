@@ -851,7 +851,16 @@ export default function DuelArena({
                   </button>
                 </span>
               ) : (
-                <span className="duel-waiting">waiting…</span>
+                <span className="duel-row-actions">
+                  <span className="duel-waiting">waiting…</span>
+                  <button
+                    className="link-btn"
+                    disabled={busy}
+                    onClick={() => rpc('duel_cancel', { p_duel: d.id })}
+                  >
+                    Cancel
+                  </button>
+                </span>
               )}
             </div>
           ))}
