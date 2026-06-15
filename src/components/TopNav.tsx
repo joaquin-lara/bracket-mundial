@@ -32,7 +32,7 @@ export default function TopNav() {
     const onEnd = (e: TouchEvent) => {
       if (touchStartX.current === null) return;
       const dx = e.changedTouches[0].clientX - touchStartX.current;
-      if (!open && touchStartX.current < 20 && dx > 60) setOpen(true);
+      if (!open && touchStartX.current < 40 && dx > 40) setOpen(true);
       if (open && dx < -60) setOpen(false);
       touchStartX.current = null;
     };
