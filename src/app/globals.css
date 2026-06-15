@@ -237,23 +237,42 @@ body:has(.home-intro) .pitch-stripes {
   flex-shrink: 0;
 }
 
+.mobile-menu-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+}
+
+.mobile-menu-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .mobile-menu {
   display: none;
-  position: absolute;
-  top: 100%;
+  position: fixed;
+  top: 0;
   left: 0;
-  right: 0;
+  bottom: 0;
+  width: 280px;
+  max-width: 85vw;
+  z-index: 501;
   background: #0a3526;
-  border-bottom: 1px solid var(--line);
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.28s ease;
+  border-right: 1px solid var(--line);
+  padding-top: 64px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transform: translateX(-100%);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mobile-menu.open {
-  max-height: calc(100dvh - 56px);
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  transform: translateX(0);
 }
 
 .mobile-menu a,
@@ -300,7 +319,8 @@ body:has(.home-intro) .pitch-stripes {
     display: block;
   }
 
-  .mobile-menu {
+  .mobile-menu,
+  .mobile-menu-backdrop {
     display: block;
   }
 }

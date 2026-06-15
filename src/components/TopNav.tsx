@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { signOut } from '@/app/actions';
 import TransitionLink from './TransitionLink';
 
@@ -18,10 +18,31 @@ const LINKS = [
 export default function TopNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
+  // Swipe from left edge to open; swipe left anywhere to close
+  useEffect(() => {
+    const onStart = (e: TouchEvent) => {
+      touchStartX.current = e.touches[0].clientX;
+    };
+    const onEnd = (e: TouchEvent) => {
+      if (touchStartX.current === null) return;
+      const dx = e.changedTouches[0].clientX - touchStartX.current;
+      if (!open && touchStartX.current < 20 && dx > 60) setOpen(true);
+      if (open && dx < -60) setOpen(false);
+      touchStartX.current = null;
+    };
+    document.addEventListener('touchstart', onStart, { passive: true });
+    document.addEventListener('touchend', onEnd, { passive: true });
+    return () => {
+      document.removeEventListener('touchstart', onStart);
+      document.removeEventListener('touchend', onEnd);
+    };
+  }, [open]);
 
   return (
     <header className="topbar">
@@ -56,6 +77,12 @@ export default function TopNav() {
       </nav>
 
       <span className="burger-spacer" />
+
+      <div
+        className={`mobile-menu-backdrop${open ? ' open' : ''}`}
+        onClick={() => setOpen(false)}
+        aria-hidden="true"
+      />
 
       <div className={`mobile-menu${open ? ' open' : ''}`}>
         <TransitionLink href="/" onClick={() => setOpen(false)} className={pathname === '/' ? 'active' : ''}>
