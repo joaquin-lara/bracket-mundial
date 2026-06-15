@@ -409,7 +409,7 @@ export default function DuelArena({
     const shownRounds = holdScore ? allRounds.slice(0, -1) : allRounds;
     const shownScore = (pid: string) =>
       shownRounds.filter((r) => r.shooter === pid && r.goal).length;
-    const suddenDeath = duel.kick > 10 && duel.status === 'active' && !holdVisual;
+    const suddenDeath = duel.kick > 10 && duel.status === 'active';
     const iPicked = iShoot ? duel.shooter_picked : duel.keeper_picked;
     const theyPicked = iShoot ? duel.keeper_picked : duel.shooter_picked;
 
