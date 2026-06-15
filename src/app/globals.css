@@ -3391,6 +3391,15 @@ table.standings td.pts {
   }
 }
 
+.ach-detail-head {
+  font-family: var(--narrow);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 6px;
+}
+
 .ach-detail-row {
   display: flex;
   align-items: center;
@@ -3432,6 +3441,7 @@ table.standings td.pts {
 .ach-card.tier-rare { border-left-color: #4f9dde; }
 .ach-card.tier-epic { border-left-color: #a974e0; }
 .ach-card.tier-legendary { border-left-color: #f2a03c; }
+.ach-card.tier-platinum { border-left-color: #d8e4e6; }
 
 .ach-card.unlocked.tier-epic {
   background: linear-gradient(135deg, rgba(169, 116, 224, 0.13), var(--card));
@@ -3439,6 +3449,15 @@ table.standings td.pts {
 
 .ach-card.unlocked.tier-legendary {
   background: linear-gradient(135deg, rgba(242, 160, 60, 0.16), var(--card));
+}
+
+.ach-card.tier-platinum {
+  background: linear-gradient(135deg, rgba(216, 228, 230, 0.14), var(--card));
+}
+
+.ach-card.unlocked.tier-platinum {
+  background: linear-gradient(135deg, rgba(216, 228, 230, 0.28), rgba(169, 116, 224, 0.1));
+  border-color: rgba(216, 228, 230, 0.5);
 }
 
 .ach-emoji {
@@ -3475,6 +3494,7 @@ table.standings td.pts {
 .tier-pill-rare { background: #4f9dde; color: var(--cream); }
 .tier-pill-epic { background: #a974e0; color: var(--cream); }
 .tier-pill-legendary { background: #f2a03c; }
+.tier-pill-platinum { background: linear-gradient(135deg, #eef4f5, #c2d2d6); color: #0b3d2c; }
 
 .ach-desc {
   font-size: 13px;

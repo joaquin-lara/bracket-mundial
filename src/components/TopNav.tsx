@@ -4,19 +4,23 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import TransitionLink from './TransitionLink';
 
-const BASE_LINKS = [
+const BASE_LINKS: readonly (readonly [string, string])[] = [
   ['/rules', 'Rules'],
   ['/schedule', 'Game schedule'],
   ['/matches', 'View your bracket'],
-  ['/standings', 'Player Standings'],
   ['/bracket', 'Tournament Tracker'],
+  ['/standings', 'Player Standings'],
   ['/predictor', 'ML Predictor'],
   ['/duels', 'Penalty Shootouts'],
-] as const;
+];
 
 export default function TopNav({ achievementsRevealed = false }: { achievementsRevealed?: boolean }) {
   const LINKS: readonly (readonly [string, string])[] = achievementsRevealed
-    ? [...BASE_LINKS, ['/achievements', 'Achievements 🏅'] as const]
+    ? [
+        ...BASE_LINKS.slice(0, 5),
+        ['/achievements', 'Achievements'],
+        ...BASE_LINKS.slice(5),
+      ]
     : BASE_LINKS;
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
