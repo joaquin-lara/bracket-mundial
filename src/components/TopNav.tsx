@@ -18,7 +18,7 @@ const LINKS = [
 export default function TopNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const touchStart = useRef<{ x: number; y: number; inScrollable: boolean } | null>(null);
 
   useEffect(() => {
     setOpen(false);
@@ -26,14 +26,29 @@ export default function TopNav() {
 
   // Swipe right to open; swipe left to close — only fires on mostly-horizontal swipes
   useEffect(() => {
+    const isHScrollable = (el: Element | null): boolean => {
+      while (el && el !== document.body) {
+        const ox = window.getComputedStyle(el).overflowX;
+        if ((ox === 'auto' || ox === 'scroll') && el.scrollWidth > el.clientWidth) return true;
+        el = el.parentElement;
+      }
+      return false;
+    };
+
     const onStart = (e: TouchEvent) => {
-      touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      touchStart.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+        inScrollable: isHScrollable(e.target as Element),
+      };
     };
     const onEnd = (e: TouchEvent) => {
       if (!touchStart.current) return;
-      const dx = e.changedTouches[0].clientX - touchStart.current.x;
-      const dy = e.changedTouches[0].clientY - touchStart.current.y;
+      const { x, y, inScrollable } = touchStart.current;
+      const dx = e.changedTouches[0].clientX - x;
+      const dy = e.changedTouches[0].clientY - y;
       touchStart.current = null;
+      if (inScrollable) return; // inside a horizontal scroll container — ignore
       if (Math.abs(dx) < Math.abs(dy) * 1.5) return; // too vertical — ignore
       if (!open && dx > 40) setOpen(true);
       if (open && dx < -60) setOpen(false);
