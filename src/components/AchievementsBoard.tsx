@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ACHIEVEMENTS,
   CATEGORY_ORDER,
@@ -40,6 +40,52 @@ function metaFor(name: string) {
 
 type GroupMode = 'rarity' | 'category';
 type FilterMode = 'all' | 'unlocked' | 'locked' | 'recent';
+
+const FILTER_OPTIONS: { value: FilterMode; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'unlocked', label: 'Unlocked' },
+  { value: 'locked', label: 'Locked' },
+  { value: 'recent', label: 'Recent' },
+];
+
+function FilterDropdown({ value, onChange }: { value: FilterMode; onChange: (v: FilterMode) => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close when clicking outside
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  const current = FILTER_OPTIONS.find((o) => o.value === value)!;
+
+  return (
+    <div className="ach-filter-drop" ref={ref}>
+      <button className={`ach-filter-trigger${value === 'all' ? ' wide' : ''}`} onClick={() => setOpen((o) => !o)}>
+        {current.label}
+        <span className="ach-filter-caret">{open ? '▴' : '▾'}</span>
+      </button>
+      {open && (
+        <div className="ach-filter-menu">
+          {FILTER_OPTIONS.map((o) => (
+            <button
+              key={o.value}
+              className={`ach-filter-opt${o.value === value ? ' on' : ''}`}
+              onClick={() => { onChange(o.value); setOpen(false); }}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function AchievementsBoard({ earners, players, meId }: Props) {
   const [lens, setLens] = useState(meId);
@@ -183,7 +229,7 @@ export default function AchievementsBoard({ earners, players, meId }: Props) {
             By type
           </button>
         </div>
-        <div className="ach-seg">
+        <div className="ach-seg ach-seg-filter-buttons">
           <button className={filter === 'all' ? 'on' : ''} onClick={() => setFilter('all')}>
             All
           </button>
@@ -196,6 +242,10 @@ export default function AchievementsBoard({ earners, players, meId }: Props) {
           <button className={filter === 'recent' ? 'on' : ''} onClick={() => setFilter('recent')}>
             Recent
           </button>
+        </div>
+        <div className="ach-filter-drop-wrap">
+          <span className="ach-filter-label">Filter by:</span>
+          <FilterDropdown value={filter} onChange={setFilter} />
         </div>
       </div>
 
