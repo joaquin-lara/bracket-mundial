@@ -12,7 +12,7 @@ export default function RulesPage() {
       <div className="rules-card">
         <h2>How to play</h2>
         <p>
-          Go to <strong>View/edit your bracket</strong> and enter the final score you think each game
+          Go to <strong>View your bracket</strong> and enter the final score you think each game
           will end on, any match in the tournament, anytime. You can change your mind as often as
           you want until <strong>10 minutes before kickoff</strong>, then that match locks for
           good. Nobody can see your picks until the match starts; after kickoff everyone&apos;s

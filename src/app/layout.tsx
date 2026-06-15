@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import AchievementWatcher from '@/components/AchievementWatcher';
 import ChallengeWatcher from '@/components/ChallengeWatcher';
 import ViewportLock from '@/components/ViewportLock';
 import PullToRefresh from '@/components/PullToRefresh';
@@ -6,6 +7,7 @@ import HomeOnRefresh from '@/components/HomeOnRefresh';
 import PageTransitionProvider from '@/components/PageTransition';
 import TopNav from '@/components/TopNav';
 import { createClient } from '@/lib/supabase/server';
+import { isAchievementsPreviewUser } from '@/lib/players';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -28,6 +30,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     data: { user },
   } = await supabase.auth.getUser();
 
+  let achievementsRevealed = false;
+  if (user) {
+    const { data: st } = await supabase
+      .from('achievements_state')
+      .select('revealed_at')
+      .eq('id', 1)
+      .maybeSingle();
+    achievementsRevealed = !!st?.revealed_at || isAchievementsPreviewUser(user.email);
+  }
+
   return (
     <html lang="en">
       <body>
@@ -35,8 +47,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <ViewportLock />
           <PullToRefresh />
           <HomeOnRefresh />
-          {user && <TopNav />}
+          {user && <TopNav achievementsRevealed={achievementsRevealed} />}
           {user && <ChallengeWatcher me={user.id} />}
+          {user && <AchievementWatcher />}
           {children}
         </PageTransitionProvider>
       </body>

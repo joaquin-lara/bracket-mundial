@@ -2,20 +2,22 @@
 
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { signOut } from '@/app/actions';
 import TransitionLink from './TransitionLink';
 
-const LINKS = [
+const BASE_LINKS = [
   ['/rules', 'Rules'],
   ['/schedule', 'Game schedule'],
-  ['/matches', 'View/edit your bracket'],
+  ['/matches', 'View your bracket'],
   ['/standings', 'Player Standings'],
-  ['/bracket', 'Group and Bracket Tracker'],
+  ['/bracket', 'Tournament Tracker'],
   ['/predictor', 'ML Predictor'],
   ['/duels', 'Penalty Shootouts'],
 ] as const;
 
-export default function TopNav() {
+export default function TopNav({ achievementsRevealed = false }: { achievementsRevealed?: boolean }) {
+  const LINKS: readonly (readonly [string, string])[] = achievementsRevealed
+    ? [...BASE_LINKS, ['/achievements', 'Achievements 🏅'] as const]
+    : BASE_LINKS;
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const touchStart = useRef<{ x: number; y: number; inScrollable: boolean } | null>(null);
@@ -23,6 +25,11 @@ export default function TopNav() {
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [open]);
 
   // Swipe right to open; swipe left to close — only fires on mostly-horizontal swipes
   useEffect(() => {
@@ -89,9 +96,6 @@ export default function TopNav() {
             {label}
           </TransitionLink>
         ))}
-        <form action={signOut}>
-          <button type="submit">Sign out</button>
-        </form>
       </nav>
 
       <span className="burger-spacer" />
@@ -117,9 +121,6 @@ export default function TopNav() {
           {label}
         </TransitionLink>
       ))}
-      <form action={signOut}>
-        <button type="submit">Sign out</button>
-      </form>
     </div>
     </>
   );

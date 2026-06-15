@@ -625,6 +625,12 @@ h1 {
   }
 }
 
+.signout-footer {
+  display: flex;
+  justify-content: center;
+  padding: 0 0 48px;
+}
+
 .contender-card {
   background: rgba(0, 0, 0, 0.6);
   border: 1px solid var(--line);
@@ -3151,4 +3157,364 @@ table.standings td.pts {
     width: 30px;
     height: 30px;
   }
+}
+
+/* ---- achievements ---- */
+
+.ach-section {
+  margin: 0 0 26px;
+}
+
+.ach-cat {
+  font-family: var(--narrow);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  margin: 22px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ach-cat-count {
+  margin-left: auto;
+  font-family: var(--sans);
+  font-weight: 800;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+.ach-rdot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* board: player lens, summary, controls */
+
+.ach-players {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.ach-player-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 12px 5px 5px;
+  color: var(--cream);
+  cursor: pointer;
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.ach-player-pill.active {
+  border-color: var(--gold);
+  background: rgba(230, 179, 55, 0.12);
+}
+
+.ach-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #0b3d2c;
+}
+
+.ach-pp-count {
+  background: rgba(244, 241, 232, 0.12);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 12px;
+}
+
+.ach-summary {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin: 0 0 14px;
+}
+
+.ach-sum-top {
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+.ach-progress {
+  height: 9px;
+  background: rgba(244, 241, 232, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  display: flex;
+  gap: 2px;
+}
+
+.ach-progress-seg {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.ach-rarity-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.ach-rchip {
+  font-family: var(--narrow);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 2px 9px;
+  border-radius: 999px;
+  color: #0b3d2c;
+}
+
+.ach-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 18px;
+}
+
+.ach-seg {
+  display: inline-flex;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.ach-seg button {
+  background: none;
+  border: none;
+  color: var(--nav-dim);
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 7px 14px;
+  cursor: pointer;
+}
+
+.ach-seg button.on {
+  background: var(--gold);
+  color: var(--bg-dark);
+}
+
+.ach-edots {
+  display: flex;
+  gap: 4px;
+  margin-top: 9px;
+}
+
+.ach-edot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 800;
+  background: rgba(244, 241, 232, 0.07);
+  color: var(--dim);
+}
+
+.ach-edot.lens {
+  outline: 2px solid var(--cream);
+  outline-offset: 1px;
+}
+
+.ach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.ach-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--dim);
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.ach-card:hover {
+  border-color: rgba(244, 241, 232, 0.25);
+}
+
+.ach-card.expanded {
+  border-color: var(--gold-soft);
+}
+
+.ach-card-main {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.ach-detail {
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  animation: achSlide 0.18s ease;
+}
+
+@keyframes achSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ach-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 13px;
+}
+
+.ach-detail-name {
+  font-weight: 700;
+}
+
+.ach-detail-when {
+  margin-left: auto;
+  color: var(--gold-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.ach-detail-when.locked {
+  color: var(--dim);
+  font-style: italic;
+}
+
+.ach-expand-hint {
+  margin-left: auto;
+  color: var(--dim);
+  font-size: 12px;
+}
+
+.ach-card.locked {
+  opacity: 0.5;
+}
+
+.ach-card.locked .ach-emoji {
+  filter: grayscale(1);
+}
+
+.ach-card.tier-common { border-left-color: #9aa5a0; }
+.ach-card.tier-rare { border-left-color: #4f9dde; }
+.ach-card.tier-epic { border-left-color: #a974e0; }
+.ach-card.tier-legendary { border-left-color: #f2a03c; }
+
+.ach-card.unlocked.tier-epic {
+  background: linear-gradient(135deg, rgba(169, 116, 224, 0.13), var(--card));
+}
+
+.ach-card.unlocked.tier-legendary {
+  background: linear-gradient(135deg, rgba(242, 160, 60, 0.16), var(--card));
+}
+
+.ach-emoji {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.ach-body {
+  min-width: 0;
+}
+
+.ach-name {
+  font-weight: 800;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ach-tier {
+  font-family: var(--narrow);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1px 7px;
+  border-radius: 999px;
+  color: var(--bg-dark);
+}
+
+.tier-pill-common { background: #9aa5a0; }
+.tier-pill-rare { background: #4f9dde; color: var(--cream); }
+.tier-pill-epic { background: #a974e0; color: var(--cream); }
+.tier-pill-legendary { background: #f2a03c; }
+
+.ach-desc {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 4px 0 0;
+}
+
+.ach-earners {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.ach-chip {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(244, 241, 232, 0.1);
+  color: var(--cream);
+}
+
+.ach-chip.me {
+  background: var(--gold);
+  color: var(--bg-dark);
+}
+
+.ach-locked-tag {
+  margin-top: 8px;
+  font-family: var(--narrow);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.ach-badges {
+  margin-left: 8px;
+  font-size: 14px;
+  white-space: nowrap;
+  vertical-align: middle;
 }

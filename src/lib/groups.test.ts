@@ -24,6 +24,7 @@ function match(
     home_score: hs,
     away_score: as_,
     scored: hs != null,
+    venue: null,
   };
 }
 

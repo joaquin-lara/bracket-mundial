@@ -7,6 +7,7 @@ import PresenceDot from '@/components/PresenceDot';
 import TodayGames from '@/components/TodayGames';
 import { PLAYER_META, PLAYERS } from '@/lib/players';
 import { ensureFreshScores } from '@/lib/autoSync';
+import { signOut } from '@/app/actions';
 import { createClient } from '@/lib/supabase/server';
 import type { Match } from '@/lib/types';
 
@@ -16,6 +17,7 @@ export default async function HomePage() {
   await ensureFreshScores();
   const supabase = createClient();
 
+  const { data: { user } } = await supabase.auth.getUser();
   const { data } = await supabase.from('standings').select('display_name, total');
   const totals = new Map<string, number>(
     (data ?? []).map((r) => [r.display_name as string, r.total as number])
@@ -59,7 +61,7 @@ export default async function HomePage() {
 
           <div className="cta-row">
             <Link href="/matches" className="btn-gold">
-              View/edit your bracket →
+              View your bracket →
             </Link>
             <Link href="/standings" className="btn-ghost">
               Player standings
@@ -93,6 +95,14 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {user && (
+        <div className="signout-footer">
+          <form action={signOut}>
+            <button type="submit" className="btn-ghost">Sign out</button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

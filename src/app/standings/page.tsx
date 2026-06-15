@@ -5,7 +5,9 @@ import RecapCard from '@/components/RecapCard';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { buildRecap, type RecapInput } from '@/lib/recap';
 import { createClient } from '@/lib/supabase/server';
-import { GUEST_NAME } from '@/lib/players';
+import { ensureAchievements } from '@/lib/achievementsSync';
+import { ACHIEVEMENTS_BY_ID, TIER_ORDER } from '@/lib/achievementsList';
+import { GUEST_NAME, isAchievementsPreviewUser } from '@/lib/players';
 
 export const metadata: Metadata = { title: 'Player Standings' };
 export const dynamic = 'force-dynamic';
@@ -19,6 +21,7 @@ interface StandingRow {
 
 export default async function StandingsPage() {
   await ensureFreshScores();
+  await ensureAchievements();
   const supabase = createClient();
   const {
     data: { user },
@@ -28,6 +31,35 @@ export default async function StandingsPage() {
   const { data } = await supabase.from('standings').select('*');
   // The shared guest account is view-only and never competes.
   const rows = ((data ?? []) as StandingRow[]).filter((r) => r.display_name !== GUEST_NAME);
+
+  // Earned badges (only once the achievements feature has revealed itself).
+  const { data: achState } = await supabase
+    .from('achievements_state')
+    .select('revealed_at')
+    .eq('id', 1)
+    .maybeSingle();
+  const achRevealed = !!achState?.revealed_at || isAchievementsPreviewUser(user.email);
+  const badgesByUser = new Map<string, { emojis: string[]; count: number }>();
+  if (achRevealed) {
+    const { data: achRows } = await supabase
+      .from('user_achievements')
+      .select('user_id, achievement_id');
+    const grouped = new Map<string, string[]>();
+    for (const r of achRows ?? []) {
+      const list = grouped.get(r.user_id as string) ?? [];
+      list.push(r.achievement_id as string);
+      grouped.set(r.user_id as string, list);
+    }
+    for (const [uid, ids] of grouped) {
+      const defs = ids.map((id) => ACHIEVEMENTS_BY_ID[id]).filter(Boolean);
+      const emojis = defs
+        .slice()
+        .sort((a, b) => TIER_ORDER[b.tier] - TIER_ORDER[a.tier])
+        .slice(0, 4)
+        .map((a) => a.emoji);
+      badgesByUser.set(uid, { emojis, count: defs.length });
+    }
+  }
 
   // Scored predictions (visible to everyone post-kickoff) + kickoff dates
   // feed the points race chart.
@@ -135,6 +167,12 @@ export default async function StandingsPage() {
                 <td>
                   {r.display_name}
                   {i === 0 ? ' 🏆' : i === rows.length - 1 && rows.length === 4 ? ' 💩' : ''}
+                  {achRevealed && badgesByUser.get(r.user_id)?.count ? (
+                    <span className="ach-badges" title={`${badgesByUser.get(r.user_id)!.count} achievements`}>
+                      {badgesByUser.get(r.user_id)!.emojis.join(' ')}
+                      {badgesByUser.get(r.user_id)!.count > 4 ? ` +${badgesByUser.get(r.user_id)!.count - 4}` : ''}
+                    </span>
+                  ) : null}
                 </td>
                 <td className="num pts">{r.total}</td>
                 <td className="num">{r.games_scored}</td>
