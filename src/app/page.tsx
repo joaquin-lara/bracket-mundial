@@ -6,12 +6,14 @@ import PitchStripes from '@/components/PitchStripes';
 import PresenceDot from '@/components/PresenceDot';
 import TodayGames from '@/components/TodayGames';
 import { PLAYER_META, PLAYERS } from '@/lib/players';
+import { ensureFreshScores } from '@/lib/autoSync';
 import { createClient } from '@/lib/supabase/server';
 import type { Match } from '@/lib/types';
 
 export const revalidate = 60; // cache for 1 minute
 
 export default async function HomePage() {
+  await ensureFreshScores();
   const supabase = createClient();
 
   const { data } = await supabase.from('standings').select('display_name, total');
