@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react';
 import {
   ACHIEVEMENTS,
   CATEGORY_ORDER,
+  PLATINUM_ID,
+  PLATINUM_REQUIRED_IDS,
   TIER_LABEL,
   TIER_ORDER,
   type Tier,
@@ -15,6 +17,7 @@ export interface BoardEarner {
   name: string;
   /** "ESP 2–1 ARG · Jun 14" for match-based badges, else just the date. */
   detail: string;
+  earnedAt: string; // ISO timestamp for sorting
 }
 export interface BoardPlayer {
   userId: string;
@@ -26,8 +29,8 @@ interface Props {
   meId: string;
 }
 
-const RARITY_DISPLAY: Tier[] = ['common', 'rare', 'epic', 'legendary'];
-const TIERS: Tier[] = ['common', 'rare', 'epic', 'legendary'];
+const RARITY_DISPLAY: Tier[] = ['common', 'rare', 'epic', 'legendary', 'platinum'];
+const TIERS: Tier[] = ['common', 'rare', 'epic', 'legendary', 'platinum'];
 const TOTAL = ACHIEVEMENTS.length;
 
 const META = PLAYER_META as Record<string, { initial: string; color: string; flagCode: string }>;
@@ -36,7 +39,7 @@ function metaFor(name: string) {
 }
 
 type GroupMode = 'rarity' | 'category';
-type FilterMode = 'all' | 'unlocked' | 'locked';
+type FilterMode = 'all' | 'unlocked' | 'locked' | 'recent';
 
 export default function AchievementsBoard({ earners, players, meId }: Props) {
   const [lens, setLens] = useState(meId);
@@ -66,6 +69,7 @@ export default function AchievementsBoard({ earners, players, meId }: Props) {
       rare: { got: 0, total: 0 },
       epic: { got: 0, total: 0 },
       legendary: { got: 0, total: 0 },
+      platinum: { got: 0, total: 0 },
     };
     for (const a of ACHIEVEMENTS) {
       out[a.tier].total += 1;
@@ -76,10 +80,23 @@ export default function AchievementsBoard({ earners, players, meId }: Props) {
 
   const lensTotal = lensSet.size;
 
+  // For "recently obtained": unlocked achievements sorted newest-first
+  const recentItems = useMemo(() => {
+    return ACHIEVEMENTS
+      .filter((a) => lensSet.has(a.id))
+      .map((a) => {
+        const earnedAt = earners[a.id]?.find((e) => e.userId === lens)?.earnedAt ?? '';
+        return { a, earnedAt };
+      })
+      .sort((x, y) => y.earnedAt.localeCompare(x.earnedAt))
+      .map(({ a }) => a);
+  }, [earners, lens, lensSet]);
+
   const groups = useMemo(() => {
     const items = ACHIEVEMENTS.filter((a) => {
       if (filter === 'unlocked') return lensSet.has(a.id);
       if (filter === 'locked') return !lensSet.has(a.id);
+      if (filter === 'recent') return lensSet.has(a.id);
       return true;
     });
     const sortItems = (arr: typeof ACHIEVEMENTS) =>
@@ -176,11 +193,49 @@ export default function AchievementsBoard({ earners, players, meId }: Props) {
           <button className={filter === 'locked' ? 'on' : ''} onClick={() => setFilter('locked')}>
             Locked
           </button>
+          <button className={filter === 'recent' ? 'on' : ''} onClick={() => setFilter('recent')}>
+            Recent
+          </button>
         </div>
       </div>
 
       {/* sections */}
-      {groups.length === 0 ? (
+      {filter === 'recent' ? (
+        recentItems.length === 0 ? (
+          <p className="empty">{lensName} hasn&apos;t unlocked anything yet.</p>
+        ) : (
+          <section className="ach-section">
+            <div className="ach-grid">
+              {recentItems.map((a) => {
+                const got4 = earners[a.id] ?? [];
+                const expanded = expandedId === a.id;
+                const earnedDetail = got4.find((e) => e.userId === lens)?.detail ?? '';
+                return (
+                  <div
+                    key={a.id}
+                    className={`ach-card tier-${a.tier} unlocked${expanded ? ' expanded' : ''}`}
+                    onClick={() => setExpandedId((cur) => (cur === a.id ? null : a.id))}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <div className="ach-card-main">
+                      <div className="ach-emoji">{a.emoji}</div>
+                      <div className="ach-body">
+                        <div className="ach-name">
+                          {a.name}
+                          <span className={`ach-tier tier-pill-${a.tier}`}>{TIER_LABEL[a.tier]}</span>
+                        </div>
+                        <div className="ach-desc">{a.description}</div>
+                        <div className="ach-desc" style={{ opacity: 0.6, fontSize: 12 }}>{earnedDetail}</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )
+      ) : groups.length === 0 ? (
         <p className="empty">Nothing here for {lensName} yet.</p>
       ) : (
         groups.map((g) => {
@@ -233,7 +288,28 @@ export default function AchievementsBoard({ earners, players, meId }: Props) {
                           </div>
                         </div>
                       </div>
-                      {expanded && (
+                      {expanded && a.id === PLATINUM_ID && (
+                        <div className="ach-detail">
+                          <div className="ach-detail-head">Badges still needed (of {PLATINUM_REQUIRED_IDS.length})</div>
+                          {players.map((p) => {
+                            const set = earnedByUser.get(p.userId) ?? new Set<string>();
+                            const missing = PLATINUM_REQUIRED_IDS.filter((id) => !set.has(id)).length;
+                            const m = metaFor(p.name);
+                            return (
+                              <div key={p.userId} className="ach-detail-row">
+                                <span className="ach-edot has" style={{ background: m.color, color: '#0b3d2c' }}>
+                                  {m.initial}
+                                </span>
+                                <span className="ach-detail-name">{p.name}</span>
+                                <span className={`ach-detail-when${missing === 0 ? '' : ' locked'}`}>
+                                  {missing === 0 ? 'Complete ✓' : `${missing} to go`}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                      {expanded && a.id !== PLATINUM_ID && (
                         <div className="ach-detail">
                           {players.map((p) => {
                             const e = got4.find((x) => x.userId === p.userId);

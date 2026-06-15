@@ -8,7 +8,7 @@
 //   "Make a pick / Pick ..."   = just lock a prediction (no correctness implied)
 //   "... points"               = career points total
 
-export type Tier = 'common' | 'rare' | 'epic' | 'legendary';
+export type Tier = 'common' | 'rare' | 'epic' | 'legendary' | 'platinum';
 
 export type Category =
   | 'Exact Scores'
@@ -19,7 +19,8 @@ export type Category =
   | 'Participation'
   | 'Tournament Stages'
   | 'Duels'
-  | 'Final Standings';
+  | 'Final Standings'
+  | 'Platinum';
 
 export interface AchievementDef {
   id: string;
@@ -124,20 +125,38 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { id: 'runner_up', name: 'Runner-up', emoji: '🥈', tier: 'epic', category: 'Final Standings', description: 'Finish the tournament in 2nd place.' },
   { id: 'podium_finish', name: 'Podium Finish', emoji: '🥉', tier: 'rare', category: 'Final Standings', description: 'Finish the tournament in 3rd place.' },
   { id: 'better_luck_next_time', name: 'Better Luck Next Time! (In 4 Years)', emoji: '🥄', tier: 'common', category: 'Final Standings', description: 'Finish the tournament in 4th — dead last.' },
+
+  // --- Platinum (the lot) --------------------------------------------------
+  { id: 'platinum', name: 'Platinum', emoji: '💎', tier: 'platinum', category: 'Platinum', description: 'Earn every other badge in the game. Final Standings (your finishing place) do not count.' },
 ];
 
 export const ACHIEVEMENTS_BY_ID: Record<string, AchievementDef> = Object.fromEntries(
   ACHIEVEMENTS.map((a) => [a.id, a])
 );
 
-export const TIER_ORDER: Record<Tier, number> = { common: 0, rare: 1, epic: 2, legendary: 3 };
+export const TIER_ORDER: Record<Tier, number> = {
+  common: 0,
+  rare: 1,
+  epic: 2,
+  legendary: 3,
+  platinum: 4,
+};
 
 export const TIER_LABEL: Record<Tier, string> = {
   common: 'Common',
   rare: 'Rare',
   epic: 'Epic',
   legendary: 'Legendary',
+  platinum: 'Platinum',
 };
+
+export const PLATINUM_ID = 'platinum';
+
+/** Every badge you must hold to earn Platinum — all of them except the
+ *  mutually-exclusive Final Standings and Platinum itself (72 badges). */
+export const PLATINUM_REQUIRED_IDS: string[] = ACHIEVEMENTS.filter(
+  (a) => a.category !== 'Platinum' && a.category !== 'Final Standings'
+).map((a) => a.id);
 
 export const CATEGORY_ORDER: Category[] = [
   'Exact Scores',
@@ -149,4 +168,5 @@ export const CATEGORY_ORDER: Category[] = [
   'Tournament Stages',
   'Duels',
   'Final Standings',
+  'Platinum',
 ];

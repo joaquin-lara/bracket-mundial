@@ -49,7 +49,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <HomeOnRefresh />
           {user && <TopNav achievementsRevealed={achievementsRevealed} />}
           {user && <ChallengeWatcher me={user.id} />}
-          {user && <AchievementWatcher />}
+          {user && <AchievementWatcher me={user.id} />}
           {children}
         </PageTransitionProvider>
       </body>

@@ -8,6 +8,7 @@ import {
   type DuelInfo,
   type DuelRound,
 } from './achievements';
+import { PLATINUM_REQUIRED_IDS } from './achievementsList';
 
 const PLAYERS = ['u1', 'u2', 'u3', 'u4'];
 
@@ -44,9 +45,9 @@ function baseCtx(over: Partial<EvalContext> = {}): EvalContext {
 }
 
 describe('achievement definitions', () => {
-  it('has 76 unique ids', () => {
-    expect(ACHIEVEMENTS).toHaveLength(76);
-    expect(new Set(ACHIEVEMENTS.map((a) => a.id)).size).toBe(76);
+  it('has 77 unique ids', () => {
+    expect(ACHIEVEMENTS).toHaveLength(77);
+    expect(new Set(ACHIEVEMENTS.map((a) => a.id)).size).toBe(77);
   });
   it('every achievement has a non-empty name, emoji and description', () => {
     for (const a of ACHIEVEMENTS) {
@@ -54,6 +55,13 @@ describe('achievement definitions', () => {
       expect(a.emoji.length).toBeGreaterThan(0);
       expect(a.description.length).toBeGreaterThan(0);
     }
+  });
+
+  it('Platinum requires the 72 non-placement badges (excludes itself + Final Standings)', () => {
+    expect(PLATINUM_REQUIRED_IDS).toHaveLength(72);
+    expect(PLATINUM_REQUIRED_IDS).not.toContain('platinum');
+    expect(PLATINUM_REQUIRED_IDS).not.toContain('champion');
+    expect(PLATINUM_REQUIRED_IDS).not.toContain('better_luck_next_time');
   });
 });
 

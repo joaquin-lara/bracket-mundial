@@ -15,7 +15,7 @@ const REVEAL_KEY = 'ach_reveal_seen';
  * Picks stay server-side; this only reacts to the public user_achievements
  * and achievements_state tables.
  */
-export default function AchievementWatcher() {
+export default function AchievementWatcher({ me }: { me: string }) {
   const supabase = createClient();
   const router = useRouter();
   const [banner, setBanner] = useState<{ who: string; name: string; emoji: string; at: string } | null>(null);
@@ -55,12 +55,12 @@ export default function AchievementWatcher() {
         (payload) => {
           const row = payload.new as { user_id: string; achievement_id: string; baseline: boolean };
           if (row.baseline) return; // silent launch backfill
+          if (row.user_id !== me) return; // only notify the player who earned it
           const key = `${row.user_id}|${row.achievement_id}`;
           if (seen.current.has(key)) return;
           seen.current.add(key);
           const def = ACHIEVEMENTS_BY_ID[row.achievement_id];
-          const who = names.current.get(row.user_id) ?? 'Someone';
-          setToast(`${def?.emoji ?? '🏅'} ${who} unlocked ${def?.name ?? 'an achievement'}!`);
+          setToast(`${def?.emoji ?? '🏅'} You unlocked ${def?.name ?? 'an achievement'}!`);
         }
       )
       .on(

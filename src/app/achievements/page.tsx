@@ -86,7 +86,7 @@ export default async function AchievementsPage() {
         year: 'numeric',
       });
     if (!earners[r.achievement_id]) earners[r.achievement_id] = [];
-    earners[r.achievement_id].push({ userId: r.user_id, name, detail });
+    earners[r.achievement_id].push({ userId: r.user_id, name, detail, earnedAt: r.earned_at });
   }
 
   // Players in the fixed roster order, only those with a profile.

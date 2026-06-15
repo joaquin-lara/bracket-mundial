@@ -9,7 +9,7 @@
 // So "correct outcome" means points >= 2, and "got it wrong" means <= 1.
 
 import { predict } from './ml/model';
-import { ACHIEVEMENTS, ACHIEVEMENTS_BY_ID, TIER_ORDER } from './achievementsList';
+import { ACHIEVEMENTS, ACHIEVEMENTS_BY_ID, PLATINUM_REQUIRED_IDS, TIER_ORDER } from './achievementsList';
 
 export type { Tier, Category, AchievementDef } from './achievementsList';
 export { ACHIEVEMENTS, ACHIEVEMENTS_BY_ID, TIER_ORDER };
@@ -368,6 +368,9 @@ export function evaluate(ctx: EvalContext): Map<string, Map<string, number | nul
 
     // ---- Duels ----
     evaluateDuels(player, ctx.duels, ctx.players, earned);
+
+    // ---- Platinum: hold every other badge (placements excluded) ----
+    if (PLATINUM_REQUIRED_IDS.every((id) => earned.has(id))) add('platinum');
 
     result.set(player, earned);
   }
