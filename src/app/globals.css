@@ -3414,8 +3414,10 @@ table.standings td.pts {
 
 .ach-edots {
   display: flex;
+  align-items: center;
   gap: 4px;
-  margin-top: 9px;
+  margin-top: auto;
+  padding-top: 10px;
 }
 
 .ach-edot {
@@ -3438,6 +3440,8 @@ table.standings td.pts {
 .ach-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-auto-rows: minmax(116px, auto);
+  align-items: stretch;
   gap: 12px;
 }
 
@@ -3464,7 +3468,8 @@ table.standings td.pts {
 .ach-card-main {
   display: flex;
   gap: 12px;
-  align-items: flex-start;
+  align-items: stretch;
+  flex: 1;
 }
 
 .ach-detail {
@@ -3562,18 +3567,21 @@ table.standings td.pts {
 
 .ach-body {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .ach-name {
   font-weight: 800;
   font-size: 15px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  line-height: 1.3;
 }
 
 .ach-tier {
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: 1px;
   font-family: var(--narrow);
   font-size: 10px;
   font-weight: 700;
