@@ -45,6 +45,7 @@ export default function TopNav() {
   }, [open]);
 
   return (
+    <>
     <header className="topbar">
       <button
         className="burger"
@@ -77,31 +78,32 @@ export default function TopNav() {
       </nav>
 
       <span className="burger-spacer" />
-
-      <div
-        className={`mobile-menu-backdrop${open ? ' open' : ''}`}
-        onClick={() => setOpen(false)}
-        aria-hidden="true"
-      />
-
-      <div className={`mobile-menu${open ? ' open' : ''}`}>
-        <TransitionLink href="/" onClick={() => setOpen(false)} className={pathname === '/' ? 'active' : ''}>
-          Home
-        </TransitionLink>
-        {LINKS.map(([href, label]) => (
-          <TransitionLink
-            href={href}
-            key={href}
-            onClick={() => setOpen(false)}
-            className={pathname === href ? 'active' : ''}
-          >
-            {label}
-          </TransitionLink>
-        ))}
-        <form action={signOut}>
-          <button type="submit">Sign out</button>
-        </form>
-      </div>
     </header>
+
+    <div
+      className={`mobile-menu-backdrop${open ? ' open' : ''}`}
+      onClick={() => setOpen(false)}
+      aria-hidden="true"
+    />
+
+    <div className={`mobile-menu${open ? ' open' : ''}`}>
+      <TransitionLink href="/" onClick={() => setOpen(false)} className={pathname === '/' ? 'active' : ''}>
+        Home
+      </TransitionLink>
+      {LINKS.map(([href, label]) => (
+        <TransitionLink
+          href={href}
+          key={href}
+          onClick={() => setOpen(false)}
+          className={pathname === href ? 'active' : ''}
+        >
+          {label}
+        </TransitionLink>
+      ))}
+      <form action={signOut}>
+        <button type="submit">Sign out</button>
+      </form>
+    </div>
+    </>
   );
 }
