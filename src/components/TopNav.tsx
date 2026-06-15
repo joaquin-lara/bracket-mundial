@@ -18,23 +18,25 @@ const LINKS = [
 export default function TopNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const touchStartX = useRef<number | null>(null);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
 
-  // Swipe from left edge to open; swipe left anywhere to close
+  // Swipe right to open; swipe left to close — only fires on mostly-horizontal swipes
   useEffect(() => {
     const onStart = (e: TouchEvent) => {
-      touchStartX.current = e.touches[0].clientX;
+      touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     };
     const onEnd = (e: TouchEvent) => {
-      if (touchStartX.current === null) return;
-      const dx = e.changedTouches[0].clientX - touchStartX.current;
+      if (!touchStart.current) return;
+      const dx = e.changedTouches[0].clientX - touchStart.current.x;
+      const dy = e.changedTouches[0].clientY - touchStart.current.y;
+      touchStart.current = null;
+      if (Math.abs(dx) < Math.abs(dy) * 1.5) return; // too vertical — ignore
       if (!open && dx > 40) setOpen(true);
       if (open && dx < -60) setOpen(false);
-      touchStartX.current = null;
     };
     document.addEventListener('touchstart', onStart, { passive: true });
     document.addEventListener('touchend', onEnd, { passive: true });
