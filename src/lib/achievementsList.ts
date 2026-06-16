@@ -76,10 +76,10 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { id: 'down_to_the_wire', name: 'Down to the Wire', emoji: '🕙', tier: 'common', category: 'Bold Picks', description: 'Make a pick in the final 2 minutes before it locks.' },
 
   // --- Points milestones ---------------------------------------------------
-  { id: 'half_century', name: 'Half Century', emoji: '🪙', tier: 'common', category: 'Points', description: 'Reach 50 total points.' },
-  { id: 'centurion', name: 'Centurion', emoji: '💯', tier: 'rare', category: 'Points', description: 'Reach 100 total points.' },
-  { id: 'galactico', name: 'Galáctico', emoji: '🌠', tier: 'epic', category: 'Points', description: 'Reach 200 total points.' },
-  { id: 'the_goat', name: 'The GOAT', emoji: '🐐', tier: 'legendary', category: 'Points', description: 'Reach 250 total points.' },
+  { id: 'quarter_century', name: 'Quarter Century', emoji: '🪙', tier: 'common', category: 'Points', description: 'Reach 25 total points.' },
+  { id: 'half_century', name: 'Half Century', emoji: '🥈', tier: 'rare', category: 'Points', description: 'Reach 50 total points.' },
+  { id: 'three_quarter_century', name: 'Three-Quarter Century', emoji: '💎', tier: 'epic', category: 'Points', description: 'Reach 75 total points.' },
+  { id: 'centurion', name: 'Centurion', emoji: '💯', tier: 'legendary', category: 'Points', description: 'Reach 100 total points.' },
 
   // --- Appearances ---------------------------------------------------------
   { id: 'squad_player', name: 'Squad Player', emoji: '🧢', tier: 'common', category: 'Participation', description: 'Make a pick on 25 matches.' },
