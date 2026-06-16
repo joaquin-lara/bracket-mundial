@@ -96,10 +96,12 @@ export default function DuelArena({
   me,
   profiles,
   initialDuelId = null,
+  isGuest = false,
 }: {
   me: string;
   profiles: Profile[];
   initialDuelId?: string | null;
+  isGuest?: boolean;
 }) {
   const supabase = createClient();
   const [duels, setDuels] = useState<Duel[]>([]);
@@ -782,11 +784,16 @@ export default function DuelArena({
   return (
     <div>
       <div className="groups-head">
-        <span className="groups-title">Challenge</span>
+        <span className="groups-title">{isGuest ? 'Practice' : 'Challenge'}</span>
         <div className="contenders-line" />
       </div>
+      {isGuest && (
+        <p className="page-intro" style={{ marginBottom: 12 }}>
+          You&apos;re in guest mode — games don&apos;t register. Practice against the CPU anytime.
+        </p>
+      )}
       <div className="duel-lobby-grid">
-        {others.map((p) => {
+        {!isGuest && others.map((p) => {
           const r = record(p.id);
           const meta = PLAYER_META[p.display_name as Player];
           return (
@@ -823,7 +830,7 @@ export default function DuelArena({
         </div>
       </div>
 
-      {(pending.length > 0 || active.length > 0) && (
+      {!isGuest && (pending.length > 0 || active.length > 0) && (
         <>
           <div className="groups-head">
             <span className="groups-title">Open duels</span>
@@ -886,7 +893,7 @@ export default function DuelArena({
         </>
       )}
 
-      {finished.length > 0 && (
+      {!isGuest && finished.length > 0 && (
         <>
           <div className="groups-head">
             <span className="groups-title">History</span>

@@ -5,6 +5,13 @@ import { useEffect, useRef, useState } from 'react';
 import { ACHIEVEMENTS_BY_ID } from '@/lib/achievementsList';
 import { createClient } from '@/lib/supabase/client';
 
+function readLocal(key: string): string | null {
+  try { return typeof window !== 'undefined' ? window.localStorage.getItem(key) : null; } catch { return null; }
+}
+function writeLocal(key: string, value: string): void {
+  try { if (typeof window !== 'undefined') window.localStorage.setItem(key, value); } catch { /* ignore */ }
+}
+
 export default function AchievementWatcher({ me }: { me: string }) {
   const supabase = createClient();
   const router = useRouter();
@@ -12,12 +19,39 @@ export default function AchievementWatcher({ me }: { me: string }) {
   const seen = useRef<Set<string>>(new Set());
 
   useEffect(() => {
+    const seenKey = `ach_seen_${me}`;
+
     async function init() {
-      // Seed seen-set so historical unlocks don't toast on every page load.
       const { data: existing } = await supabase
         .from('user_achievements')
-        .select('user_id, achievement_id');
-      existing?.forEach((r) => seen.current.add(`${r.user_id}|${r.achievement_id}`));
+        .select('achievement_id, baseline')
+        .eq('user_id', me);
+
+      const all = existing ?? [];
+
+      // Seed the realtime dedup set so live events don't re-toast.
+      all.forEach((r) => seen.current.add(r.achievement_id as string));
+
+      // Compare against what was stored on the last visit. Achievements that
+      // are new (not in stored) and not baseline were earned while away —
+      // the Realtime INSERT fired before this client connected, so we catch
+      // them here instead.
+      const storedRaw = readLocal(seenKey);
+      if (storedRaw !== null) {
+        const stored = new Set(JSON.parse(storedRaw) as string[]);
+        const newOnes = all.filter(
+          (r) => !(r.baseline as boolean) && !stored.has(r.achievement_id as string)
+        );
+        if (newOnes.length === 1) {
+          const def = ACHIEVEMENTS_BY_ID[newOnes[0].achievement_id as string];
+          setToast(`${def?.emoji ?? '🏅'} You unlocked ${def?.name ?? 'an achievement'}!`);
+        } else if (newOnes.length > 1) {
+          setToast(`🏅 You unlocked ${newOnes.length} new achievements!`);
+        }
+      }
+
+      // Save current IDs so next visit knows the baseline.
+      writeLocal(seenKey, JSON.stringify(all.map((r) => r.achievement_id)));
     }
     init();
 
@@ -30,9 +64,11 @@ export default function AchievementWatcher({ me }: { me: string }) {
           const row = payload.new as { user_id: string; achievement_id: string; baseline: boolean };
           if (row.baseline) return;
           if (row.user_id !== me) return;
-          const key = `${row.user_id}|${row.achievement_id}`;
-          if (seen.current.has(key)) return;
-          seen.current.add(key);
+          if (seen.current.has(row.achievement_id)) return; // init() already toasted
+          seen.current.add(row.achievement_id);
+          // Keep localStorage in sync so next visit doesn't re-toast.
+          const stored: string[] = JSON.parse(readLocal(seenKey) ?? '[]');
+          writeLocal(seenKey, JSON.stringify([...stored, row.achievement_id]));
           const def = ACHIEVEMENTS_BY_ID[row.achievement_id];
           setToast(`${def?.emoji ?? '🏅'} You unlocked ${def?.name ?? 'an achievement'}!`);
         }

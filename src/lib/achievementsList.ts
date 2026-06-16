@@ -127,7 +127,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { id: 'better_luck_next_time', name: 'Better Luck Next Time! (In 4 Years)', emoji: '🥄', tier: 'common', category: 'Final Standings', description: 'Finish the tournament in 4th — dead last.' },
 
   // --- Platinum (the lot) --------------------------------------------------
-  { id: 'platinum', name: 'Platinum', emoji: '💎', tier: 'platinum', category: 'Platinum', description: 'Earn every other badge in the game. Final Standings (your finishing place) do not count.' },
+  { id: 'platinum', name: 'Ultimate Baller', emoji: '💎', tier: 'platinum', category: 'Platinum', description: 'Earn every other badge in the game. Final Standings (your finishing place) do not count.' },
 ];
 
 export const ACHIEVEMENTS_BY_ID: Record<string, AchievementDef> = Object.fromEntries(
