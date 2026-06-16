@@ -156,6 +156,36 @@ npx tsx scripts/lineup-strength.ts   # coverage + sample deltas
 npm run backtest                     # LINEUP TEST block
 ```
 
+## Experiments that DID find signal (2026-06-15) — `scripts/model-experiments.ts`
+
+After squad + lineups came up empty, ran three no-new-data experiments looking for
+signal DC misses. Walk-forward, competitive only, tuned on [2013,2018), tested on
+[2018,+). **All three help (modestly); the DC+Elo blend is the standout and is a
+ship candidate.** Baseline DC on this window: RPS 0.1647, log-loss 0.8431.
+
+1. **DC + Elo blend — REAL WIN.** Averaging the shipped Elo+Poisson model with DC
+   beats DC alone. Validation picks ~40% Elo / 60% DC; on test:
+   `wElo 0.0 (DC) 0.1647 / 0.8431  ->  wElo 0.4  RPS 0.1636  logloss 0.8390`.
+   Classic diversification: Elo (margin-of-victory, different update) and DC
+   (attack/defence) make different errors, so the average is steadier. ~0.7% RPS,
+   validation-confirmed and monotonic. **Recommend wiring into the live predictor.**
+
+2. **Altitude home advantage — REAL but niche.** A venue-altitude boost to home
+   advantage (acclimatised host) does nothing to the overall number (only ~200 of
+   5,801 test matches are >=1000m) but clearly helps *those* games: on the altitude
+   subset, `altCoef 0 -> RPS 0.1749/0.9008` improves to `altCoef 0.20 -> 0.1672/0.8698`,
+   validation picks altCoef≈0.15. Worth adding for CONMEBOL/Mexico/altitude hosts;
+   small global effect. (Altitude table is in model-experiments.ts.)
+
+3. **DC memory/weight tuning — marginal.** Best validation config (shrink 0.0005 =
+   longer memory, friendlyWeight 0.7) → test RPS 0.1644 / logloss 0.8418 vs 0.1647 /
+   0.8431. Real but tiny; fold in opportunistically.
+
+These improve the *core* model (not a bolt-on signal), so unlike squad/lineups they
+are worth shipping. Next step (deliberate model change, not yet done): wire the
+DC+Elo blend into `src/lib/ml/model.ts` (it already has both Elo and DC ratings in
+ratings.json), optionally add the altitude term, and update the predictor explainer.
+
 ## Data (gitignored under `/data/`, must be re-fetched per session)
 
 ```bash
