@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { isGuestEmail } from '@/lib/players';
 import type { Match, Prediction, RevealedPick } from '@/lib/types';
 
-export const metadata: Metadata = { title: 'Enter your bracket' };
+export const metadata: Metadata = { title: 'Your bracket' };
 export const dynamic = 'force-dynamic';
 
 export default async function EnterBracketPage() {
@@ -64,7 +64,7 @@ export default async function EnterBracketPage() {
 
   return (
     <main>
-      <h1>{guest ? 'The bracket' : 'Enter your bracket'}</h1>
+      <h1>{guest ? 'The bracket' : 'Your bracket'}</h1>
       {guest ? (
         <p className="page-intro">
           You&apos;re browsing as a <strong>guest</strong>. Every fixture is here to look through,

@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { ensureAchievements } from './achievementsSync';
 import { fetchFixtures } from './footballData';
 import { runSync } from './sync';
 import { makeSupabaseSyncDb } from './syncDb';
@@ -38,9 +39,15 @@ async function doSync(): Promise<void> {
       .limit(1);
 
     const newest = data?.[0]?.updated_at ? new Date(data[0].updated_at as string).getTime() : 0;
-    if (Date.now() - newest < STALE_MS) return;
+    if (Date.now() - newest < STALE_MS) {
+      // Matches are fresh, but duels/standings may have moved: still let the
+      // (throttled) achievement pass run so badges keep up.
+      await ensureAchievements();
+      return;
+    }
 
     await runSync(makeSupabaseSyncDb(admin), fetchFixtures);
+    await ensureAchievements();
   } catch (err) {
     console.error('auto-sync failed:', err instanceof Error ? err.message : err);
   }

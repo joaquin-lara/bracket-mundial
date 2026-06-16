@@ -1,12 +1,15 @@
 import type { Metadata, Viewport } from 'next';
+import AchievementWatcher from '@/components/AchievementWatcher';
+import AutoRefresh from '@/components/AutoRefresh';
 import ChallengeWatcher from '@/components/ChallengeWatcher';
 import EnableNotifications from '@/components/EnableNotifications';
 import HomeOnRefresh from '@/components/HomeOnRefresh';
 import PageTransitionProvider from '@/components/PageTransition';
-import PickReminder from '@/components/PickReminder';
+import PullToRefresh from '@/components/PullToRefresh';
 import TopNav from '@/components/TopNav';
-import { isGuestEmail } from '@/lib/players';
+import ViewportLock from '@/components/ViewportLock';
 import { createClient } from '@/lib/supabase/server';
+import { isAchievementsPreviewUser } from '@/lib/players';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -22,6 +25,9 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: '#0b5f3a',
+  width: 'device-width',
+  initialScale: 1,
+  userScalable: false,
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -30,14 +36,27 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     data: { user },
   } = await supabase.auth.getUser();
 
+  let achievementsRevealed = false;
+  if (user) {
+    const { data: st } = await supabase
+      .from('achievements_state')
+      .select('revealed_at')
+      .eq('id', 1)
+      .maybeSingle();
+    achievementsRevealed = !!st?.revealed_at || isAchievementsPreviewUser(user.email);
+  }
+
   return (
     <html lang="en">
       <body>
         <PageTransitionProvider>
+          <ViewportLock />
+          <PullToRefresh />
           <HomeOnRefresh />
-          {user && <TopNav />}
+          <AutoRefresh />
+          {user && <TopNav achievementsRevealed={achievementsRevealed} />}
           {user && <ChallengeWatcher me={user.id} />}
-          {user && <PickReminder me={user.id} isGuest={isGuestEmail(user.email)} />}
+          {user && <AchievementWatcher me={user.id} />}
           {user && <EnableNotifications />}
           {children}
         </PageTransitionProvider>

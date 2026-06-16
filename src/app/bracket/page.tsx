@@ -6,7 +6,7 @@ import { computeGroupTables } from '@/lib/groups';
 import { createClient } from '@/lib/supabase/server';
 import type { Match } from '@/lib/types';
 
-export const metadata: Metadata = { title: 'Group and Bracket Tracker' };
+export const metadata: Metadata = { title: 'Tournament Tracker' };
 export const revalidate = 120; // cache for 2 minutes
 
 const ROUNDS: { stage: string; label: string }[] = [
@@ -114,7 +114,7 @@ export default async function BracketPage() {
 
   return (
     <div className="bracket-page">
-      <h1>Group and Bracket Tracker</h1>
+      <h1>Tournament Tracker</h1>
       <p className="subtitle">
         Group tables and the road from the Round of 32 to the Final. Fills in automatically as
         the tournament unfolds; winners in gold.

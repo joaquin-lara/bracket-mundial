@@ -308,6 +308,7 @@ describe('sync scoring + idempotency', () => {
         status: 'FINISHED',
         home_score: 2,
         away_score: 1,
+        venue: null,
       },
     ]);
     const third = await runSync(db, async () => fixtures);

@@ -2,6 +2,7 @@
 // is swappable: football-data.org (primary) and openfootball (fallback).
 
 import { finalScore, type ApiScore } from './scoring';
+import { lookup } from './ml/teams';
 
 export interface FixtureRow {
   id: number;
@@ -15,6 +16,7 @@ export interface FixtureRow {
   status: string;
   home_score: number | null;
   away_score: number | null;
+  venue: string | null; // host city; football-data omits it, sourced from openfootball
 }
 
 // --- football-data.org v4 --------------------------------------------------
@@ -67,6 +69,7 @@ function mapFdMatch(m: FdMatch): FixtureRow {
     status: m.status ?? 'SCHEDULED',
     home_score: score?.home ?? null,
     away_score: score?.away ?? null,
+    venue: null, // football-data has no venue; filled from openfootball in fetchFixtures
   };
 }
 
@@ -121,6 +124,7 @@ function mapOfMatch(m: OfMatch): FixtureRow | null {
     status: finished ? 'FINISHED' : new Date(kickoff).getTime() <= Date.now() ? 'TIMED' : 'SCHEDULED',
     home_score: finished ? ft![0] : null,
     away_score: finished ? ft![1] : null,
+    venue: m.ground ?? null,
   };
 }
 
@@ -169,5 +173,41 @@ export async function fetchFixtures(): Promise<FixtureRow[]> {
   if (source === 'openfootball') return fetchOpenfootballFixtures();
   const key = process.env.FOOTBALL_DATA_API_KEY;
   if (!key) throw new Error('FOOTBALL_DATA_API_KEY is not set');
-  return fetchFootballDataFixtures(key);
+  const rows = await fetchFootballDataFixtures(key);
+  await mergeVenues(rows);
+  return rows;
+}
+
+/**
+ * football-data omits the venue; openfootball carries the host city. Each team
+ * pairing is unique across the tournament, so we key on the canonical team pair
+ * and copy the city across. Best-effort: if openfootball is unreachable the
+ * rows simply keep null venues. Mutates `rows` in place.
+ */
+async function mergeVenues(rows: FixtureRow[]): Promise<void> {
+  let ofRows: FixtureRow[];
+  try {
+    ofRows = await fetchOpenfootballFixtures();
+  } catch {
+    return;
+  }
+  const cityByPair = new Map<string, string>();
+  for (const r of ofRows) {
+    const k = pairKey(r);
+    if (k && r.venue) cityByPair.set(k, r.venue);
+  }
+  for (const r of rows) {
+    if (r.venue) continue;
+    const k = pairKey(r);
+    if (k) r.venue = cityByPair.get(k) ?? null;
+  }
+}
+
+/** Canonical, order-independent key for a fixture: the sorted TLA codes of its
+ *  two teams. Returns null if either side can't be resolved (e.g. TBD). */
+function pairKey(r: FixtureRow): string | null {
+  const a = lookup(r.home_code)?.code ?? lookup(r.home_team)?.code ?? null;
+  const b = lookup(r.away_code)?.code ?? lookup(r.away_team)?.code ?? null;
+  if (!a || !b) return null;
+  return [a, b].sort().join('|');
 }

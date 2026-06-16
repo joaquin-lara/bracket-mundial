@@ -26,6 +26,7 @@ create table if not exists public.matches (
   home_score int,
   away_score int,
   scored boolean not null default false,
+  venue text, -- host city (from openfootball; football-data omits it)
   updated_at timestamptz not null default now()
 );
 

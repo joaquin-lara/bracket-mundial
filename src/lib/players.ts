@@ -20,6 +20,17 @@ export function pinPassword(player: string, pin: string): string {
   return `bm-${pin}-${player.toLowerCase()}`;
 }
 
+// --- TEMPORARY achievements preview ----------------------------------------
+// Lets one account see the achievements page / nav / badges BEFORE the public
+// reveal, for review. Set to null (or remove this + its usages in
+// layout.tsx, app/achievements/page.tsx, app/standings/page.tsx) to disable.
+const ACHIEVEMENTS_PREVIEW_PLAYER: string | null = 'Joaquin';
+
+export function isAchievementsPreviewUser(email: string | null | undefined): boolean {
+  if (!ACHIEVEMENTS_PREVIEW_PLAYER) return false;
+  return (email ?? '').toLowerCase() === playerEmail(ACHIEVEMENTS_PREVIEW_PLAYER);
+}
+
 // A single shared, view-only account for visitors who just want to look
 // around. It is a real Supabase user (so row-level security still applies),
 // but the app blocks it from editing the bracket or running shootouts.

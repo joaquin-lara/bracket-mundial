@@ -7,12 +7,12 @@ export default function RulesPage() {
   return (
     <main>
       <h1>Rules</h1>
-      <p className="subtitle">Short version: guess scores, don&apos;t be last.</p>
+      <p className="subtitle">Predict the score of every match. The most points after the Final wins.</p>
 
       <div className="rules-card">
         <h2>How to play</h2>
         <p>
-          Go to <strong>Edit your bracket</strong> and enter the final score you think each game
+          Go to <strong>View your bracket</strong> and enter the final score you think each game
           will end on, any match in the tournament, anytime. You can change your mind as often as
           you want until <strong>10 minutes before kickoff</strong>, then that match locks for
           good. Nobody can see your picks until the match starts; after kickoff everyone&apos;s
@@ -30,7 +30,7 @@ export default function RulesPage() {
           <br />
           <strong>1 point</strong> — you locked a pick but got the outcome wrong.
           <br />
-          <strong>0 points</strong> — you didn&apos;t pick. Don&apos;t be that guy.
+          <strong>0 points</strong> — no pick submitted.
         </p>
       </div>
 
@@ -39,8 +39,7 @@ export default function RulesPage() {
         <p>
           Knockout matches are judged on the score at the end of play, including extra time. A
           match decided on penalties counts as a draw. Scores and points update automatically
-          every few minutes. Whoever has the most points after the Final wins. El que sale último
-          es el más pendejo.
+          every few minutes. Whoever has the most points after the Final wins.
         </p>
       </div>
     </main>

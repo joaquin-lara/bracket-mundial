@@ -6,14 +6,18 @@ import PitchStripes from '@/components/PitchStripes';
 import PresenceDot from '@/components/PresenceDot';
 import TodayGames from '@/components/TodayGames';
 import { PLAYER_META, PLAYERS } from '@/lib/players';
+import { ensureFreshScores } from '@/lib/autoSync';
+import { signOut } from '@/app/actions';
 import { createClient } from '@/lib/supabase/server';
 import type { Match } from '@/lib/types';
 
 export const revalidate = 60; // cache for 1 minute
 
 export default async function HomePage() {
+  await ensureFreshScores();
   const supabase = createClient();
 
+  const { data: { user } } = await supabase.auth.getUser();
   const { data } = await supabase.from('standings').select('display_name, total');
   const totals = new Map<string, number>(
     (data ?? []).map((r) => [r.display_name as string, r.total as number])
@@ -53,11 +57,11 @@ export default async function HomePage() {
             Cup Bracket.
           </h1>
 
-          <p className="hero-tag">El que sale último es el más pendejo.</p>
+          <p className="hero-tag">Predict the scores. Most points after the Final wins.</p>
 
           <div className="cta-row">
             <Link href="/matches" className="btn-gold">
-              Edit your bracket →
+              View your bracket →
             </Link>
             <Link href="/standings" className="btn-ghost">
               Player standings
@@ -91,6 +95,14 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {user && (
+        <div className="signout-footer">
+          <form action={signOut}>
+            <button type="submit" className="btn-ghost">Sign out</button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

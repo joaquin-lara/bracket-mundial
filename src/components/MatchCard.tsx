@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { submitPrediction } from '@/app/actions';
 import Flag from './Flag';
+import TransitionLink from './TransitionLink';
 import { lockTime, stageLabel, type Match, type Prediction, type RevealedPick } from '@/lib/types';
 
 interface Props {
@@ -91,37 +91,40 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
           <span>{match.home_team}</span>
         </div>
 
-        {started ? (
-          <div className="final-score">
-            {match.home_score ?? '–'} : {match.away_score ?? '–'}
-          </div>
-        ) : readOnly ? (
-          <div className="final-score muted-score">vs</div>
-        ) : (
-          <div className="score-inputs">
-            <input
-              type="number"
-              min={0}
-              max={20}
-              inputMode="numeric"
-              value={home}
-              disabled={locked || teamsTbd}
-              onChange={(e) => setHome(e.target.value)}
-              aria-label={`${match.home_team} goals`}
-            />
-            <span className="dash">:</span>
-            <input
-              type="number"
-              min={0}
-              max={20}
-              inputMode="numeric"
-              value={away}
-              disabled={locked || teamsTbd}
-              onChange={(e) => setAway(e.target.value)}
-              aria-label={`${match.away_team} goals`}
-            />
-          </div>
-        )}
+        <div className="match-center">
+          {match.venue && <span className="match-venue">{match.venue}</span>}
+          {started ? (
+            <div className="final-score">
+              {match.home_score ?? '–'} : {match.away_score ?? '–'}
+            </div>
+          ) : readOnly ? (
+            <div className="final-score muted-score">vs</div>
+          ) : (
+            <div className="score-inputs">
+              <input
+                type="number"
+                min={0}
+                max={20}
+                inputMode="numeric"
+                value={home}
+                disabled={locked || teamsTbd}
+                onChange={(e) => setHome(e.target.value)}
+                aria-label={`${match.home_team} goals`}
+              />
+              <span className="dash">:</span>
+              <input
+                type="number"
+                min={0}
+                max={20}
+                inputMode="numeric"
+                value={away}
+                disabled={locked || teamsTbd}
+                onChange={(e) => setAway(e.target.value)}
+                aria-label={`${match.away_team} goals`}
+              />
+            </div>
+          )}
+        </div>
 
         <div className="team away">
           <span>{match.away_team}</span>
@@ -155,13 +158,13 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
         )}
 
         {!teamsTbd && match.home_code && match.away_code && (
-          <Link
+          <TransitionLink
             className="ml-link-btn"
             href={`/predictor?home=${match.home_code}&away=${match.away_code}`}
             title={`Open ${match.home_team} vs ${match.away_team} in the ML Predictor`}
           >
             ML Prediction
-          </Link>
+          </TransitionLink>
         )}
 
         {!locked && !teamsTbd && !readOnly && (
