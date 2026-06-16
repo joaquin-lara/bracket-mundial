@@ -12,6 +12,42 @@ export const dynamic = 'force-dynamic';
  * Safe — it only reveals booleans/counts (no secret values) and only pushes to
  * the signed-in user's own devices. Remove once push is confirmed working.
  */
+/** POST: send a test push to the signed-in user's own devices (used by the
+ *  in-app Test button, which runs as the app's real account). */
+export async function POST() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'not signed in' }, { status: 401 });
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return NextResponse.json({ error: 'server env missing' }, { status: 500 });
+  const admin = createAdmin(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+  const { data: subs } = await admin
+    .from('push_subscriptions')
+    .select('id,endpoint,p256dh,auth')
+    .eq('user_id', user.id);
+  let sent = 0;
+  const errors: string[] = [];
+  if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY && subs?.length) {
+    webpush.setVapidDetails(
+      process.env.VAPID_SUBJECT || 'mailto:notify@stonksbracket.app',
+      process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+      process.env.VAPID_PRIVATE_KEY
+    );
+    const body = JSON.stringify({ title: '✅ It works!', body: 'Stonks notifications are live.', url: '/' });
+    for (const s of subs) {
+      try {
+        await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, body);
+        sent++;
+      } catch (e) {
+        const err = e as { statusCode?: number; body?: string; message?: string };
+        errors.push(`${err.statusCode ?? ''} ${err.body || err.message || String(e)}`.trim().slice(0, 200));
+      }
+    }
+  }
+  return NextResponse.json({ email: user.email, devices: subs?.length ?? 0, sent, errors });
+}
+
 export async function GET() {
   const env = {
     vapidPublic: !!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
