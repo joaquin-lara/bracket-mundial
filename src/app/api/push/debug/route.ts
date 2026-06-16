@@ -38,6 +38,20 @@ export async function GET() {
     .from('push_subscriptions')
     .select('*', { count: 'exact', head: true });
 
+  // Which accounts own the subscriptions? (so we can spot the account mismatch)
+  const subscriptionsByAccount: Record<string, number> = {};
+  try {
+    const { data: allSubs } = await admin.from('push_subscriptions').select('user_id');
+    const { data: usersList } = await admin.auth.admin.listUsers();
+    const emailById = new Map((usersList?.users ?? []).map((u) => [u.id, u.email ?? u.id]));
+    for (const s of allSubs ?? []) {
+      const e = (emailById.get(s.user_id as string) as string) ?? (s.user_id as string);
+      subscriptionsByAccount[e] = (subscriptionsByAccount[e] ?? 0) + 1;
+    }
+  } catch {
+    /* listing users is best-effort */
+  }
+
   const send: { attempted: boolean; sent: number; errors: string[] } = { attempted: false, sent: 0, errors: [] };
   if (env.vapidPublic && env.vapidPrivate && mySubs && mySubs.length) {
     send.attempted = true;
@@ -65,6 +79,7 @@ export async function GET() {
     env,
     mySubscriptions: mySubs?.length ?? 0,
     totalSubscriptions: totalSubscriptions ?? 0,
+    subscriptionsByAccount,
     subQueryError: subErr?.message ?? null,
     send,
   });
