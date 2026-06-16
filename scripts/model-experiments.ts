@@ -272,10 +272,11 @@ const comp = (r: Row) => r.tournament.toLowerCase() !== 'friendly';
 // Run a DC config; return validation + test accumulators, plus a test accumulator
 // restricted to a subset of interest (default: the altitude matches).
 const altSub = (r: Row) => !r.neutral && altKm(r.city) > 0;
-function runDC(cfg: DCConfig, sub: (r: Row) => boolean = altSub): { val: Acc; test: Acc; testSub: Acc } {
+function runDC(cfg: DCConfig, sub: (r: Row) => boolean = altSub, startDate = '1872-01-01'): { val: Acc; test: Acc; testSub: Acc } {
   const dc = new DC(cfg);
   const val = mk(), test = mk(), testSub = mk();
   for (const r of rows) {
+    if (r.date < startDate) continue; // only learn from matches on/after the cutoff
     if (comp(r)) {
       const p = dc.predict(r);
       if (p) {
@@ -367,4 +368,18 @@ const longHaul = (r: Row) => awayTravelKm(r) - homeTravelKm(r) > 3000;
 for (const travelCoef of [0, 0.01, 0.02, 0.04, 0.08]) {
   const r = runDC({ ...DC_DEFAULT, travelCoef }, longHaul);
   console.log(`  travelCoef=${travelCoef.toFixed(2)}  val RPS ${(r.val.rps / r.val.n).toFixed(4)}  | test ${show(r.test)}  | longHaul(>3000km) ${show(r.testSub)}`);
+}
+
+// --- Test 6: training-data start cutoff (does old data dilute?) -------------
+console.log('\n=== Test 6: training start cutoff (test window fixed 2018+) ===');
+for (const start of ['1872-01-01', '1990-01-01', '2000-01-01', '2008-01-01', '2014-01-01']) {
+  const r = runDC(DC_DEFAULT, altSub, start);
+  console.log(`  train from ${start.slice(0, 4)}:  test ${show(r.test)}`);
+}
+
+// --- Test 7: friendly weight in training (0 = drop friendlies entirely) -----
+console.log('\n=== Test 7: friendlies in training (friendlyWeight 0 = exclude) ===');
+for (const fw of [0, 0.25, 0.5, 0.75, 1.0, 1.5]) {
+  const r = runDC({ ...DC_DEFAULT, friendlyWeight: fw });
+  console.log(`  friendlyWeight=${fw.toFixed(2)}  val RPS ${(r.val.rps / r.val.n).toFixed(4)}  | test ${show(r.test)}`);
 }

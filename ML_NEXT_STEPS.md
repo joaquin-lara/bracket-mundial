@@ -186,8 +186,18 @@ ship candidate.** Baseline DC on this window: RPS 0.1647, log-loss 0.8431.
    model-experiments.ts): validation mildly likes a coef but it doesn't improve test
    (0.1647→0.1648), and the long-haul (>3000km, n=714) gain is tiny + non-robust.
 
+6. **Training start cutoff — keep ALL history.** Test window fixed (2018+); vary
+   where training begins. More history is monotonically better: train-from-1872
+   RPS 0.1647, 2000 → 0.1652, 2008 → 0.1667, 2014 → 0.1697. The online decay
+   already discounts ancient games; cutting them just removes good priors. No
+   overfitting to old data.
+7. **Friendlies — keep them, down-weighted.** friendlyWeight 0 (exclude) → test
+   0.1664 (worst); 0.5 (current) / 0.75 → 0.1647 (best); 1.5 → 0.1659. Excluding
+   friendlies loses real signal; the shipped 0.5 down-weight is already near-optimal.
+
 These improve the *core* model (not a bolt-on signal), so unlike squad/lineups they
-are worth shipping. Next step (deliberate model change, not yet done): wire the
+are worth shipping. (Tests 6-7 confirm the data scope is already right: full history
++ down-weighted friendlies — not overfitting.) Next step (deliberate model change, not yet done): wire the
 DC+Elo blend into `src/lib/ml/model.ts` (it already has both Elo and DC ratings in
 ratings.json), optionally add the altitude term, and update the predictor explainer.
 
