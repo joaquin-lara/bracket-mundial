@@ -195,10 +195,10 @@ export function evaluate(ctx: EvalContext): Map<string, Map<string, number | nul
     if (exactCount >= 15) add('sniper_elite');
     if (outcomeCount >= 20) add('marksman');
     if (outcomeCount >= 40) add('deadeye');
+    if (totalPoints >= 25) add('quarter_century');
     if (totalPoints >= 50) add('half_century');
+    if (totalPoints >= 75) add('three_quarter_century');
     if (totalPoints >= 100) add('centurion');
-    if (totalPoints >= 200) add('galactico');
-    if (totalPoints >= 250) add('the_goat');
     if (matchesPredicted >= 25) add('squad_player');
     if (matchesPredicted >= 50) add('veteran');
     if (matchesPredicted >= 75) add('club_legend');
