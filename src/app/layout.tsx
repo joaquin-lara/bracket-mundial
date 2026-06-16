@@ -20,7 +20,8 @@ export const metadata: Metadata = {
   description: 'World Cup 2026 prediction game',
   manifest: '/manifest.webmanifest',
   appleWebApp: { capable: true, title: 'Stonks Bracket', statusBarStyle: 'black-translucent' },
-  icons: { icon: '/icon-192.png', apple: '/apple-touch-icon.png' },
+  // Favicon + apple-touch-icon come from src/app/icon.png and src/app/apple-icon.png
+  // (Next's file convention) -- the most reliable way to get the icon onto iOS.
 };
 
 export const viewport: Viewport = {
