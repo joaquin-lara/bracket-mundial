@@ -1,5 +1,6 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import ChallengeWatcher from '@/components/ChallengeWatcher';
+import EnableNotifications from '@/components/EnableNotifications';
 import HomeOnRefresh from '@/components/HomeOnRefresh';
 import PageTransitionProvider from '@/components/PageTransition';
 import PickReminder from '@/components/PickReminder';
@@ -14,6 +15,13 @@ export const metadata: Metadata = {
     template: '%s · Stonks Bracket',
   },
   description: 'World Cup 2026 prediction game',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: { capable: true, title: 'Stonks Bracket', statusBarStyle: 'black-translucent' },
+  icons: { icon: '/icon-192.png', apple: '/apple-touch-icon.png' },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0b5f3a',
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -30,6 +38,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {user && <TopNav />}
           {user && <ChallengeWatcher me={user.id} />}
           {user && <PickReminder me={user.id} isGuest={isGuestEmail(user.email)} />}
+          {user && <EnableNotifications />}
           {children}
         </PageTransitionProvider>
       </body>
