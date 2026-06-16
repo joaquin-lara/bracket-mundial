@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import AchievementWatcher from '@/components/AchievementWatcher';
+import AutoRefresh from '@/components/AutoRefresh';
 import ChallengeWatcher from '@/components/ChallengeWatcher';
 import ViewportLock from '@/components/ViewportLock';
 import PullToRefresh from '@/components/PullToRefresh';
@@ -47,6 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <ViewportLock />
           <PullToRefresh />
           <HomeOnRefresh />
+          <AutoRefresh />
           {user && <TopNav achievementsRevealed={achievementsRevealed} />}
           {user && <ChallengeWatcher me={user.id} />}
           {user && <AchievementWatcher me={user.id} />}

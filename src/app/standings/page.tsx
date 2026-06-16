@@ -3,11 +3,11 @@ import PickHeatmap, { type HeatColumn, type HeatRow } from '@/components/PickHea
 import RaceChart, { type RacePoint } from '@/components/RaceChart';
 import RecapCard from '@/components/RecapCard';
 import { ensureFreshScores } from '@/lib/autoSync';
-import { buildRecap, type RecapInput } from '@/lib/recap';
+import { buildRecap, type RecapInput, type RecapAchievement, type RecapDuel } from '@/lib/recap';
 import { createClient } from '@/lib/supabase/server';
-import { ensureAchievements } from '@/lib/achievementsSync';
-import { ACHIEVEMENTS_BY_ID, TIER_ORDER } from '@/lib/achievementsList';
-import { GUEST_NAME, isAchievementsPreviewUser } from '@/lib/players';
+import { predict } from '@/lib/ml/model';
+import { ACHIEVEMENTS_BY_ID } from '@/lib/achievementsList';
+import { GUEST_NAME } from '@/lib/players';
 
 export const metadata: Metadata = { title: 'Player Standings' };
 export const dynamic = 'force-dynamic';
@@ -19,9 +19,23 @@ interface StandingRow {
   games_scored: number;
 }
 
+/** True if the side the model favored did NOT win (an upset). */
+function underdogWon(
+  homeCode: string | null,
+  awayCode: string | null,
+  hs: number | null,
+  as_: number | null
+): boolean {
+  if (homeCode == null || awayCode == null || hs == null || as_ == null || hs === as_) return false;
+  const r = predict({ home: homeCode, away: awayCode, neutral: true });
+  if (!r) return false;
+  const favIsHome = r.probHome >= r.probAway;
+  const homeWon = hs > as_;
+  return favIsHome ? !homeWon : homeWon;
+}
+
 export default async function StandingsPage() {
   await ensureFreshScores();
-  await ensureAchievements();
   const supabase = createClient();
   const {
     data: { user },
@@ -31,35 +45,6 @@ export default async function StandingsPage() {
   const { data } = await supabase.from('standings').select('*');
   // The shared guest account is view-only and never competes.
   const rows = ((data ?? []) as StandingRow[]).filter((r) => r.display_name !== GUEST_NAME);
-
-  // Earned badges (only once the achievements feature has revealed itself).
-  const { data: achState } = await supabase
-    .from('achievements_state')
-    .select('revealed_at')
-    .eq('id', 1)
-    .maybeSingle();
-  const achRevealed = !!achState?.revealed_at || isAchievementsPreviewUser(user.email);
-  const badgesByUser = new Map<string, { emojis: string[]; count: number }>();
-  if (achRevealed) {
-    const { data: achRows } = await supabase
-      .from('user_achievements')
-      .select('user_id, achievement_id');
-    const grouped = new Map<string, string[]>();
-    for (const r of achRows ?? []) {
-      const list = grouped.get(r.user_id as string) ?? [];
-      list.push(r.achievement_id as string);
-      grouped.set(r.user_id as string, list);
-    }
-    for (const [uid, ids] of grouped) {
-      const defs = ids.map((id) => ACHIEVEMENTS_BY_ID[id]).filter(Boolean);
-      const emojis = defs
-        .slice()
-        .sort((a, b) => TIER_ORDER[b.tier] - TIER_ORDER[a.tier])
-        .slice(0, 4)
-        .map((a) => a.emoji);
-      badgesByUser.set(uid, { emojis, count: defs.length });
-    }
-  }
 
   // Scored predictions (visible to everyone post-kickoff) + kickoff dates
   // feed the points race chart.
@@ -105,6 +90,7 @@ export default async function StandingsPage() {
           m.away_score != null &&
           (p.pred_home as number) === m.home_score &&
           (p.pred_away as number) === m.away_score,
+        upset: underdogWon(m.home_code, m.away_code, m.home_score, m.away_score),
         homeCode: m.home_code,
         awayCode: m.away_code,
         homeScore: m.home_score,
@@ -112,7 +98,47 @@ export default async function StandingsPage() {
       };
     })
     .filter((e): e is RecapInput => e !== null);
-  const recap = buildRecap(recapInput);
+
+  // Recap extras: badge unlocks (only once achievements are revealed) + duels.
+  const { data: achState } = await supabase
+    .from('achievements_state')
+    .select('revealed_at')
+    .eq('id', 1)
+    .maybeSingle();
+
+  let recapAchievements: RecapAchievement[] = [];
+  if (achState?.revealed_at) {
+    const { data: achRows } = await supabase
+      .from('user_achievements')
+      .select('user_id, achievement_id, earned_at, baseline')
+      .eq('baseline', false);
+    recapAchievements = (achRows ?? [])
+      .map((a) => {
+        const def = ACHIEVEMENTS_BY_ID[a.achievement_id as string];
+        const player = nameById.get(a.user_id as string);
+        if (!def || !player) return null;
+        return { player, name: def.name, emoji: def.emoji, at: a.earned_at as string };
+      })
+      .filter((a): a is RecapAchievement => a !== null);
+  }
+
+  const { data: duelRows } = await supabase
+    .from('duels')
+    .select('challenger, opponent, winner, challenger_score, opponent_score, updated_at')
+    .eq('status', 'finished');
+  const recapDuels: RecapDuel[] = (duelRows ?? [])
+    .map((d) => {
+      const winner = nameById.get(d.winner as string);
+      const loserId = d.winner === d.challenger ? d.opponent : d.challenger;
+      const loser = nameById.get(loserId as string);
+      if (!winner || !loser) return null;
+      const winnerScore = (d.winner === d.challenger ? d.challenger_score : d.opponent_score) as number;
+      const loserScore = (d.winner === d.challenger ? d.opponent_score : d.challenger_score) as number;
+      return { winner, loser, winnerScore, loserScore, at: d.updated_at as string };
+    })
+    .filter((d): d is RecapDuel => d !== null);
+
+  const recap = buildRecap(recapInput, { achievements: recapAchievements, duels: recapDuels });
 
   // Pick wall: one column per finished match, one row per player.
   const { data: finished } = await supabase
@@ -167,12 +193,6 @@ export default async function StandingsPage() {
                 <td>
                   {r.display_name}
                   {i === 0 ? ' 🏆' : i === rows.length - 1 && rows.length === 4 ? ' 💩' : ''}
-                  {achRevealed && badgesByUser.get(r.user_id)?.count ? (
-                    <span className="ach-badges" title={`${badgesByUser.get(r.user_id)!.count} achievements`}>
-                      {badgesByUser.get(r.user_id)!.emojis.join(' ')}
-                      {badgesByUser.get(r.user_id)!.count > 4 ? ` +${badgesByUser.get(r.user_id)!.count - 4}` : ''}
-                    </span>
-                  ) : null}
                 </td>
                 <td className="num pts">{r.total}</td>
                 <td className="num">{r.games_scored}</td>

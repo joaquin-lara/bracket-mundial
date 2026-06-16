@@ -16,6 +16,7 @@
   --danger: #ff8a73;
   --sans: 'Archivo', sans-serif;
   --narrow: 'Archivo Narrow', sans-serif;
+  --panel-radius: 5px;
 }
 
 * {
@@ -634,7 +635,7 @@ h1 {
 .contender-card {
   background: rgba(0, 0, 0, 0.6);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: var(--panel-radius);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
   padding: 22px 20px;
   text-align: center;
@@ -703,7 +704,7 @@ h1 {
 .match-card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: var(--panel-radius);
   padding: 14px 18px;
   margin-bottom: 12px;
 }
@@ -938,7 +939,7 @@ h1 {
 .sched-card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: var(--panel-radius);
   overflow: hidden;
 }
 
@@ -1150,7 +1151,7 @@ h1 {
 .race-card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: var(--panel-radius);
   padding: 18px 20px 10px;
   margin-top: 24px;
 }
@@ -1279,7 +1280,7 @@ h1 {
   position: relative;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: var(--panel-radius);
   overflow: hidden;
   margin-bottom: 14px;
 }
@@ -2063,7 +2064,7 @@ h1 {
 .recap-card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: var(--panel-radius);
   padding: 18px 20px;
   margin-top: 24px;
 }
@@ -2154,7 +2155,7 @@ h1 {
 .heat-card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: var(--panel-radius);
   padding: 18px 20px;
   margin-top: 24px;
 }
@@ -2264,7 +2265,7 @@ table.standings {
   border-collapse: collapse;
   margin-top: 16px;
   background: var(--card);
-  border-radius: 16px;
+  border-radius: var(--panel-radius);
   overflow: hidden;
 }
 
@@ -2715,7 +2716,7 @@ table.standings tr.me td {
 .rules-card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: var(--panel-radius);
   padding: 24px 28px;
   margin-bottom: 16px;
 }
@@ -2747,7 +2748,7 @@ table.standings tr.me td {
   margin: 60px auto;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: var(--panel-radius);
   padding: 30px;
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
