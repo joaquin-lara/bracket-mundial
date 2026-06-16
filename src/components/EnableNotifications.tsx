@@ -13,7 +13,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   return arr;
 }
 
-type State = 'hidden' | 'iosInstall' | 'prompt' | 'busy' | 'denied' | 'on';
+type State = 'hidden' | 'iosInstall' | 'prompt' | 'busy' | 'denied';
 
 /**
  * Discreet pill that turns on Web Push: registers the service worker, requests
@@ -51,7 +51,7 @@ export default function EnableNotifications() {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(sub),
             }).catch(() => {});
-            setState('on');
+            setState('hidden');
           } else if (!dismissed) {
             setState('prompt');
           }
@@ -102,29 +102,6 @@ export default function EnableNotifications() {
     }
   }
 
-  async function sendTest() {
-    setErr('Sending test…');
-    try {
-      const res = await fetch('/api/push/debug', { method: 'POST' });
-      const text = await res.text();
-      let j: { sent?: number; devices?: number; errors?: string[]; error?: string } | null = null;
-      try { j = JSON.parse(text); } catch { /* non-JSON response */ }
-      if (!res.ok || !j) {
-        setErr(`HTTP ${res.status}: ${(j && j.error) || text.slice(0, 100) || 'no body'}`);
-        return;
-      }
-      setErr(
-        (j.sent ?? 0) > 0
-          ? `Sent to ${j.sent} device(s) ✓`
-          : (j.devices ?? 0) === 0
-            ? 'No devices saved for this account'
-            : `0 sent: ${(j.errors || []).join('; ') || 'unknown'}`
-      );
-    } catch (e) {
-      setErr('Network error: ' + (e instanceof Error ? e.message : String(e)));
-    }
-  }
-
   function dismiss() {
     localStorage.setItem('pushCtaDismissed', '1');
     setState('hidden');
@@ -143,16 +120,6 @@ export default function EnableNotifications() {
     padding: '6px 12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
   };
   const x: React.CSSProperties = { background: 'transparent', color: '#cfe8db', border: 0, cursor: 'pointer', fontSize: 16, lineHeight: 1 };
-
-  if (state === 'on') {
-    return (
-      <div style={wrap}>
-        <span>🔔 {err ?? 'Notifications on'}</span>
-        <button style={btn} onClick={sendTest}>Send test</button>
-        <button style={x} onClick={dismiss} aria-label="Dismiss">×</button>
-      </div>
-    );
-  }
 
   if (state === 'iosInstall') {
     return (
