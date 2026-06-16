@@ -87,7 +87,9 @@ export default function TopNav({ achievementsRevealed = false }: { achievementsR
       </button>
 
       <TransitionLink href="/" className="brand" onClick={() => setOpen(false)}>
-        <span className="brand-badge">⚽</span>
+        <span className="brand-badge">
+          <img src="/stonks-badge.png" alt="Stonks" className="brand-logo" />
+        </span>
         <span className="brand-name">Stonks©</span>
       </TransitionLink>
 
