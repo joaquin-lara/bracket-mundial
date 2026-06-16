@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stonks — Send Notification</title>
+  <style>
+    body { font: 16px/1.5 system-ui, sans-serif; max-width: 560px; margin: 32px auto; padding: 0 16px; color: #111; }
+    h1 { color: #0b5f3a; font-size: 22px; }
+    label { display: block; font-weight: 600; margin: 14px 0 4px; }
+    input, textarea { width: 100%; padding: 10px; font: inherit; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+    textarea { min-height: 80px; }
+    .row { display: flex; gap: 12px; }
+    .row > div { flex: 1; }
+    button { margin-top: 18px; background: #0b5f3a; color: #fff; border: 0; border-radius: 999px; padding: 12px 20px; font-size: 16px; font-weight: 700; cursor: pointer; }
+    .hint { color: #666; font-size: 13px; }
+    #out { margin-top: 16px; padding: 12px; border-radius: 8px; white-space: pre-wrap; display: none; }
+    .ok { background: #e7f6ec; } .err { background: #fdeaea; }
+  </style>
+</head>
+<body>
+  <h1>⚽ Send a Stonks notification</h1>
+  <p class="hint">Fill Site URL + Secret once (saved on this computer). Leave “Target email” blank to send to everyone, or enter one player’s email to send only to them.</p>
+
+  <div class="row">
+    <div>
+      <label>Site URL</label>
+      <input id="site" placeholder="https://your-app.vercel.app" />
+    </div>
+    <div>
+      <label>Secret (CRON_SECRET)</label>
+      <input id="secret" type="password" placeholder="your CRON_SECRET" />
+    </div>
+  </div>
+
+  <label>Target email <span class="hint">(blank = everyone)</span></label>
+  <input id="target" placeholder="joaquin@bracketmundial.app" />
+
+  <label>Title</label>
+  <input id="title" placeholder="⚽ Heads up!" />
+
+  <label>Message</label>
+  <textarea id="body" placeholder="Type your notification..."></textarea>
+
+  <label>Open URL when tapped <span class="hint">(optional)</span></label>
+  <input id="url" placeholder="/" />
+
+  <button id="send">Send notification</button>
+  <div id="out"></div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    // remember site + secret locally
+    for (const k of ['site', 'secret', 'target']) {
+      $(k).value = localStorage.getItem('notif_' + k) || '';
+      $(k).addEventListener('input', () => localStorage.setItem('notif_' + k, $(k).value));
+    }
+    $('send').addEventListener('click', async () => {
+      const out = $('out');
+      const site = $('site').value.trim().replace(/\/+$/, '');
+      const secret = $('secret').value.trim();
+      if (!site || !secret) { show(false, 'Enter Site URL and Secret.'); return; }
+      if (!$('title').value.trim() || !$('body').value.trim()) { show(false, 'Enter a title and message.'); return; }
+      out.style.display = 'block'; out.className = ''; out.textContent = 'Sending…';
+      try {
+        const res = await fetch(site + '/api/push/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + secret },
+          body: JSON.stringify({
+            title: $('title').value.trim(),
+            body: $('body').value.trim(),
+            url: $('url').value.trim() || '/',
+            targetEmail: $('target').value.trim() || undefined,
+          }),
+        });
+        const j = await res.json();
+        show(res.ok, JSON.stringify(j, null, 2));
+      } catch (e) {
+        show(false, 'Request failed: ' + e);
+      }
+    });
+    function show(ok, text) {
+      const out = $('out');
+      out.style.display = 'block';
+      out.className = ok ? 'ok' : 'err';
+      out.textContent = (ok ? '✅ ' : '❌ ') + text;
+    }
+  </script>
+</body>
+</html>
