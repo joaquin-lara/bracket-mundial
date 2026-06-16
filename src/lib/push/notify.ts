@@ -15,7 +15,7 @@ interface MatchRow {
   notif_away_score: number;
 }
 
-const PRE_MIN = 10; // minutes before kickoff for the reminder
+const PRE_MIN = 20; // minutes before kickoff for the reminder
 
 /**
  * Send any due push notifications for matches around now: a reminder ~10 min
@@ -28,7 +28,7 @@ export async function runMatchNotifications(admin: SupabaseClient): Promise<stri
   try {
     const now = Date.now();
     const from = new Date(now - 3 * 60 * 60 * 1000).toISOString();
-    const to = new Date(now + 15 * 60 * 1000).toISOString();
+    const to = new Date(now + 25 * 60 * 1000).toISOString(); // covers the 20-min reminder
     const { data: matches } = await admin
       .from('matches')
       .select('id,home_team,away_team,kickoff,status,home_score,away_score,notif_pre,notif_start,notif_home_score,notif_away_score')
