@@ -34,6 +34,11 @@ const LINEUPS_PATH = path.join(ROOT, 'lineups', 'fbref_lineups.json');
 const EDITIONS = [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25];
 const MIN_MATCHED = 7; // need at least this many rated starters to trust an XI
 const BEST_XI = 11;
+// "star missing" feature: a nation player rated >= STAR_THRESH is a star; a star
+// absent from the XI costs (overall - STAR_BASE); consider at most STAR_MAX stars.
+const STAR_THRESH = 82;
+const STAR_BASE = 78;
+const STAR_MAX = 6;
 
 // --- text helpers -----------------------------------------------------------
 function norm(s: string): string {
@@ -267,6 +272,76 @@ export function lineupDeltaFor(team: string, date: string): number | null {
   return d ? d.delta : null;
 }
 
+// --- star-missing feature ---------------------------------------------------
+// Is a recognised star of the nation NOT in the starting XI? This is the sharp
+// version of the lineup signal: a single missing Mbappe should jolt the forecast,
+// not be averaged into oblivion across 11 players.
+
+function nameMatchSets(starterToks: Set<string>, playerToks: Set<string>): boolean {
+  if (starterToks.size === 0) return false;
+  let allIn = true;
+  for (const t of starterToks) if (!playerToks.has(t)) { allIn = false; break; }
+  if (allIn) return true; // every token of the starter's name is in the player's
+  const arr = [...starterToks];
+  const last = arr[arr.length - 1];
+  if (playerToks.has(last)) {
+    const fi = arr[0][0];
+    for (const t of playerToks) if (t[0] === fi) return true; // surname + initial
+  }
+  return false;
+}
+
+/** Penalty for stars of `team` missing from `starters`: sum of (overall-STAR_BASE)
+ *  over absent stars. 0 = full-strength or no stars; null = nation not in FIFA. */
+function starPenalty(team: string, starters: Starter[], date: string): number | null {
+  const order = editionOrder(date);
+  const nat = keyNat(team);
+  let pool: Player[] | null = null;
+  for (const ed of order) {
+    const p = ed.byNat.get(nat);
+    if (p && p.length) {
+      pool = p;
+      break;
+    }
+  }
+  if (!pool) return null;
+  const stars = pool
+    .filter((p) => p.ov >= STAR_THRESH)
+    .sort((a, b) => b.ov - a.ov)
+    .slice(0, STAR_MAX);
+  if (!stars.length) return 0;
+  const starterToks = starters.map((s) => new Set(tokens(s.name)));
+  let pen = 0;
+  for (const st of stars) {
+    if (!starterToks.some((set) => nameMatchSets(set, st.toks))) pen += st.ov - STAR_BASE;
+  }
+  return pen;
+}
+
+let STARS: Map<string, number> | null = null;
+function loadStars(): Map<string, number> {
+  if (STARS) return STARS;
+  STARS = new Map();
+  if (!existsSync(LINEUPS_PATH) || editions().length === 0) return STARS;
+  const raw = JSON.parse(readFileSync(LINEUPS_PATH, 'utf8')) as Record<string, Match>;
+  for (const m of Object.values(raw)) {
+    if (!m.date) continue;
+    for (const lu of m.lineups || []) {
+      if (!lu.team || !lu.starters?.length) continue;
+      const p = starPenalty(lu.team, lu.starters, m.date);
+      if (p != null) STARS.set(dkey(m.date, lu.team), p);
+    }
+  }
+  return STARS;
+}
+
+/** Missing-star penalty for a team in a match (0 = full strength), or null when
+ *  the nation isn't in FIFA. Higher = more / better stars are sitting out. */
+export function starPenaltyFor(team: string, date: string): number | null {
+  const p = loadStars().get(dkey(date, team));
+  return p === undefined ? null : p;
+}
+
 // --- self-test --------------------------------------------------------------
 if (process.argv[1] && process.argv[1].endsWith('lineup-strength.ts')) {
   if (!lineupsAvailable()) {
@@ -297,4 +372,25 @@ if (process.argv[1] && process.argv[1].endsWith('lineup-strength.ts')) {
   console.log(`Matches where BOTH teams have a delta: ${bothDelta}/${matches.length}`);
   console.log('\nSample deltas (actual XI vs best XI, negative = weakened side):');
   for (const s of samples) console.log(`  ${s.label.padEnd(28)} ${s.d >= 0 ? '+' : ''}${s.d.toFixed(2)}`);
+
+  // star-missing coverage
+  let starBoth = 0;
+  let anyMissing = 0;
+  const missEx: string[] = [];
+  for (const m of matches) {
+    if (!m.date) continue;
+    const ps: (number | null)[] = [];
+    for (const lu of m.lineups || []) {
+      const p = starPenaltyFor(lu.team, m.date);
+      ps.push(p);
+      if (p != null && p > 0 && missEx.length < 10) missEx.push(`${lu.team} ${m.date}: -${p}`);
+    }
+    if (ps.length === 2 && ps[0] != null && ps[1] != null) {
+      starBoth++;
+      if ((ps[0] || 0) + (ps[1] || 0) > 0) anyMissing++;
+    }
+  }
+  console.log(`\nStar test: ${starBoth} matches both nations rated; ${anyMissing} have >=1 star missing.`);
+  console.log('Examples (team date: -penalty for absent stars):');
+  for (const e of missEx) console.log('  ' + e);
 }

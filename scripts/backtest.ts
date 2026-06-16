@@ -22,7 +22,7 @@ import { readFileSync, existsSync } from 'fs';
 import path from 'path';
 import { scoreGrid } from '../src/lib/ml/poisson';
 import { strengthAsOf, squadDataAvailable } from './squad-strength';
-import { lineupDeltaFor, lineupsAvailable } from './lineup-strength';
+import { lineupDeltaFor, lineupsAvailable, starPenaltyFor } from './lineup-strength';
 
 const ROOT = process.cwd();
 const CSV_PATH = path.join(ROOT, 'data', 'results.csv');
@@ -527,6 +527,10 @@ function main(): void {
   const lineupOn = lineupsAvailable();
   const LINEUP_COEFS = [0, 0.01, 0.02, 0.03, 0.05, 0.08, 0.12];
   const lineupM = LINEUP_COEFS.map(() => new Metrics());
+  // star-missing test: nudge DC by the gap in absent-star penalty between sides.
+  const STAR_COEFS = [0, 0.005, 0.01, 0.02, 0.04, 0.08];
+  const starAll = STAR_COEFS.map(() => new Metrics());
+  const starActive = STAR_COEFS.map(() => new Metrics()); // only matches w/ a star out
 
   let constFrozen = false;
   let lateFrozen = false;
@@ -588,6 +592,22 @@ function main(): void {
             });
           }
         }
+        const sh = starPenaltyFor(r.home, r.date);
+        const sa = starPenaltyFor(r.away, r.date);
+        if (sh != null && sa != null) {
+          const pDc = dc.predict(r);
+          if (pDc) {
+            const gap = sa - sh; // home missing stars -> home weaker -> supremacy down
+            const active = sh + sa > 0;
+            STAR_COEFS.forEach((coef, i) => {
+              const p = coef === 0 ? pDc : dc.adjustedPredict(r, coef * gap);
+              if (p) {
+                starAll[i].add(p, o);
+                if (active) starActive[i].add(p, o);
+              }
+            });
+          }
+        }
       }
     }
     // each base model accumulates fit stats up to its own freeze point
@@ -625,6 +645,18 @@ function main(): void {
     console.log(header);
     LINEUP_COEFS.forEach((coef, i) =>
       console.log(`${lineupM[i].row()}  DC + lineup (coef=${coef.toFixed(2)})${coef === 0 ? '  <= DC only' : ''}`),
+    );
+
+    console.log('\nSTAR-MISSING TEST -- nudge DC when a nation\'s stars are absent from the XI');
+    console.log('All covered competitive matches:');
+    console.log(header);
+    STAR_COEFS.forEach((coef, i) =>
+      console.log(`${starAll[i].row()}  DC + stars (coef=${coef.toFixed(3)})${coef === 0 ? '  <= DC only' : ''}`),
+    );
+    console.log('\nOnly matches where >=1 side is missing a star (where it can actually matter):');
+    console.log(header);
+    STAR_COEFS.forEach((coef, i) =>
+      console.log(`${starActive[i].row()}  DC + stars (coef=${coef.toFixed(3)})${coef === 0 ? '  <= DC only' : ''}`),
     );
   }
 

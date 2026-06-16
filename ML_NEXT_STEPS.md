@@ -116,9 +116,33 @@ Every non-zero coefficient is **strictly worse** on RPS and log-loss; the optimu
 is coef=0 (ignore lineups). The earlier 192-match tournament-only run was
 inconclusive because teams field full strength there; this 495-match run *with*
 the qualifiers is the fair test, and the lineup-strength delta adds nothing —
-it injects noise. Likely because (a) DC already adapts to results faster than a
-once-a-year FIFA snapshot reveals, and (b) even in qualifiers teams field close
-to their best *available* XI, so the actual-vs-best-overall gap is mostly noise.
+it injects noise.
+
+**Sharper variant also rejected — "star missing" (not averaging).** Averaging an
+XI dilutes a single key absence, so we also tested the direct version: penalise a
+team when a recognised star (nation player rated >= 82) is absent from the XI
+(`starPenaltyFor` in lineup-strength.ts; `STAR-MISSING TEST` in backtest.ts).
+767 matches both nations rated, a star missing in 413 of them. On those 413
+"star actually out" matches (the best case for the idea):
+
+| coef | RPS | log-loss |
+|---|---|---|
+| **0.000 (DC alone)** | **0.1703** | **0.8755** |
+| 0.005 | 0.1706 | 0.8757 |
+| 0.02 | 0.1782 | 0.8997 |
+| 0.08 | 0.2925 | 1.3888 |
+
+Zero is best again, monotonically. So it is not an averaging artifact: detecting
+real absences (e.g. France 2022 missing Benzema/Pogba/Kanté, penalty -41) and
+adjusting for them still hurts.
+
+**Why both fail — the satisfying reason:** a missing star is almost never news to
+a results-based model. Injured stars have usually been out for *weeks*, so the
+team's recent results are already without them and DC has already marked the team
+down. FIFA still labels them "stars," but that label is **stale** — the absence is
+already priced in by results. The only case this can't cover is a *truly
+last-minute* absence (a star who'd been playing, ruled out ~30 min pre-kickoff);
+that's rare and not backtestable here, so not shippable with confidence.
 
 **Status: lineup-strength joins squad-strength as researched-and-rejected.** The
 live predictor is DC-only and untouched. Pipeline left in place in case a *smarter*
