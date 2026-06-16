@@ -78,7 +78,10 @@ export default function EnableNotifications() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(sub),
       });
-      if (!res.ok) throw new Error('Could not save subscription');
+      if (!res.ok) {
+        const j = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(j.error || `Save failed (${res.status})`);
+      }
       setState('hidden');
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Something went wrong');
