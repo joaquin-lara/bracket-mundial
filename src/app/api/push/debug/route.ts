@@ -60,6 +60,8 @@ export async function GET() {
 
   return NextResponse.json({
     loggedIn: true,
+    userEmail: user.email ?? null,
+    userId: user.id,
     env,
     mySubscriptions: mySubs?.length ?? 0,
     totalSubscriptions: totalSubscriptions ?? 0,
