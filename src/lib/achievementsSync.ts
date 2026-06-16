@@ -18,6 +18,8 @@ import {
   type PredInfo,
 } from './achievements';
 import { GUEST_NAME } from './players';
+import { ACHIEVEMENTS_BY_ID } from './achievementsList';
+import { sendToUser } from './push/webpush';
 
 const THROTTLE_MS = 60_000; // re-evaluate at most once a minute
 let lastRun = 0;
@@ -122,6 +124,22 @@ async function runAchievements(): Promise<void> {
       })),
       { onConflict: 'user_id,achievement_id', ignoreDuplicates: true }
     );
+
+    // Push each earner their new badge(s). Best-effort; never blocks the sync.
+    for (const e of fresh) {
+      const def = ACHIEVEMENTS_BY_ID[e.achievementId];
+      if (!def) continue;
+      try {
+        await sendToUser(admin, e.userId, {
+          title: `${def.emoji} Achievement unlocked!`,
+          body: `${def.name} — ${def.description}`,
+          url: '/achievements',
+          tag: `ach-${e.achievementId}`,
+        });
+      } catch {
+        /* ignore push failures */
+      }
+    }
 
     // First live unlock ever → fire the group reveal.
     if (!alreadyRevealed) {
