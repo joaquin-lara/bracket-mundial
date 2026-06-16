@@ -140,10 +140,12 @@ describe('milestones', () => {
     const matches = Array.from({ length: 25 }, (_, i) => match(i + 1));
     const predictions = matches.map((m) => pred('u1', m.id, 1, 0, 2));
     const earned = evaluate(baseCtx({ matches, predictions })).get('u1')!;
+    expect(earned.has('quarter_century')).toBe(true); // 25 pts
     expect(earned.has('half_century')).toBe(true); // 50 pts
+    expect(earned.has('three_quarter_century')).toBe(false); // 75 pts
     expect(earned.has('squad_player')).toBe(true); // 25 picks
     expect(earned.has('marksman')).toBe(true); // 20+ correct outcomes
-    expect(earned.has('centurion')).toBe(false);
+    expect(earned.has('centurion')).toBe(false); // 100 pts
   });
 });
 

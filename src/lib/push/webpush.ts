@@ -53,3 +53,12 @@ export async function broadcast(admin: SupabaseClient, payload: PushPayload): Pr
   const { data } = await admin.from('push_subscriptions').select('id,endpoint,p256dh,auth');
   return sendToSubs(admin, (data as SubRow[]) ?? [], payload);
 }
+
+/** Send a payload to one user's devices. */
+export async function sendToUser(admin: SupabaseClient, userId: string, payload: PushPayload): Promise<number> {
+  const { data } = await admin
+    .from('push_subscriptions')
+    .select('id,endpoint,p256dh,auth')
+    .eq('user_id', userId);
+  return sendToSubs(admin, (data as SubRow[]) ?? [], payload);
+}

@@ -4,6 +4,7 @@ import { fetchFixtures } from '@/lib/footballData';
 import { runSync } from '@/lib/sync';
 import { makeSupabaseSyncDb } from '@/lib/syncDb';
 import { runMatchNotifications } from '@/lib/push/notify';
+import { ensureAchievements } from '@/lib/achievementsSync';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -21,13 +22,15 @@ export async function GET(request: NextRequest) {
     { auth: { persistSession: false, autoRefreshToken: false } }
   );
 
+  // Update fixtures/scores; a sync failure must NOT stop notifications.
+  let result: Record<string, unknown> = {};
   try {
-    const result = await runSync(makeSupabaseSyncDb(admin), fetchFixtures);
-    // After scores are fresh, fire any due push notifications (best-effort).
-    const notified = await runMatchNotifications(admin);
-    return NextResponse.json({ ok: true, ...result, notified });
+    result = { ...(await runSync(makeSupabaseSyncDb(admin), fetchFixtures)) };
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    result = { syncError: err instanceof Error ? err.message : String(err) };
   }
+
+  const notified = await runMatchNotifications(admin);
+  await ensureAchievements().catch(() => {});
+  return NextResponse.json({ ok: true, ...result, notified });
 }
