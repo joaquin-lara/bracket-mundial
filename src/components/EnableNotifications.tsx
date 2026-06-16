@@ -106,16 +106,22 @@ export default function EnableNotifications() {
     setErr('Sending test…');
     try {
       const res = await fetch('/api/push/debug', { method: 'POST' });
-      const j = (await res.json()) as { sent?: number; devices?: number; errors?: string[] };
+      const text = await res.text();
+      let j: { sent?: number; devices?: number; errors?: string[]; error?: string } | null = null;
+      try { j = JSON.parse(text); } catch { /* non-JSON response */ }
+      if (!res.ok || !j) {
+        setErr(`HTTP ${res.status}: ${(j && j.error) || text.slice(0, 100) || 'no body'}`);
+        return;
+      }
       setErr(
         (j.sent ?? 0) > 0
           ? `Sent to ${j.sent} device(s) ✓`
           : (j.devices ?? 0) === 0
             ? 'No devices saved for this account'
-            : `Failed: ${(j.errors || []).join('; ') || res.status}`
+            : `0 sent: ${(j.errors || []).join('; ') || 'unknown'}`
       );
-    } catch {
-      setErr('Request failed');
+    } catch (e) {
+      setErr('Network error: ' + (e instanceof Error ? e.message : String(e)));
     }
   }
 
