@@ -77,62 +77,60 @@ input. (Sweep harness used: a standalone weight grid over the same DC + squad
 models as `scripts/backtest.ts`; not committed, since the conclusion is "don't
 ship it.") This closes to-do #1 and #3 below.
 
-## Lineup feature (started 2026-06-14) — preliminary, NULL so far on tournaments
+## Lineup feature (started 2026-06-14) — REJECTED: doesn't help, slightly hurts
 
 The squad average was redundant with DC. Actual **starting lineups** are the
 signal DC genuinely cannot have: who is on the pitch tonight (injuries,
-suspensions, rotation, B-teams). We test it on *historical* lineups so it's
-backtestable; if it works, the same code later powers a live 30-min-before
-lineup feature in production.
+suspensions, rotation, B-teams). We tested it on *historical* lineups so it's
+backtestable. **Verdict (2026-06-15): it does not improve on Dixon-Coles.**
 
-**Pipeline built (this is the deliverable; data is still being collected):**
+**Pipeline built (kept for reuse / the live idea):**
 - Lineups are scraped from fbref in the **user's own browser** via a Tampermonkey
-  userscript (fbref blocks server-side fetch — both this sandbox and a normal
-  scraper get 403; a real browser session passes). The script politely crawls
-  (~7-11s/page, resumable, checkpoints to localStorage) and downloads one JSON.
-  fbref rate-limits hard (~10 req/min, then a multi-minute-to-hour IP block), so
-  the full pull comes in chunks across sittings.
-- `lineups/fbref_lineups.json` — committed scraped XIs. **Currently 244 matches**
-  (WC2022, Euro2024, Copa2024, AFCON2025, GoldCup2025, NationsLeague2425 + a
-  little WCQ). Target ~540-1300 incl. the 2026 WC qualifiers (CONMEBOL/CONCACAF/
-  UEFA/CAF/AFC) — those were still crawling when fbref rate-limited.
-- `scripts/lineup-strength.ts` — joins each starter's name to FIFA `overall`
-  (edition in effect on the match date, with fallback) and computes
-  `delta = mean(actual XI overall) - mean(nation best-11 overall)`. Name→FIFA
-  join lands **~88%** of starters (misses are uncapped/lower-league players of
-  small nations + a couple non-FIFA sides like Guadeloupe; degrades gracefully).
-- `scripts/backtest.ts` — new **LINEUP TEST** block: nudges DC's goal supremacy
-  by `coef * (homeDelta - awayDelta)` and sweeps coef, scoring DC-vs-DC+lineup on
-  the same covered matches. `DixonColesOnline.adjustedPredict()` applies the shift.
+  userscript (fbref 403s server-side fetch — both this sandbox and a normal
+  scraper; a real browser session passes). Polite crawl, resumable, checkpoints to
+  localStorage, 65-min auto-wait through fbref's rate-limit blocks.
+- `lineups/fbref_lineups.json` — committed scraped XIs. **844 matches**: WC2022,
+  Euro2024, Copa2024, AFCON2025, GoldCup2025, NationsLeague2425, **and the 2026 WC
+  qualifiers (CONMEBOL/CONCACAF/UEFA/CAF/AFC)** — i.e. the rotation/dead-rubber
+  games where lineups were supposed to matter.
+- `scripts/lineup-strength.ts` — joins each starter to FIFA `overall` (edition by
+  match date, with fallback) and computes
+  `delta = mean(actual XI overall) - mean(nation best-11 overall)`. Join lands
+  ~74% of starters across this set (lower than the tournament-only 88% because
+  qualifiers are full of minnow nations EA barely rates); degrades gracefully.
+- `scripts/backtest.ts` — **LINEUP TEST** block nudges DC's supremacy by
+  `coef * (homeDelta - awayDelta)` and sweeps coef.
+  `DixonColesOnline.adjustedPredict()` applies the shift.
 
-**Preliminary result (192 covered competitive matches, coef sweep):**
+**Result (495 covered competitive matches — qualifiers included):**
 
 | coef | RPS | log-loss |
 |---|---|---|
-| 0.00 (DC alone) | 0.1935 | 0.9941 |
-| 0.01 | 0.1935 | 0.9938 |
-| 0.02 | 0.1936 | 0.9938 |
-| 0.05 | 0.1946 | 0.9961 |
-| 0.12 | 0.2009 | 1.0140 |
+| **0.00 (DC alone)** | **0.1887** | **0.9672** |
+| 0.01 | 0.1890 | 0.9682 |
+| 0.03 | 0.1899 | 0.9723 |
+| 0.08 | 0.1943 | 0.9958 |
+| 0.12 | 0.1991 | 1.0292 |
 
-So: **no RPS gain**, a rounding-error log-loss gain at a tiny coef, and any real
-nudge hurts. **But read the sample first:** these 192 are almost all *tournament*
-matches (group + knockout), where teams field their strongest XI — so the lineup
-delta barely varies and there is little for it to exploit. This is the *worst*
-sample for the feature. Where lineups should actually matter — rotation, dead
-rubbers, B-teams — is **qualifiers**, which are mostly the games still being
-scraped. So this is **inconclusive-leaning-null, not a verdict**.
+Every non-zero coefficient is **strictly worse** on RPS and log-loss; the optimum
+is coef=0 (ignore lineups). The earlier 192-match tournament-only run was
+inconclusive because teams field full strength there; this 495-match run *with*
+the qualifiers is the fair test, and the lineup-strength delta adds nothing —
+it injects noise. Likely because (a) DC already adapts to results faster than a
+once-a-year FIFA snapshot reveals, and (b) even in qualifiers teams field close
+to their best *available* XI, so the actual-vs-best-overall gap is mostly noise.
 
-**To extend when the full JSON lands** (no code changes needed):
+**Status: lineup-strength joins squad-strength as researched-and-rejected.** The
+live predictor is DC-only and untouched. Pipeline left in place in case a *smarter*
+use is tried later (position-aware impact, or the live near-kickoff feature for a
+specific big injury), but the simple XI-overall delta is a dead end.
+
+**To re-check with more/other data** (no code changes needed):
 ```bash
-# replace lineups/fbref_lineups.json with the bigger download, then:
+# replace lineups/fbref_lineups.json, then:
 npx tsx scripts/lineup-strength.ts   # coverage + sample deltas
-npm run backtest                     # re-check the LINEUP TEST block
+npm run backtest                     # LINEUP TEST block
 ```
-If qualifiers move the needle, tune coef on a validation split (don't trust the
-tournament-only coef) before any thought of wiring it live. If they don't, this
-joins squad strength as a researched-and-rejected signal. The live predictor is
-DC-only and untouched either way.
 
 ## Data (gitignored under `/data/`, must be re-fetched per session)
 
