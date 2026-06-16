@@ -31,11 +31,19 @@ export async function GET(request: NextRequest) {
     // even when nobody has a page open. Best-effort.
     await ensureAchievements().catch(() => {});
 
-    // TEMP one-off test push around 1:15 AM US-Eastern (05:15 UTC) on 2026-06-16,
-    // sent only to the account owner. Safe to delete this whole block afterwards.
+    // TEMP one-off test push at ~1:30 AM New York time on 2026-06-16, sent only
+    // to the account owner. Safe to delete this whole block afterwards.
     try {
-      const iso = new Date().toISOString();
-      if (iso >= '2026-06-16T05:15:00.000Z' && iso < '2026-06-16T05:21:00.000Z') {
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/New_York',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', hour12: false,
+      }).formatToParts(new Date());
+      const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '';
+      const ymd = `${get('year')}-${get('month')}-${get('day')}`;
+      const hh = Number(get('hour'));
+      const mm = Number(get('minute'));
+      if (ymd === '2026-06-16' && hh === 1 && mm >= 30 && mm < 45) {
         const { data } = await admin.auth.admin.listUsers();
         const me = data.users.find((u) => u.email === 'joaquinlara490@gmail.com');
         if (me) {
@@ -43,7 +51,7 @@ export async function GET(request: NextRequest) {
             title: '✅ Stonks test notification',
             body: 'Lock-screen notifications are working! You can remove this test now.',
             url: '/',
-            tag: 'test-115',
+            tag: 'test-130',
           });
         }
       }
