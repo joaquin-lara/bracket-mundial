@@ -180,6 +180,11 @@ ship candidate.** Baseline DC on this window: RPS 0.1647, log-loss 0.8431.
 3. **DC memory/weight tuning — marginal.** Best validation config (shrink 0.0005 =
    longer memory, friendlyWeight 0.7) → test RPS 0.1644 / logloss 0.8418 vs 0.1647 /
    0.8431. Real but tiny; fold in opportunistically.
+4. **Rest days — NULL.** Fatigue/rest-asymmetry supremacy term: validation prefers
+   coef=0. No signal.
+5. **Travel distance — NULL.** Away-team travel-km term (country-centroid table in
+   model-experiments.ts): validation mildly likes a coef but it doesn't improve test
+   (0.1647→0.1648), and the long-haul (>3000km, n=714) gain is tiny + non-robust.
 
 These improve the *core* model (not a bolt-on signal), so unlike squad/lineups they
 are worth shipping. Next step (deliberate model change, not yet done): wire the
