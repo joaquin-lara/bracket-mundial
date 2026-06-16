@@ -223,7 +223,36 @@ be luck specific to that era. So we replayed history once and scored fixed setti
   reliable on this evidence — do NOT ship until there are more altitude games.
 
 Net: the one thing to wire live is the **DC+Elo blend** (optionally fold in the
-tuned shrink/friendlyWeight). Altitude stays research-only for now. Next step (deliberate model change, not yet done): wire the
+tuned shrink/friendlyWeight). Altitude stays research-only for now.
+
+## Live update + data audit + goals (2026-06-15)
+
+**DC+Elo blend is now LIVE.** `src/lib/ml/model.ts` blends the Dixon-Coles W/D/L
+60/40 with the Elo+independent-Poisson model (`BLEND_ELO_WEIGHT = 0.4`,
+`eloPoissonWDL()`). Scoreline distribution / expected goals stay pure DC; only the
+headline win/draw/win split is blended. Predictor-page explainer + footer updated
+to describe the blend honestly. No `ratings.json` change needed (it already carries
+Elo + the Poisson constants). 32 tests still pass.
+
+**Country-name audit (every source reconciled).** `scripts/country-names.ts` is the
+single source of truth: audited all 336 results-dataset teams, 192 FIFA
+nationalities, 159 fbref teams; only 13 FIFA + 20 fbref spellings differ and all are
+mapped to the verified results spelling (Korea Republic→South Korea, IR Iran→Iran,
+Côte d'Ivoire→Ivory Coast, Türkiye→Turkey, Czechia→Czech Republic, Dominican Rep.→…,
+etc.). `lineup-strength.ts` now uses it. The lineup join rose 73.7%→75.5%; remaining
+misses are genuinely unrated players (minnow nations / uncapped youth), not name
+bugs. Re-ran the STAR-MISSING test with exact names: **verdict unchanged** — DC-alone
+still best, lineups still don't help. So the rejection is real, not a join artifact.
+
+**Goals accuracy (`scripts/goals-accuracy.ts`) — measured for the first time.** Every
+other test scores W/D/L; this scores the scoreline. On 5,801 competitive test
+matches (2018+): total-goals MAE **1.41** (vs 1.47 naive-average), exact most-likely
+scoreline hit **13.3%**, total within ±1 goal **43.1%**, scoreline log-loss 2.82.
+Takeaway: goal/scoreline prediction is only modestly better than guessing the
+average — football scorelines are inherently noisy, and the model's real edge is in
+the *outcome* odds, not exact goals. **No test ever improved goal accuracy** (the
+blend doesn't touch goals; squad/lineup were rejected). If better *goals* are the
+goal, xG-based lambdas are the most promising lever (next). Next step (deliberate model change, not yet done): wire the
 DC+Elo blend into `src/lib/ml/model.ts` (it already has both Elo and DC ratings in
 ratings.json), optionally add the altitude term, and update the predictor explainer.
 

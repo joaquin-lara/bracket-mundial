@@ -27,6 +27,7 @@
  */
 import { readFileSync, existsSync } from 'fs';
 import path from 'path';
+import { countryKey } from './country-names';
 
 const ROOT = process.cwd();
 const FIFA_DIR = path.join(ROOT, 'data', 'fifa');
@@ -53,31 +54,8 @@ function tokens(s: string): string[] {
   return norm(s).split(/\s+/).filter(Boolean);
 }
 
-// Map the many spellings of a nation (fbref team, FIFA nationality_name, and the
-// results dataset) onto one key so all three sides join.
-const NAT_ALIASES: Record<string, string> = {
-  korearepublic: 'southkorea',
-  koreadpr: 'northkorea',
-  capeverdeislands: 'capeverde',
-  caboverde: 'capeverde',
-  congodr: 'drcongo',
-  chinapr: 'china',
-  iranislamicrepublic: 'iran',
-  iriran: 'iran',
-  usa: 'unitedstates',
-  turkiye: 'turkey',
-  czechia: 'czechrepublic',
-  ivorycoast: 'cotedivoire',
-  bosniaandherzegovina: 'bosniaherzegovina',
-  dominicanrep: 'dominicanrepublic',
-  equguinea: 'equatorialguinea',
-  trintobago: 'trinidadandtobago',
-  northmacedonia: 'macedonia',
-};
-function keyNat(s: string): string {
-  const n = norm(s).replace(/\s+/g, '');
-  return NAT_ALIASES[n] ?? n;
-}
+// All cross-source name reconciliation lives in scripts/country-names.ts.
+const keyNat = countryKey;
 
 // minimal quote-aware CSV splitter (player names embed commas)
 function splitCsvLine(line: string): string[] {

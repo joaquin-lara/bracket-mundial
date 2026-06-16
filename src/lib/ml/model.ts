@@ -6,8 +6,10 @@
 // one side's attack against the other's defense; those two Poisson means give a
 // scoreline grid, which a low-score correction tilts toward draws (real football
 // has more 0-0 / 1-1 than independent goals predict). This beat the old Elo +
-// independent-Poisson model out of sample (see scripts/backtest.ts). Elo is kept
-// only as the human-readable overall-strength number shown on screen.
+// independent-Poisson model out of sample (see scripts/backtest.ts). The final
+// W/D/L is then *blended* 60/40 with that Elo+Poisson model: the two make
+// different errors, so the average is steadier in every era (rolling-validation).
+// The scoreline distribution and expected goals stay pure Dixon-Coles.
 
 import { MODEL, lookup, type TeamRating } from './teams';
 import { scoreGrid, type ScoreCell } from './poisson';
@@ -36,6 +38,10 @@ export interface PredictResult {
 }
 
 const MAX_GOALS = 8;
+// The live W/D/L is a blend of Dixon-Coles with the Elo + independent-Poisson
+// model. The two make different errors, so the average is steadier out of sample
+// -- it beats DC alone in every 2-year window (scripts/rolling-validation.ts).
+const BLEND_ELO_WEIGHT = 0.4; // 40% Elo+Poisson, 60% Dixon-Coles
 
 /** Logistic expected score for the home side given the Elo gap. */
 export function expectedWin(eloGap: number): number {
@@ -105,6 +111,13 @@ function dixonColes(
   return { cells, pHome, pDraw, pAway };
 }
 
+/** Win/draw/loss from the Elo + independent-Poisson model (no draw correction). */
+function eloPoissonWDL(eloGap: number): { pHome: number; pDraw: number; pAway: number } {
+  const { lambdaHome, lambdaAway } = expectedGoals(eloGap);
+  const g = scoreGrid(lambdaHome, lambdaAway, MAX_GOALS);
+  return { pHome: g.pHome, pDraw: g.pDraw, pAway: g.pAway };
+}
+
 export function predict(input: PredictInput): PredictResult | null {
   const home = lookup(input.home);
   const away = lookup(input.away);
@@ -117,8 +130,16 @@ export function predict(input: PredictInput): PredictResult | null {
   const sorted = [...grid.cells].sort((a, b) => b.prob - a.prob);
   const top = sorted[0];
 
-  // Elo gap retained for the on-screen strength readout, not the goal model.
   const eloGap = home.elo - away.elo + (neutral ? 0 : MODEL.homeAdvantageElo);
+
+  // Blend DC's W/D/L with the Elo+Poisson model's (robust win, see above). The
+  // scoreline distribution / expected goals stay pure Dixon-Coles -- the blend
+  // only steadies the headline win/draw/win split.
+  const eloWDL = eloPoissonWDL(eloGap);
+  const w = BLEND_ELO_WEIGHT;
+  const probHome = (1 - w) * grid.pHome + w * eloWDL.pHome;
+  const probDraw = (1 - w) * grid.pDraw + w * eloWDL.pDraw;
+  const probAway = (1 - w) * grid.pAway + w * eloWDL.pAway;
 
   return {
     home,
@@ -128,9 +149,9 @@ export function predict(input: PredictInput): PredictResult | null {
     expectedWinHome: expectedWin(eloGap),
     lambdaHome,
     lambdaAway,
-    probHome: grid.pHome,
-    probDraw: grid.pDraw,
-    probAway: grid.pAway,
+    probHome,
+    probDraw,
+    probAway,
     mostLikelyScore: { home: top.home, away: top.away, prob: top.prob },
     topScores: sorted.slice(0, 6),
   };

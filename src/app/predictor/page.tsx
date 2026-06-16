@@ -137,9 +137,11 @@ export default async function PredictorPage() {
                 works out the odds of every realistic score: 1–0, 2–1, 0–0, and so on. It also nudges
                 the low-scoring draws (0–0, 1–1) up a touch, because tight games end level more often
                 than pure chance suggests. Then it adds up all the scores where the first team wins, all
-                the draws, and all the scores where the second team wins. Those three totals are the{' '}
-                <strong>win / draw / win</strong> percentages you see. Because goals involve luck, the
-                model never says a result <em>will</em> happen, only how likely each one is.
+                the draws, and all the scores where the second team wins. Finally it blends those totals
+                with a second, simpler read taken straight from the two teams&apos; strength gap (step 1)
+                — the two methods miss in different ways, so their average is steadier and more accurate.
+                The result is the <strong>win / draw / win</strong> percentages you see. Because goals
+                involve luck, the model never says a result <em>will</em> happen, only how likely each one is.
               </p>
             </div>
           </div>
@@ -243,8 +245,8 @@ export default async function PredictorPage() {
 
       <p className="ml-foot">
         Model and ratings rebuilt {lastUpdated} from {DATASET.source}. Dixon-Coles attack/defence with
-        a low-score correction (Elo shown for overall strength), computed in your browser and on the
-        server. No external prediction service.
+        a low-score correction, blended with an Elo strength model for steadier win/draw/win odds,
+        computed in your browser and on the server. No external prediction service.
       </p>
     </main>
   );
