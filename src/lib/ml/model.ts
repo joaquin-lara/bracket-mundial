@@ -7,8 +7,10 @@
 // scoreline grid, which a low-score correction tilts toward draws (real football
 // has more 0-0 / 1-1 than independent goals predict). This beat the old Elo +
 // independent-Poisson model out of sample (see scripts/backtest.ts). The final
-// W/D/L is then *blended* 60/40 with that Elo+Poisson model: the two make
-// different errors, so the average is steadier in every era (rolling-validation).
+// W/D/L is a *blend* of three signals that make different errors, so the average
+// is steadier in every era (scripts/rolling-validation.ts, squad-rolling.ts):
+// Dixon-Coles (form/attack-defence) 60% + Elo (overall strength) 40%, then mixed
+// 70/30 with a FIFA squad talent-pool model on teams that have a squad rating.
 // The scoreline distribution and expected goals stay pure Dixon-Coles.
 
 import { MODEL, lookup, type TeamRating } from './teams';
@@ -118,6 +120,20 @@ function eloPoissonWDL(eloGap: number): { pHome: number; pDraw: number; pAway: n
   return { pHome: g.pHome, pDraw: g.pDraw, pAway: g.pAway };
 }
 
+/**
+ * Win/draw/loss from the FIFA squad talent-pool model (mean overall of each
+ * nation's best 23), or null when either side has no squad rating. Rolling-
+ * window validated to add on top of the DC+Elo blend; mixed at MODEL.squad.weight.
+ */
+function squadWDL(home: TeamRating, away: TeamRating): { pHome: number; pDraw: number; pAway: number } | null {
+  const sq = MODEL.squad;
+  if (!sq || home.squad == null || away.squad == null) return null;
+  const supremacy = (home.squad - away.squad) * sq.goalsPerStr;
+  const half = MODEL.avgTotalGoals / 2;
+  const g = scoreGrid(Math.max(0.15, half + supremacy / 2), Math.max(0.15, half - supremacy / 2), MAX_GOALS);
+  return { pHome: g.pHome, pDraw: g.pDraw, pAway: g.pAway };
+}
+
 export function predict(input: PredictInput): PredictResult | null {
   const home = lookup(input.home);
   const away = lookup(input.away);
@@ -137,9 +153,20 @@ export function predict(input: PredictInput): PredictResult | null {
   // only steadies the headline win/draw/win split.
   const eloWDL = eloPoissonWDL(eloGap);
   const w = BLEND_ELO_WEIGHT;
-  const probHome = (1 - w) * grid.pHome + w * eloWDL.pHome;
-  const probDraw = (1 - w) * grid.pDraw + w * eloWDL.pDraw;
-  const probAway = (1 - w) * grid.pAway + w * eloWDL.pAway;
+  let probHome = (1 - w) * grid.pHome + w * eloWDL.pHome;
+  let probDraw = (1 - w) * grid.pDraw + w * eloWDL.pDraw;
+  let probAway = (1 - w) * grid.pAway + w * eloWDL.pAway;
+
+  // Mix in the FIFA squad talent-pool model when both teams are rated (a third,
+  // orthogonal signal: results + Elo strength + squad talent). Robust across
+  // every rolling window; see scripts/squad-rolling.ts.
+  const squad = squadWDL(home, away);
+  if (squad && MODEL.squad) {
+    const sw = MODEL.squad.weight;
+    probHome = (1 - sw) * probHome + sw * squad.pHome;
+    probDraw = (1 - sw) * probDraw + sw * squad.pDraw;
+    probAway = (1 - sw) * probAway + sw * squad.pAway;
+  }
 
   return {
     home,

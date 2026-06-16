@@ -25,6 +25,8 @@ export interface TeamRating {
   dcAtt: number;
   /** Dixon-Coles defense rating (log-goal space): higher = concedes less. */
   dcDef: number;
+  /** Current FIFA talent-pool strength (mean overall of best 23), or null. */
+  squad?: number | null;
   form: TeamForm;
 }
 
@@ -34,6 +36,11 @@ export interface DixonColesConstants {
   rho: number; // low-score (draw) correction
 }
 
+export interface SquadConstants {
+  goalsPerStr: number; // goals of supremacy per talent-pool point
+  weight: number; // blend weight of the squad model in the final W/D/L
+}
+
 export interface ModelConstants {
   homeAdvantageElo: number;
   goalsPerElo: number;
@@ -41,6 +48,8 @@ export interface ModelConstants {
   homeMarginGoals: number;
   eloBaseline: number;
   dc: DixonColesConstants;
+  /** Present only when the ratings were built with FIFA data available. */
+  squad?: SquadConstants;
 }
 
 export const MODEL: ModelConstants = ratings.model;

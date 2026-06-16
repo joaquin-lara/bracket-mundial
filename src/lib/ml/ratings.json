@@ -1,21 +1,25 @@
 {
-  "generatedAt": "2026-06-14T11:37:55.695Z",
+  "generatedAt": "2026-06-16T03:27:32.432Z",
   "source": "martj42/international_results (mirror of Kaggle international results 1872-present)",
-  "matchesProcessed": 49409,
+  "matchesProcessed": 49413,
   "dateRange": [
     "1872-11-30",
-    "2026-06-12"
+    "2026-06-13"
   ],
   "model": {
     "homeAdvantageElo": 100,
     "goalsPerElo": 0.005596,
-    "avgTotalGoals": 2.9392,
+    "avgTotalGoals": 2.9391,
     "homeMarginGoals": 0.6744,
     "eloBaseline": 1500,
     "dc": {
-      "base": 0.259813,
+      "base": 0.241535,
       "home": 0.213166,
       "rho": -0.07
+    },
+    "squad": {
+      "goalsPerStr": 0.137368,
+      "weight": 0.3
     }
   },
   "totalRankedTeams": 247,
@@ -29,6 +33,7 @@
       "globalRank": 27,
       "dcAtt": 0.7071,
       "dcDef": 0.6997,
+      "squad": 75.96,
       "form": {
         "played": 10,
         "won": 7,
@@ -109,6 +114,7 @@
       "globalRank": 2,
       "dcAtt": 1.0112,
       "dcDef": 1.39,
+      "squad": 83.52,
       "form": {
         "played": 10,
         "won": 8,
@@ -183,26 +189,21 @@
     "AUS": {
       "name": "Australia",
       "code": "AUS",
-      "elo": 1898.2,
-      "matches": 581,
-      "lastPlayed": "2026-06-06",
-      "globalRank": 24,
-      "dcAtt": 0.731,
-      "dcDef": 0.9339,
+      "elo": 1952.7,
+      "matches": 582,
+      "lastPlayed": "2026-06-13",
+      "globalRank": 17,
+      "dcAtt": 0.7589,
+      "dcDef": 0.9901,
+      "squad": 71.09,
       "form": {
         "played": 10,
         "won": 5,
         "drawn": 1,
         "lost": 4,
-        "goalsFor": 13,
+        "goalsFor": 14,
         "goalsAgainst": 10,
         "recent": [
-          {
-            "date": "2025-09-05",
-            "opp": "New Zealand",
-            "gf": 1,
-            "ga": 0
-          },
           {
             "date": "2025-09-09",
             "opp": "New Zealand",
@@ -256,6 +257,12 @@
             "opp": "Switzerland",
             "gf": 1,
             "ga": 1
+          },
+          {
+            "date": "2026-06-13",
+            "opp": "Turkey",
+            "gf": 2,
+            "ga": 0
           }
         ]
       }
@@ -269,6 +276,7 @@
       "globalRank": 26,
       "dcAtt": 0.5706,
       "dcDef": 0.7146,
+      "squad": 78.13,
       "form": {
         "played": 10,
         "won": 8,
@@ -346,9 +354,10 @@
       "elo": 1943.1,
       "matches": 853,
       "lastPlayed": "2026-06-06",
-      "globalRank": 19,
+      "globalRank": 18,
       "dcAtt": 0.9513,
       "dcDef": 0.7274,
+      "squad": 80.65,
       "form": {
         "played": 10,
         "won": 7,
@@ -429,6 +438,7 @@
       "globalRank": 78,
       "dcAtt": 0.2315,
       "dcDef": 0.4106,
+      "squad": 73.22,
       "form": {
         "played": 10,
         "won": 2,
@@ -503,26 +513,21 @@
     "BRA": {
       "name": "Brazil",
       "code": "BRA",
-      "elo": 2067.3,
-      "matches": 1059,
-      "lastPlayed": "2026-06-06",
-      "globalRank": 5,
-      "dcAtt": 1.0719,
-      "dcDef": 0.9858,
+      "elo": 2060.2,
+      "matches": 1060,
+      "lastPlayed": "2026-06-13",
+      "globalRank": 6,
+      "dcAtt": 1.0627,
+      "dcDef": 0.9785,
+      "squad": 84.39,
       "form": {
         "played": 10,
-        "won": 6,
-        "drawn": 1,
+        "won": 5,
+        "drawn": 2,
         "lost": 3,
-        "goalsFor": 25,
-        "goalsAgainst": 11,
+        "goalsFor": 23,
+        "goalsAgainst": 12,
         "recent": [
-          {
-            "date": "2025-09-04",
-            "opp": "Chile",
-            "gf": 3,
-            "ga": 0
-          },
           {
             "date": "2025-09-09",
             "opp": "Bolivia",
@@ -576,6 +581,12 @@
             "opp": "Egypt",
             "gf": 2,
             "ga": 1
+          },
+          {
+            "date": "2026-06-13",
+            "opp": "Morocco",
+            "gf": 1,
+            "ga": 1
           }
         ]
       }
@@ -589,6 +600,7 @@
       "globalRank": 29,
       "dcAtt": 0.5491,
       "dcDef": 0.816,
+      "squad": 72.09,
       "form": {
         "played": 10,
         "won": 3,
@@ -669,6 +681,7 @@
       "globalRank": 87,
       "dcAtt": 0.1235,
       "dcDef": 0.2596,
+      "squad": 68.18,
       "form": {
         "played": 10,
         "won": 4,
@@ -746,9 +759,10 @@
       "elo": 2062.2,
       "matches": 638,
       "lastPlayed": "2026-06-07",
-      "globalRank": 6,
+      "globalRank": 5,
       "dcAtt": 1.094,
       "dcDef": 0.9541,
+      "squad": 77.48,
       "form": {
         "played": 10,
         "won": 7,
@@ -826,9 +840,10 @@
       "elo": 1972,
       "matches": 396,
       "lastPlayed": "2026-06-07",
-      "globalRank": 17,
+      "globalRank": 16,
       "dcAtt": 0.6728,
       "dcDef": 0.7268,
+      "squad": 78.35,
       "form": {
         "played": 10,
         "won": 7,
@@ -909,6 +924,7 @@
       "globalRank": 94,
       "dcAtt": 0.2286,
       "dcDef": 0.1955,
+      "squad": 66.67,
       "form": {
         "played": 10,
         "won": 4,
@@ -989,6 +1005,7 @@
       "globalRank": 47,
       "dcAtt": 0.5687,
       "dcDef": 0.3657,
+      "squad": 75.83,
       "form": {
         "played": 10,
         "won": 4,
@@ -1069,6 +1086,7 @@
       "globalRank": 53,
       "dcAtt": 0.1493,
       "dcDef": 0.7326,
+      "squad": 73,
       "form": {
         "played": 10,
         "won": 5,
@@ -1149,6 +1167,7 @@
       "globalRank": 8,
       "dcAtt": 0.4835,
       "dcDef": 1.33,
+      "squad": 74.26,
       "form": {
         "played": 10,
         "won": 4,
@@ -1229,6 +1248,7 @@
       "globalRank": 42,
       "dcAtt": 0.2198,
       "dcDef": 0.7422,
+      "squad": 70.85,
       "form": {
         "played": 10,
         "won": 5,
@@ -1309,6 +1329,7 @@
       "globalRank": 4,
       "dcAtt": 0.937,
       "dcDef": 1.1755,
+      "squad": 84.52,
       "form": {
         "played": 10,
         "won": 8,
@@ -1389,6 +1410,7 @@
       "globalRank": 3,
       "dcAtt": 0.9056,
       "dcDef": 0.9084,
+      "squad": 84.65,
       "form": {
         "played": 10,
         "won": 8,
@@ -1469,6 +1491,7 @@
       "globalRank": 10,
       "dcAtt": 1.0606,
       "dcDef": 0.7374,
+      "squad": 84.3,
       "form": {
         "played": 10,
         "won": 9,
@@ -1549,6 +1572,7 @@
       "globalRank": 92,
       "dcAtt": 0.2585,
       "dcDef": 0.3751,
+      "squad": 75.7,
       "form": {
         "played": 10,
         "won": 3,
@@ -1623,26 +1647,21 @@
     "HAI": {
       "name": "Haiti",
       "code": "HAI",
-      "elo": 1716.9,
-      "matches": 510,
-      "lastPlayed": "2026-06-05",
-      "globalRank": 66,
-      "dcAtt": 0.5042,
-      "dcDef": 0.2929,
+      "elo": 1697.9,
+      "matches": 511,
+      "lastPlayed": "2026-06-13",
+      "globalRank": 75,
+      "dcAtt": 0.4418,
+      "dcDef": 0.3351,
+      "squad": 63.73,
       "form": {
         "played": 10,
         "won": 4,
-        "drawn": 3,
-        "lost": 3,
+        "drawn": 2,
+        "lost": 4,
         "goalsFor": 15,
-        "goalsAgainst": 10,
+        "goalsAgainst": 11,
         "recent": [
-          {
-            "date": "2025-09-05",
-            "opp": "Honduras",
-            "gf": 0,
-            "ga": 0
-          },
           {
             "date": "2025-09-09",
             "opp": "Costa Rica",
@@ -1696,6 +1715,12 @@
             "opp": "Peru",
             "gf": 1,
             "ga": 2
+          },
+          {
+            "date": "2026-06-13",
+            "opp": "Scotland",
+            "gf": 0,
+            "ga": 1
           }
         ]
       }
@@ -1709,6 +1734,7 @@
       "globalRank": 25,
       "dcAtt": 0.5706,
       "dcDef": 0.7471,
+      "squad": 69.38,
       "form": {
         "played": 10,
         "won": 5,
@@ -1789,6 +1815,7 @@
       "globalRank": 61,
       "dcAtt": 0.1345,
       "dcDef": 0.5385,
+      "squad": 63.38,
       "form": {
         "played": 10,
         "won": 5,
@@ -1869,6 +1896,7 @@
       "globalRank": 40,
       "dcAtt": 0.4639,
       "dcDef": 0.7527,
+      "squad": 77.3,
       "form": {
         "played": 10,
         "won": 7,
@@ -1949,6 +1977,7 @@
       "globalRank": 11,
       "dcAtt": 0.845,
       "dcDef": 0.9797,
+      "squad": 76.65,
       "form": {
         "played": 10,
         "won": 7,
@@ -2029,6 +2058,7 @@
       "globalRank": 50,
       "dcAtt": 0.6295,
       "dcDef": 0.3995,
+      "squad": 59.91,
       "form": {
         "played": 10,
         "won": 5,
@@ -2109,6 +2139,7 @@
       "globalRank": 12,
       "dcAtt": 0.6548,
       "dcDef": 0.9894,
+      "squad": 71.13,
       "form": {
         "played": 10,
         "won": 7,
@@ -2183,26 +2214,21 @@
     "MAR": {
       "name": "Morocco",
       "code": "MAR",
-      "elo": 1983.8,
-      "matches": 617,
-      "lastPlayed": "2026-06-07",
+      "elo": 1990.8,
+      "matches": 618,
+      "lastPlayed": "2026-06-13",
       "globalRank": 13,
-      "dcAtt": 0.6098,
-      "dcDef": 1.1829,
+      "dcAtt": 0.6147,
+      "dcDef": 1.1887,
+      "squad": 78,
       "form": {
         "played": 10,
-        "won": 7,
-        "drawn": 3,
+        "won": 6,
+        "drawn": 4,
         "lost": 0,
-        "goalsFor": 22,
-        "goalsAgainst": 3,
+        "goalsFor": 20,
+        "goalsAgainst": 4,
         "recent": [
-          {
-            "date": "2025-12-29",
-            "opp": "Zambia",
-            "gf": 3,
-            "ga": 0
-          },
           {
             "date": "2026-01-04",
             "opp": "Tanzania",
@@ -2256,6 +2282,12 @@
             "opp": "Norway",
             "gf": 1,
             "ga": 1
+          },
+          {
+            "date": "2026-06-13",
+            "opp": "Brazil",
+            "gf": 1,
+            "ga": 1
           }
         ]
       }
@@ -2269,6 +2301,7 @@
       "globalRank": 9,
       "dcAtt": 0.9223,
       "dcDef": 0.7578,
+      "squad": 82.17,
       "form": {
         "played": 10,
         "won": 6,
@@ -2349,6 +2382,7 @@
       "globalRank": 65,
       "dcAtt": 0.5945,
       "dcDef": 0.5576,
+      "squad": 67.43,
       "form": {
         "played": 10,
         "won": 1,
@@ -2429,6 +2463,7 @@
       "globalRank": 14,
       "dcAtt": 1.095,
       "dcDef": 0.7027,
+      "squad": 76.57,
       "form": {
         "played": 10,
         "won": 6,
@@ -2506,9 +2541,10 @@
       "elo": 1858.8,
       "matches": 539,
       "lastPlayed": "2026-06-06",
-      "globalRank": 33,
+      "globalRank": 34,
       "dcAtt": 0.5619,
       "dcDef": 0.3742,
+      "squad": 68.73,
       "form": {
         "played": 10,
         "won": 4,
@@ -2586,9 +2622,10 @@
       "elo": 1865.5,
       "matches": 784,
       "lastPlayed": "2026-06-12",
-      "globalRank": 32,
+      "globalRank": 33,
       "dcAtt": 0.4585,
       "dcDef": 0.7392,
+      "squad": 74,
       "form": {
         "played": 10,
         "won": 4,
@@ -2669,6 +2706,7 @@
       "globalRank": 7,
       "dcAtt": 1.0147,
       "dcDef": 0.8394,
+      "squad": 83.52,
       "form": {
         "played": 10,
         "won": 7,
@@ -2743,26 +2781,21 @@
     "QAT": {
       "name": "Qatar",
       "code": "QAT",
-      "elo": 1563.3,
-      "matches": 635,
-      "lastPlayed": "2026-06-06",
-      "globalRank": 105,
-      "dcAtt": 0.1057,
-      "dcDef": -0.0223,
+      "elo": 1587.4,
+      "matches": 636,
+      "lastPlayed": "2026-06-13",
+      "globalRank": 99,
+      "dcAtt": 0.1213,
+      "dcDef": 0.0872,
+      "squad": 67.39,
       "form": {
         "played": 10,
         "won": 1,
         "drawn": 4,
         "lost": 5,
-        "goalsFor": 7,
-        "goalsAgainst": 15,
+        "goalsFor": 6,
+        "goalsAgainst": 14,
         "recent": [
-          {
-            "date": "2025-09-03",
-            "opp": "Bahrain",
-            "gf": 2,
-            "ga": 2
-          },
           {
             "date": "2025-09-07",
             "opp": "Russia",
@@ -2816,6 +2849,12 @@
             "opp": "El Salvador",
             "gf": 0,
             "ga": 0
+          },
+          {
+            "date": "2026-06-13",
+            "opp": "Switzerland",
+            "gf": 1,
+            "ga": 1
           }
         ]
       }
@@ -2829,6 +2868,7 @@
       "globalRank": 77,
       "dcAtt": 0.1638,
       "dcDef": 0.4832,
+      "squad": 71.04,
       "form": {
         "played": 10,
         "won": 4,
@@ -2903,26 +2943,21 @@
     "SCO": {
       "name": "Scotland",
       "code": "SCO",
-      "elo": 1850.6,
-      "matches": 851,
-      "lastPlayed": "2026-06-06",
-      "globalRank": 34,
-      "dcAtt": 0.6573,
-      "dcDef": 0.5472,
+      "elo": 1869.6,
+      "matches": 852,
+      "lastPlayed": "2026-06-13",
+      "globalRank": 32,
+      "dcAtt": 0.6137,
+      "dcDef": 0.6081,
+      "squad": 76.04,
       "form": {
         "played": 10,
-        "won": 6,
-        "drawn": 1,
+        "won": 7,
+        "drawn": 0,
         "lost": 3,
-        "goalsFor": 21,
+        "goalsFor": 22,
         "goalsAgainst": 10,
         "recent": [
-          {
-            "date": "2025-09-05",
-            "opp": "Denmark",
-            "gf": 0,
-            "ga": 0
-          },
           {
             "date": "2025-09-08",
             "opp": "Belarus",
@@ -2976,6 +3011,12 @@
             "opp": "Bolivia",
             "gf": 4,
             "ga": 0
+          },
+          {
+            "date": "2026-06-13",
+            "opp": "Haiti",
+            "gf": 1,
+            "ga": 0
           }
         ]
       }
@@ -2986,9 +3027,10 @@
       "elo": 1911.8,
       "matches": 638,
       "lastPlayed": "2026-06-09",
-      "globalRank": 22,
+      "globalRank": 23,
       "dcAtt": 0.6651,
       "dcDef": 0.7768,
+      "squad": 76.35,
       "form": {
         "played": 10,
         "won": 6,
@@ -3069,6 +3111,7 @@
       "globalRank": 84,
       "dcAtt": 0.2071,
       "dcDef": 0.3336,
+      "squad": 62,
       "form": {
         "played": 10,
         "won": 4,
@@ -3146,9 +3189,10 @@
       "elo": 1902.4,
       "matches": 1008,
       "lastPlayed": "2026-06-11",
-      "globalRank": 23,
+      "globalRank": 24,
       "dcAtt": 0.6597,
       "dcDef": 0.6095,
+      "squad": 74.61,
       "form": {
         "played": 10,
         "won": 6,
@@ -3229,6 +3273,7 @@
       "globalRank": 1,
       "dcAtt": 1.0952,
       "dcDef": 0.9515,
+      "squad": 84.13,
       "form": {
         "played": 10,
         "won": 7,
@@ -3309,6 +3354,7 @@
       "globalRank": 49,
       "dcAtt": 0.671,
       "dcDef": 0.2805,
+      "squad": 76.09,
       "form": {
         "played": 10,
         "won": 2,
@@ -3383,26 +3429,21 @@
     "SUI": {
       "name": "Switzerland",
       "code": "SUI",
-      "elo": 1950.1,
-      "matches": 884,
-      "lastPlayed": "2026-06-06",
-      "globalRank": 18,
-      "dcAtt": 0.8776,
-      "dcDef": 0.7416,
+      "elo": 1926,
+      "matches": 885,
+      "lastPlayed": "2026-06-13",
+      "globalRank": 21,
+      "dcAtt": 0.7668,
+      "dcDef": 0.7249,
+      "squad": 78.78,
       "form": {
         "played": 10,
-        "won": 5,
-        "drawn": 4,
+        "won": 4,
+        "drawn": 5,
         "lost": 1,
-        "goalsFor": 22,
-        "goalsAgainst": 8,
+        "goalsFor": 19,
+        "goalsAgainst": 9,
         "recent": [
-          {
-            "date": "2025-09-05",
-            "opp": "Kosovo",
-            "gf": 4,
-            "ga": 0
-          },
           {
             "date": "2025-09-08",
             "opp": "Slovenia",
@@ -3456,6 +3497,12 @@
             "opp": "Australia",
             "gf": 1,
             "ga": 1
+          },
+          {
+            "date": "2026-06-13",
+            "opp": "Qatar",
+            "gf": 1,
+            "ga": 1
           }
         ]
       }
@@ -3469,6 +3516,7 @@
       "globalRank": 59,
       "dcAtt": 0.2996,
       "dcDef": 0.6546,
+      "squad": 69.61,
       "form": {
         "played": 10,
         "won": 3,
@@ -3543,26 +3591,21 @@
     "TUR": {
       "name": "Turkey",
       "code": "TUR",
-      "elo": 1972.8,
-      "matches": 642,
-      "lastPlayed": "2026-06-06",
-      "globalRank": 16,
-      "dcAtt": 0.8315,
-      "dcDef": 0.6233,
+      "elo": 1918.3,
+      "matches": 643,
+      "lastPlayed": "2026-06-13",
+      "globalRank": 22,
+      "dcAtt": 0.7727,
+      "dcDef": 0.5934,
+      "squad": 77.43,
       "form": {
         "played": 10,
-        "won": 8,
+        "won": 7,
         "drawn": 1,
-        "lost": 1,
-        "goalsFor": 25,
+        "lost": 2,
+        "goalsFor": 22,
         "goalsAgainst": 13,
         "recent": [
-          {
-            "date": "2025-09-04",
-            "opp": "Georgia",
-            "gf": 3,
-            "ga": 2
-          },
           {
             "date": "2025-09-07",
             "opp": "Spain",
@@ -3616,6 +3659,12 @@
             "opp": "Venezuela",
             "gf": 2,
             "ga": 1
+          },
+          {
+            "date": "2026-06-13",
+            "opp": "Australia",
+            "gf": 0,
+            "ga": 2
           }
         ]
       }
@@ -3629,6 +3678,7 @@
       "globalRank": 30,
       "dcAtt": 0.8237,
       "dcDef": 0.5527,
+      "squad": 75.83,
       "form": {
         "played": 10,
         "won": 6,
@@ -3709,6 +3759,7 @@
       "globalRank": 15,
       "dcAtt": 0.5363,
       "dcDef": 1.114,
+      "squad": 79.04,
       "form": {
         "played": 10,
         "won": 4,
@@ -3789,6 +3840,7 @@
       "globalRank": 38,
       "dcAtt": 0.2469,
       "dcDef": 0.7797,
+      "squad": null,
       "form": {
         "played": 10,
         "won": 4,

@@ -20,6 +20,7 @@
  */
 import { readFileSync, existsSync } from 'fs';
 import path from 'path';
+import { countryKey } from './country-names';
 
 const FIFA_DIR = path.join(process.cwd(), 'data', 'fifa');
 // All editions we know how to consume. The FIFA->EA Sports FC rename keeps the
@@ -36,30 +37,8 @@ function editionStart(yy: number): string {
   return `${2000 + yy - 1}-09-01`;
 }
 
-// strip accents/case/punctuation so spellings can be matched
-function norm(s: string): string {
-  return s
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '');
-}
-
-// sofifa spelling (normalized) -> results-dataset spelling (normalized)
-const ALIASES: Record<string, string> = {
-  korearepublic: 'southkorea',
-  koreadpr: 'northkorea',
-  capeverdeislands: 'capeverde',
-  congodr: 'drcongo',
-  chinapr: 'china',
-  unitedstates: 'unitedstates',
-  republicofireland: 'republicofireland',
-};
-
-function canonical(nationalityName: string): string {
-  const n = norm(nationalityName);
-  return ALIASES[n] ?? n;
-}
+// Reconcile sofifa / fbref / results spellings via the shared canonical map.
+const canonical = countryKey;
 
 // minimal quote-aware CSV line splitter (player_positions etc. embed commas)
 function splitCsvLine(line: string): string[] {
@@ -148,13 +127,15 @@ function load() {
 export function strengthAsOf(team: string, date: string): number | null {
   const { editions } = load();
   const key = canonical(team);
-  let chosen: Map<string, number> | null = null;
-  for (const e of editions) {
-    if (e.start <= date) chosen = e.strength;
-    else break;
+  // Use the most recent edition on/before `date`; if that edition doesn't rate
+  // the nation (newer editions cover fewer nations), fall back to the next most
+  // recent one that does, rather than returning null.
+  for (let i = editions.length - 1; i >= 0; i--) {
+    if (editions[i].start > date) continue;
+    const v = editions[i].strength.get(key);
+    if (v != null) return v;
   }
-  if (!chosen) return null;
-  return chosen.get(key) ?? null;
+  return null;
 }
 
 // --- self-test --------------------------------------------------------------

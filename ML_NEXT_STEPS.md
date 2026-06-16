@@ -7,9 +7,16 @@
 > (`scripts/squad-rolling.ts`) shows squad strength, blended at ~0.3 on the
 > FIFA-covered matches, improves prediction in **all six** 2-year windows — and it
 > still adds **on top of the live DC+Elo blend** (Δ +0.0002..+0.0034, positive in
-> every window incl. all clean out-of-sample ones). Recommend wiring it live
-> (all 48 World Cup 2026 teams have FIFA pools, so it applies to every live match).
-> The narrative below is kept for history; read it through this correction.
+> every window incl. all clean out-of-sample ones).
+>
+> **NOW WIRED LIVE (2026-06-16).** The live model is a three-way blend:
+> `0.7·(0.6·DC + 0.4·Elo) + 0.3·squad` on teams that have a squad rating (47/48 WC
+> teams; Uzbekistan has <11 rated players so it falls back to the DC+Elo blend).
+> `build-elo.ts` fits `goalsPerStr` over history and exports `model.squad` + each
+> team's current talent-pool strength into ratings.json; `model.ts` mixes it in;
+> `squad-strength.ts` now uses the shared `country-names.ts` keys and falls back to
+> the most recent edition that rates a nation. The narrative below is kept for
+> history; read it through this correction.
 
 Working branch: `claude/ml-model-predictor-review-y1xufc`.
 
