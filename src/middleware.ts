@@ -52,6 +52,9 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Everything except static assets and the cron-only sync endpoint.
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|api/sync).*)'],
+  // Everything except static assets and API routes. API routes authenticate
+  // themselves (session in-handler, or a secret) and must never be redirected to
+  // /login -- a 307 to an HTML page breaks programmatic callers (the cron, the
+  // push sender, the subscribe/debug endpoints).
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|api/).*)'],
 };
