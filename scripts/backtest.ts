@@ -22,6 +22,7 @@ import { readFileSync, existsSync } from 'fs';
 import path from 'path';
 import { scoreGrid } from '../src/lib/ml/poisson';
 import { strengthAsOf, squadDataAvailable } from './squad-strength';
+import { lineupDeltaFor, lineupsAvailable, starPenaltyFor } from './lineup-strength';
 
 const ROOT = process.cwd();
 const CSV_PATH = path.join(ROOT, 'data', 'results.csv');
@@ -234,10 +235,12 @@ class DixonColesOnline implements Predictor {
     return [lh, la];
   }
 
-  predict(r: Row): Probs | null {
-    if ((this.played.get(r.home) ?? 0) < MIN_HISTORY) return null;
-    if ((this.played.get(r.away) ?? 0) < MIN_HISTORY) return null;
-    const [lh, la] = this.means(r);
+  private hasHistory(r: Row): boolean {
+    return (this.played.get(r.home) ?? 0) >= MIN_HISTORY && (this.played.get(r.away) ?? 0) >= MIN_HISTORY;
+  }
+
+  // Dixon-Coles tau-corrected scoreline grid -> W/D/L for given goal means.
+  private probsFromMeans(lh: number, la: number): Probs {
     const g = scoreGrid(lh, la, MAX_GOALS);
     let pH = 0,
       pD = 0,
@@ -256,6 +259,20 @@ class DixonColesOnline implements Predictor {
       else pA += p;
     }
     return { H: pH / tot, D: pD / tot, A: pA / tot };
+  }
+
+  predict(r: Row): Probs | null {
+    if (!this.hasHistory(r)) return null;
+    const [lh, la] = this.means(r);
+    return this.probsFromMeans(lh, la);
+  }
+
+  // DC prediction nudged by a lineup-strength supremacy shift S (log-goal space):
+  // home goal mean scaled by exp(S/2), away by exp(-S/2). S>0 favours the home XI.
+  adjustedPredict(r: Row, S: number): Probs | null {
+    if (!this.hasHistory(r)) return null;
+    const [lh, la] = this.means(r);
+    return this.probsFromMeans(lh * Math.exp(S / 2), la * Math.exp(-S / 2));
   }
 
   update(r: Row): void {
@@ -505,6 +522,15 @@ function main(): void {
   // have a FIFA pool and it's competitive): does adding squad info beat DC alone?
   const matchedNames = ['Dixon-Coles only', 'Squad only', 'Ensemble (DC+squad)'];
   const matched = matchedNames.map(() => new Metrics());
+  // lineup test: does nudging DC by the actual-XI-vs-best-XI gap beat DC alone,
+  // on the matches we scraped real starting lineups for? coef=0 is DC untouched.
+  const lineupOn = lineupsAvailable();
+  const LINEUP_COEFS = [0, 0.01, 0.02, 0.03, 0.05, 0.08, 0.12];
+  const lineupM = LINEUP_COEFS.map(() => new Metrics());
+  // star-missing test: nudge DC by the gap in absent-star penalty between sides.
+  const STAR_COEFS = [0, 0.005, 0.01, 0.02, 0.04, 0.08];
+  const starAll = STAR_COEFS.map(() => new Metrics());
+  const starActive = STAR_COEFS.map(() => new Metrics()); // only matches w/ a star out
 
   let constFrozen = false;
   let lateFrozen = false;
@@ -553,6 +579,36 @@ function main(): void {
           matched[2].add(pEn, o);
         }
       }
+      if (lineupOn && competitive) {
+        const dh = lineupDeltaFor(r.home, r.date);
+        const da = lineupDeltaFor(r.away, r.date);
+        if (dh != null && da != null) {
+          const pDc = dc.predict(r);
+          if (pDc) {
+            const gap = dh - da;
+            LINEUP_COEFS.forEach((coef, i) => {
+              const p = coef === 0 ? pDc : dc.adjustedPredict(r, coef * gap);
+              if (p) lineupM[i].add(p, o);
+            });
+          }
+        }
+        const sh = starPenaltyFor(r.home, r.date);
+        const sa = starPenaltyFor(r.away, r.date);
+        if (sh != null && sa != null) {
+          const pDc = dc.predict(r);
+          if (pDc) {
+            const gap = sa - sh; // home missing stars -> home weaker -> supremacy down
+            const active = sh + sa > 0;
+            STAR_COEFS.forEach((coef, i) => {
+              const p = coef === 0 ? pDc : dc.adjustedPredict(r, coef * gap);
+              if (p) {
+                starAll[i].add(p, o);
+                if (active) starActive[i].add(p, o);
+              }
+            });
+          }
+        }
+      }
     }
     // each base model accumulates fit stats up to its own freeze point
     for (const m of base) {
@@ -581,6 +637,27 @@ function main(): void {
     console.log('(identical match set for all three rows, so RPS is directly comparable)');
     console.log(header);
     matched.forEach((m, i) => console.log(`${m.row()}  ${matchedNames[i]}`));
+  }
+
+  if (lineupOn) {
+    console.log('\nLINEUP TEST -- competitive matches both teams have a scraped starting XI for');
+    console.log('(coef scales the actual-XI-vs-best-XI overall gap into a goal-supremacy nudge on DC; coef=0 is DC alone)');
+    console.log(header);
+    LINEUP_COEFS.forEach((coef, i) =>
+      console.log(`${lineupM[i].row()}  DC + lineup (coef=${coef.toFixed(2)})${coef === 0 ? '  <= DC only' : ''}`),
+    );
+
+    console.log('\nSTAR-MISSING TEST -- nudge DC when a nation\'s stars are absent from the XI');
+    console.log('All covered competitive matches:');
+    console.log(header);
+    STAR_COEFS.forEach((coef, i) =>
+      console.log(`${starAll[i].row()}  DC + stars (coef=${coef.toFixed(3)})${coef === 0 ? '  <= DC only' : ''}`),
+    );
+    console.log('\nOnly matches where >=1 side is missing a star (where it can actually matter):');
+    console.log(header);
+    STAR_COEFS.forEach((coef, i) =>
+      console.log(`${starActive[i].row()}  DC + stars (coef=${coef.toFixed(3)})${coef === 0 ? '  <= DC only' : ''}`),
+    );
   }
 
   const dcCalIdx = base.length; // first calibrated wrapper = recalibrated DC

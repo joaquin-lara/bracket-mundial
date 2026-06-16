@@ -1,0 +1,3142 @@
+{
+ "2022-12-01|Canada|Morocco": {
+  "date": "2022-12-01",
+  "home": "Canada",
+  "away": "Morocco",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 1.096,
+  "awayXg": 0.426,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-21|England|Iran": {
+  "date": "2022-11-21",
+  "home": "England",
+  "away": "Iran",
+  "homeScore": 6,
+  "awayScore": 2,
+  "homeXg": 1.987,
+  "awayXg": 1.456,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-01|Croatia|Belgium": {
+  "date": "2022-12-01",
+  "home": "Croatia",
+  "away": "Belgium",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.695,
+  "awayXg": 2.382,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-25|Netherlands|Ecuador": {
+  "date": "2022-11-25",
+  "home": "Netherlands",
+  "away": "Ecuador",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 0.104,
+  "awayXg": 1.651,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-01|Japan|Spain": {
+  "date": "2022-12-01",
+  "home": "Japan",
+  "away": "Spain",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 1.158,
+  "awayXg": 0.858,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-25|England|United States": {
+  "date": "2022-11-25",
+  "home": "England",
+  "away": "United States",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.461,
+  "awayXg": 0.514,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-29|Iran|United States": {
+  "date": "2022-11-29",
+  "home": "Iran",
+  "away": "United States",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.921,
+  "awayXg": 1.17,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-23|Morocco|Croatia": {
+  "date": "2022-11-23",
+  "home": "Morocco",
+  "away": "Croatia",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.363,
+  "awayXg": 0.85,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-25|Wales|Iran": {
+  "date": "2022-11-25",
+  "home": "Wales",
+  "away": "Iran",
+  "homeScore": 0,
+  "awayScore": 2,
+  "homeXg": 0.616,
+  "awayXg": 1.454,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-30|Tunisia|France": {
+  "date": "2022-11-30",
+  "home": "Tunisia",
+  "away": "France",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 0.298,
+  "awayXg": 0.477,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-29|Wales|England": {
+  "date": "2022-11-29",
+  "home": "Wales",
+  "away": "England",
+  "homeScore": 0,
+  "awayScore": 3,
+  "homeXg": 0.208,
+  "awayXg": 2.915,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-24|Switzerland|Cameroon": {
+  "date": "2022-11-24",
+  "home": "Switzerland",
+  "away": "Cameroon",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 1.427,
+  "awayXg": 0.613,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-24|Portugal|Ghana": {
+  "date": "2022-11-24",
+  "home": "Portugal",
+  "away": "Ghana",
+  "homeScore": 3,
+  "awayScore": 2,
+  "homeXg": 2.097,
+  "awayXg": 0.78,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-21|Senegal|Netherlands": {
+  "date": "2022-11-21",
+  "home": "Senegal",
+  "away": "Netherlands",
+  "homeScore": 0,
+  "awayScore": 2,
+  "homeXg": 0.691,
+  "awayXg": 1.124,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-21|United States|Wales": {
+  "date": "2022-11-21",
+  "home": "United States",
+  "away": "Wales",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 0.602,
+  "awayXg": 1.395,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-26|Poland|Saudi Arabia": {
+  "date": "2022-11-26",
+  "home": "Poland",
+  "away": "Saudi Arabia",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 1.734,
+  "awayXg": 1.972,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-29|Netherlands|Qatar": {
+  "date": "2022-11-29",
+  "home": "Netherlands",
+  "away": "Qatar",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 1.714,
+  "awayXg": 0.144,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-26|France|Denmark": {
+  "date": "2022-11-26",
+  "home": "France",
+  "away": "Denmark",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 1.934,
+  "awayXg": 0.889,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-23|Germany|Japan": {
+  "date": "2022-11-23",
+  "home": "Germany",
+  "away": "Japan",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 2.768,
+  "awayXg": 1.249,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-22|Denmark|Tunisia": {
+  "date": "2022-11-22",
+  "home": "Denmark",
+  "away": "Tunisia",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 1.567,
+  "awayXg": 1.06,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-22|Mexico|Poland": {
+  "date": "2022-11-22",
+  "home": "Mexico",
+  "away": "Poland",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.529,
+  "awayXg": 1.138,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-25|Qatar|Senegal": {
+  "date": "2022-11-25",
+  "home": "Qatar",
+  "away": "Senegal",
+  "homeScore": 1,
+  "awayScore": 3,
+  "homeXg": 0.96,
+  "awayXg": 0.903,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-23|Belgium|Canada": {
+  "date": "2022-11-23",
+  "home": "Belgium",
+  "away": "Canada",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 0.67,
+  "awayXg": 2.546,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-28|Brazil|Switzerland": {
+  "date": "2022-11-28",
+  "home": "Brazil",
+  "away": "Switzerland",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 0.923,
+  "awayXg": 0.289,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-09|Netherlands|Argentina": {
+  "date": "2022-12-09",
+  "home": "Netherlands",
+  "away": "Argentina",
+  "homeScore": 2,
+  "awayScore": 2,
+  "homeXg": 4.487,
+  "awayXg": 5.857,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-01|Costa Rica|Germany": {
+  "date": "2022-12-01",
+  "home": "Costa Rica",
+  "away": "Germany",
+  "homeScore": 2,
+  "awayScore": 4,
+  "homeXg": 1.035,
+  "awayXg": 4.316,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-27|Japan|Costa Rica": {
+  "date": "2022-11-27",
+  "home": "Japan",
+  "away": "Costa Rica",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.774,
+  "awayXg": 0.199,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-18|Argentina|France": {
+  "date": "2022-12-18",
+  "home": "Argentina",
+  "away": "France",
+  "homeScore": 3,
+  "awayScore": 3,
+  "homeXg": 5.892,
+  "awayXg": 5.407,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-17|Croatia|Morocco": {
+  "date": "2022-12-17",
+  "home": "Croatia",
+  "away": "Morocco",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 0.849,
+  "awayXg": 0.991,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-02|Serbia|Switzerland": {
+  "date": "2022-12-02",
+  "home": "Serbia",
+  "away": "Switzerland",
+  "homeScore": 2,
+  "awayScore": 3,
+  "homeXg": 1.189,
+  "awayXg": 3.104,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-03|Argentina|Australia": {
+  "date": "2022-12-03",
+  "home": "Argentina",
+  "away": "Australia",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 1.482,
+  "awayXg": 0.426,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-30|Australia|Denmark": {
+  "date": "2022-11-30",
+  "home": "Australia",
+  "away": "Denmark",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 0.47,
+  "awayXg": 0.737,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-24|Brazil|Serbia": {
+  "date": "2022-11-24",
+  "home": "Brazil",
+  "away": "Serbia",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 2.124,
+  "awayXg": 0.163,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-26|Tunisia|Australia": {
+  "date": "2022-11-26",
+  "home": "Tunisia",
+  "away": "Australia",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 1.052,
+  "awayXg": 0.359,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-29|Ecuador|Senegal": {
+  "date": "2022-11-29",
+  "home": "Ecuador",
+  "away": "Senegal",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 1.002,
+  "awayXg": 1.707,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-24|Uruguay|South Korea": {
+  "date": "2022-11-24",
+  "home": "Uruguay",
+  "away": "South Korea",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.417,
+  "awayXg": 0.493,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-10|Morocco|Portugal": {
+  "date": "2022-12-10",
+  "home": "Morocco",
+  "away": "Portugal",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 0.972,
+  "awayXg": 0.744,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-30|Saudi Arabia|Mexico": {
+  "date": "2022-11-30",
+  "home": "Saudi Arabia",
+  "away": "Mexico",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 1.076,
+  "awayXg": 2.322,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-30|Poland|Argentina": {
+  "date": "2022-11-30",
+  "home": "Poland",
+  "away": "Argentina",
+  "homeScore": 0,
+  "awayScore": 2,
+  "homeXg": 0.198,
+  "awayXg": 3.077,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-26|Argentina|Mexico": {
+  "date": "2022-11-26",
+  "home": "Argentina",
+  "away": "Mexico",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 0.325,
+  "awayXg": 0.206,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-06|Portugal|Switzerland": {
+  "date": "2022-12-06",
+  "home": "Portugal",
+  "away": "Switzerland",
+  "homeScore": 6,
+  "awayScore": 1,
+  "homeXg": 2.284,
+  "awayXg": 1.272,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-04|England|Senegal": {
+  "date": "2022-12-04",
+  "home": "England",
+  "away": "Senegal",
+  "homeScore": 3,
+  "awayScore": 0,
+  "homeXg": 1.02,
+  "awayXg": 0.973,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-13|Argentina|Croatia": {
+  "date": "2022-12-13",
+  "home": "Argentina",
+  "away": "Croatia",
+  "homeScore": 3,
+  "awayScore": 0,
+  "homeXg": 1.864,
+  "awayXg": 0.41,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-10|England|France": {
+  "date": "2022-12-10",
+  "home": "England",
+  "away": "France",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 2.353,
+  "awayXg": 0.839,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-14|France|Morocco": {
+  "date": "2022-12-14",
+  "home": "France",
+  "away": "Morocco",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 2.002,
+  "awayXg": 1.23,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-09|Croatia|Brazil": {
+  "date": "2022-12-09",
+  "home": "Croatia",
+  "away": "Brazil",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 3.767,
+  "awayXg": 4.95,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-06|Morocco|Spain": {
+  "date": "2022-12-06",
+  "home": "Morocco",
+  "away": "Spain",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 3.704,
+  "awayXg": 2.845,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-05|Japan|Croatia": {
+  "date": "2022-12-05",
+  "home": "Japan",
+  "away": "Croatia",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 4.203,
+  "awayXg": 3.988,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-05|Brazil|South Korea": {
+  "date": "2022-12-05",
+  "home": "Brazil",
+  "away": "South Korea",
+  "homeScore": 4,
+  "awayScore": 1,
+  "homeXg": 3.261,
+  "awayXg": 0.345,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-04|France|Poland": {
+  "date": "2022-12-04",
+  "home": "France",
+  "away": "Poland",
+  "homeScore": 3,
+  "awayScore": 1,
+  "homeXg": 1.126,
+  "awayXg": 1.594,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-03|Netherlands|United States": {
+  "date": "2022-12-03",
+  "home": "Netherlands",
+  "away": "United States",
+  "homeScore": 3,
+  "awayScore": 1,
+  "homeXg": 1.482,
+  "awayXg": 1.652,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-28|Portugal|Uruguay": {
+  "date": "2022-11-28",
+  "home": "Portugal",
+  "away": "Uruguay",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 1.214,
+  "awayXg": 1.217,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-27|Spain|Germany": {
+  "date": "2022-11-27",
+  "home": "Spain",
+  "away": "Germany",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 0.64,
+  "awayXg": 1.147,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-28|Cameroon|Serbia": {
+  "date": "2022-11-28",
+  "home": "Cameroon",
+  "away": "Serbia",
+  "homeScore": 3,
+  "awayScore": 3,
+  "homeXg": 2.07,
+  "awayXg": 1.738,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-27|Belgium|Morocco": {
+  "date": "2022-11-27",
+  "home": "Belgium",
+  "away": "Morocco",
+  "homeScore": 0,
+  "awayScore": 2,
+  "homeXg": 0.643,
+  "awayXg": 0.991,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-20|Qatar|Ecuador": {
+  "date": "2022-11-20",
+  "home": "Qatar",
+  "away": "Ecuador",
+  "homeScore": 0,
+  "awayScore": 2,
+  "homeXg": 0.304,
+  "awayXg": 1.154,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-22|Argentina|Saudi Arabia": {
+  "date": "2022-11-22",
+  "home": "Argentina",
+  "away": "Saudi Arabia",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 2.492,
+  "awayXg": 0.153,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-28|South Korea|Ghana": {
+  "date": "2022-11-28",
+  "home": "South Korea",
+  "away": "Ghana",
+  "homeScore": 2,
+  "awayScore": 3,
+  "homeXg": 1.368,
+  "awayXg": 1.181,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-02|Ghana|Uruguay": {
+  "date": "2022-12-02",
+  "home": "Ghana",
+  "away": "Uruguay",
+  "homeScore": 0,
+  "awayScore": 2,
+  "homeXg": 1.393,
+  "awayXg": 1.637,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-23|Spain|Costa Rica": {
+  "date": "2022-11-23",
+  "home": "Spain",
+  "away": "Costa Rica",
+  "homeScore": 7,
+  "awayScore": 0,
+  "homeXg": 2.762,
+  "awayXg": 0,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-27|Croatia|Canada": {
+  "date": "2022-11-27",
+  "home": "Croatia",
+  "away": "Canada",
+  "homeScore": 4,
+  "awayScore": 1,
+  "homeXg": 2.61,
+  "awayXg": 0.287,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-02|Cameroon|Brazil": {
+  "date": "2022-12-02",
+  "home": "Cameroon",
+  "away": "Brazil",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 0.383,
+  "awayXg": 2.378,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-11-22|France|Australia": {
+  "date": "2022-11-22",
+  "home": "France",
+  "away": "Australia",
+  "homeScore": 4,
+  "awayScore": 1,
+  "homeXg": 3.17,
+  "awayXg": 0.323,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2022-12-02|South Korea|Portugal": {
+  "date": "2022-12-02",
+  "home": "South Korea",
+  "away": "Portugal",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 1.399,
+  "awayXg": 0.974,
+  "tournament": "FIFA World Cup 2022"
+ },
+ "2018-07-06|Brazil|Belgium": {
+  "date": "2018-07-06",
+  "home": "Brazil",
+  "away": "Belgium",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 2.609,
+  "awayXg": 0.405,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-07-02|Belgium|Japan": {
+  "date": "2018-07-02",
+  "home": "Belgium",
+  "away": "Japan",
+  "homeScore": 3,
+  "awayScore": 2,
+  "homeXg": 2.918,
+  "awayXg": 0.694,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-24|England|Panama": {
+  "date": "2018-06-24",
+  "home": "England",
+  "away": "Panama",
+  "homeScore": 6,
+  "awayScore": 1,
+  "homeXg": 3.168,
+  "awayXg": 1.08,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-19|Poland|Senegal": {
+  "date": "2018-06-19",
+  "home": "Poland",
+  "away": "Senegal",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 1.042,
+  "awayXg": 1.428,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-22|Serbia|Switzerland": {
+  "date": "2018-06-22",
+  "home": "Serbia",
+  "away": "Switzerland",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 1.153,
+  "awayXg": 1.557,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-18|Sweden|South Korea": {
+  "date": "2018-06-18",
+  "home": "Sweden",
+  "away": "South Korea",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 2.015,
+  "awayXg": 0.414,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-17|Germany|Mexico": {
+  "date": "2018-06-17",
+  "home": "Germany",
+  "away": "Mexico",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 2.299,
+  "awayXg": 0.993,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-20|Iran|Spain": {
+  "date": "2018-06-20",
+  "home": "Iran",
+  "away": "Spain",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.426,
+  "awayXg": 2.197,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-20|Uruguay|Saudi Arabia": {
+  "date": "2018-06-20",
+  "home": "Uruguay",
+  "away": "Saudi Arabia",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 1.807,
+  "awayXg": 0.273,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-21|France|Peru": {
+  "date": "2018-06-21",
+  "home": "France",
+  "away": "Peru",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 1.862,
+  "awayXg": 0.625,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-21|Argentina|Croatia": {
+  "date": "2018-06-21",
+  "home": "Argentina",
+  "away": "Croatia",
+  "homeScore": 0,
+  "awayScore": 3,
+  "homeXg": 1.218,
+  "awayXg": 1.832,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-07-03|Colombia|England": {
+  "date": "2018-07-03",
+  "home": "Colombia",
+  "away": "England",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 4.749,
+  "awayXg": 6.162,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-28|Panama|Tunisia": {
+  "date": "2018-06-28",
+  "home": "Panama",
+  "away": "Tunisia",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 0.691,
+  "awayXg": 2.852,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-28|Japan|Poland": {
+  "date": "2018-06-28",
+  "home": "Japan",
+  "away": "Poland",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.891,
+  "awayXg": 1.041,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-26|Iceland|Croatia": {
+  "date": "2018-06-26",
+  "home": "Iceland",
+  "away": "Croatia",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 2.133,
+  "awayXg": 0.674,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-19|Russia|Egypt": {
+  "date": "2018-06-19",
+  "home": "Russia",
+  "away": "Egypt",
+  "homeScore": 3,
+  "awayScore": 1,
+  "homeXg": 0.981,
+  "awayXg": 1.698,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-16|Argentina|Iceland": {
+  "date": "2018-06-16",
+  "home": "Argentina",
+  "away": "Iceland",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 2.081,
+  "awayXg": 1.032,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-28|England|Belgium": {
+  "date": "2018-06-28",
+  "home": "England",
+  "away": "Belgium",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 1.201,
+  "awayXg": 0.965,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-07-03|Sweden|Switzerland": {
+  "date": "2018-07-03",
+  "home": "Sweden",
+  "away": "Switzerland",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 0.91,
+  "awayXg": 0.533,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-25|Iran|Portugal": {
+  "date": "2018-06-25",
+  "home": "Iran",
+  "away": "Portugal",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 1.577,
+  "awayXg": 1.522,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-20|Portugal|Morocco": {
+  "date": "2018-06-20",
+  "home": "Portugal",
+  "away": "Morocco",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 0.885,
+  "awayXg": 1.455,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-07-11|Croatia|England": {
+  "date": "2018-07-11",
+  "home": "Croatia",
+  "away": "England",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 2.141,
+  "awayXg": 0.547,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-22|Brazil|Costa Rica": {
+  "date": "2018-06-22",
+  "home": "Brazil",
+  "away": "Costa Rica",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 3.096,
+  "awayXg": 0.159,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-15|Egypt|Uruguay": {
+  "date": "2018-06-15",
+  "home": "Egypt",
+  "away": "Uruguay",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.364,
+  "awayXg": 1.941,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-23|South Korea|Mexico": {
+  "date": "2018-06-23",
+  "home": "South Korea",
+  "away": "Mexico",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 0.822,
+  "awayXg": 1.878,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-18|Belgium|Panama": {
+  "date": "2018-06-18",
+  "home": "Belgium",
+  "away": "Panama",
+  "homeScore": 3,
+  "awayScore": 0,
+  "homeXg": 1.212,
+  "awayXg": 0.625,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-24|Poland|Colombia": {
+  "date": "2018-06-24",
+  "home": "Poland",
+  "away": "Colombia",
+  "homeScore": 0,
+  "awayScore": 3,
+  "homeXg": 1.114,
+  "awayXg": 1.387,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-15|Portugal|Spain": {
+  "date": "2018-06-15",
+  "home": "Portugal",
+  "away": "Spain",
+  "homeScore": 3,
+  "awayScore": 3,
+  "homeXg": 1.435,
+  "awayXg": 1.661,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-27|Serbia|Brazil": {
+  "date": "2018-06-27",
+  "home": "Serbia",
+  "away": "Brazil",
+  "homeScore": 0,
+  "awayScore": 2,
+  "homeXg": 0.948,
+  "awayXg": 1.42,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-23|Germany|Sweden": {
+  "date": "2018-06-23",
+  "home": "Germany",
+  "away": "Sweden",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 1.318,
+  "awayXg": 0.815,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-18|Tunisia|England": {
+  "date": "2018-06-18",
+  "home": "Tunisia",
+  "away": "England",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 0.946,
+  "awayXg": 2.626,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-30|France|Argentina": {
+  "date": "2018-06-30",
+  "home": "France",
+  "away": "Argentina",
+  "homeScore": 4,
+  "awayScore": 3,
+  "homeXg": 1.638,
+  "awayXg": 1.447,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-07-01|Croatia|Denmark": {
+  "date": "2018-07-01",
+  "home": "Croatia",
+  "away": "Denmark",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 6.088,
+  "awayXg": 4.614,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-22|Nigeria|Iceland": {
+  "date": "2018-06-22",
+  "home": "Nigeria",
+  "away": "Iceland",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 1.312,
+  "awayXg": 1.552,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-16|Croatia|Nigeria": {
+  "date": "2018-06-16",
+  "home": "Croatia",
+  "away": "Nigeria",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 1.694,
+  "awayXg": 0.762,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-26|Australia|Peru": {
+  "date": "2018-06-26",
+  "home": "Australia",
+  "away": "Peru",
+  "homeScore": 0,
+  "awayScore": 2,
+  "homeXg": 1.629,
+  "awayXg": 0.336,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-28|Senegal|Colombia": {
+  "date": "2018-06-28",
+  "home": "Senegal",
+  "away": "Colombia",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.361,
+  "awayXg": 0.285,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-27|Switzerland|Costa Rica": {
+  "date": "2018-06-27",
+  "home": "Switzerland",
+  "away": "Costa Rica",
+  "homeScore": 2,
+  "awayScore": 2,
+  "homeXg": 1.22,
+  "awayXg": 1.576,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-16|France|Australia": {
+  "date": "2018-06-16",
+  "home": "France",
+  "away": "Australia",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 1.562,
+  "awayXg": 0.98,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-25|Uruguay|Russia": {
+  "date": "2018-06-25",
+  "home": "Uruguay",
+  "away": "Russia",
+  "homeScore": 3,
+  "awayScore": 0,
+  "homeXg": 2.483,
+  "awayXg": 0.18,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-07-02|Brazil|Mexico": {
+  "date": "2018-07-02",
+  "home": "Brazil",
+  "away": "Mexico",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 3.32,
+  "awayXg": 0.583,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-21|Denmark|Australia": {
+  "date": "2018-06-21",
+  "home": "Denmark",
+  "away": "Australia",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 1.014,
+  "awayXg": 1.412,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-17|Costa Rica|Serbia": {
+  "date": "2018-06-17",
+  "home": "Costa Rica",
+  "away": "Serbia",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.596,
+  "awayXg": 1.993,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-07-06|Uruguay|France": {
+  "date": "2018-07-06",
+  "home": "Uruguay",
+  "away": "France",
+  "homeScore": 0,
+  "awayScore": 2,
+  "homeXg": 0.693,
+  "awayXg": 0.539,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-07-15|France|Croatia": {
+  "date": "2018-07-15",
+  "home": "France",
+  "away": "Croatia",
+  "homeScore": 4,
+  "awayScore": 2,
+  "homeXg": 1.098,
+  "awayXg": 1.48,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-07-01|Spain|Russia": {
+  "date": "2018-07-01",
+  "home": "Spain",
+  "away": "Russia",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 5.359,
+  "awayXg": 4.54,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-23|Belgium|Tunisia": {
+  "date": "2018-06-23",
+  "home": "Belgium",
+  "away": "Tunisia",
+  "homeScore": 5,
+  "awayScore": 2,
+  "homeXg": 5.336,
+  "awayXg": 1.188,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-16|Peru|Denmark": {
+  "date": "2018-06-16",
+  "home": "Peru",
+  "away": "Denmark",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 1.926,
+  "awayXg": 1.122,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-25|Spain|Morocco": {
+  "date": "2018-06-25",
+  "home": "Spain",
+  "away": "Morocco",
+  "homeScore": 2,
+  "awayScore": 2,
+  "homeXg": 2.604,
+  "awayXg": 1.072,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-17|Brazil|Switzerland": {
+  "date": "2018-06-17",
+  "home": "Brazil",
+  "away": "Switzerland",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 1.867,
+  "awayXg": 0.472,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-26|Nigeria|Argentina": {
+  "date": "2018-06-26",
+  "home": "Nigeria",
+  "away": "Argentina",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 1.305,
+  "awayXg": 0.851,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-30|Uruguay|Portugal": {
+  "date": "2018-06-30",
+  "home": "Uruguay",
+  "away": "Portugal",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 0.476,
+  "awayXg": 0.996,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-15|Morocco|Iran": {
+  "date": "2018-06-15",
+  "home": "Morocco",
+  "away": "Iran",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 1.059,
+  "awayXg": 0.698,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-14|Russia|Saudi Arabia": {
+  "date": "2018-06-14",
+  "home": "Russia",
+  "away": "Saudi Arabia",
+  "homeScore": 5,
+  "awayScore": 0,
+  "homeXg": 1.282,
+  "awayXg": 0.249,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-27|Mexico|Sweden": {
+  "date": "2018-06-27",
+  "home": "Mexico",
+  "away": "Sweden",
+  "homeScore": 0,
+  "awayScore": 3,
+  "homeXg": 1.611,
+  "awayXg": 2.79,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-07-07|Sweden|England": {
+  "date": "2018-07-07",
+  "home": "Sweden",
+  "away": "England",
+  "homeScore": 0,
+  "awayScore": 2,
+  "homeXg": 0.834,
+  "awayXg": 0.758,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-27|South Korea|Germany": {
+  "date": "2018-06-27",
+  "home": "South Korea",
+  "away": "Germany",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 1.775,
+  "awayXg": 2.706,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-19|Colombia|Japan": {
+  "date": "2018-06-19",
+  "home": "Colombia",
+  "away": "Japan",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 0.806,
+  "awayXg": 2.321,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-07-10|France|Belgium": {
+  "date": "2018-07-10",
+  "home": "France",
+  "away": "Belgium",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 1.682,
+  "awayXg": 0.567,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-07-14|Belgium|England": {
+  "date": "2018-07-14",
+  "home": "Belgium",
+  "away": "England",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 1.321,
+  "awayXg": 1.335,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-07-07|Russia|Croatia": {
+  "date": "2018-07-07",
+  "home": "Russia",
+  "away": "Croatia",
+  "homeScore": 2,
+  "awayScore": 2,
+  "homeXg": 4.988,
+  "awayXg": 5.568,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-26|Denmark|France": {
+  "date": "2018-06-26",
+  "home": "Denmark",
+  "away": "France",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.139,
+  "awayXg": 0.418,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-24|Japan|Senegal": {
+  "date": "2018-06-24",
+  "home": "Japan",
+  "away": "Senegal",
+  "homeScore": 2,
+  "awayScore": 2,
+  "homeXg": 0.982,
+  "awayXg": 1.878,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2018-06-25|Saudi Arabia|Egypt": {
+  "date": "2018-06-25",
+  "home": "Saudi Arabia",
+  "away": "Egypt",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 2.546,
+  "awayXg": 0.924,
+  "tournament": "FIFA World Cup 2018"
+ },
+ "2024-06-18|Portugal|Czech Republic": {
+  "date": "2024-06-18",
+  "home": "Portugal",
+  "away": "Czech Republic",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 1.838,
+  "awayXg": 0.315,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-15|Hungary|Switzerland": {
+  "date": "2024-06-15",
+  "home": "Hungary",
+  "away": "Switzerland",
+  "homeScore": 1,
+  "awayScore": 3,
+  "homeXg": 1.103,
+  "awayXg": 2.096,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-16|Serbia|England": {
+  "date": "2024-06-16",
+  "home": "Serbia",
+  "away": "England",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.249,
+  "awayXg": 0.559,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-25|England|Slovenia": {
+  "date": "2024-06-25",
+  "home": "England",
+  "away": "Slovenia",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.756,
+  "awayXg": 0.165,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-24|Croatia|Italy": {
+  "date": "2024-06-24",
+  "home": "Croatia",
+  "away": "Italy",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 1.483,
+  "awayXg": 0.985,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-15|Spain|Croatia": {
+  "date": "2024-06-15",
+  "home": "Spain",
+  "away": "Croatia",
+  "homeScore": 3,
+  "awayScore": 0,
+  "homeXg": 1.567,
+  "awayXg": 2.482,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-20|Slovenia|Serbia": {
+  "date": "2024-06-20",
+  "home": "Slovenia",
+  "away": "Serbia",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 1.552,
+  "awayXg": 1.461,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-25|France|Poland": {
+  "date": "2024-06-25",
+  "home": "France",
+  "away": "Poland",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 1.891,
+  "awayXg": 1.179,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-21|Poland|Austria": {
+  "date": "2024-06-21",
+  "home": "Poland",
+  "away": "Austria",
+  "homeScore": 1,
+  "awayScore": 3,
+  "homeXg": 1.438,
+  "awayXg": 1.822,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-22|Georgia|Czech Republic": {
+  "date": "2024-06-22",
+  "home": "Georgia",
+  "away": "Czech Republic",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 1.18,
+  "awayXg": 2.865,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-18|Turkey|Georgia": {
+  "date": "2024-06-18",
+  "home": "Turkey",
+  "away": "Georgia",
+  "homeScore": 3,
+  "awayScore": 1,
+  "homeXg": 2.403,
+  "awayXg": 1.579,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-17|Romania|Ukraine": {
+  "date": "2024-06-17",
+  "home": "Romania",
+  "away": "Ukraine",
+  "homeScore": 3,
+  "awayScore": 0,
+  "homeXg": 1.121,
+  "awayXg": 0.543,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-21|Slovakia|Ukraine": {
+  "date": "2024-06-21",
+  "home": "Slovakia",
+  "away": "Ukraine",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 0.746,
+  "awayXg": 1.732,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-16|Poland|Netherlands": {
+  "date": "2024-06-16",
+  "home": "Poland",
+  "away": "Netherlands",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 0.909,
+  "awayXg": 1.313,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-26|Georgia|Portugal": {
+  "date": "2024-06-26",
+  "home": "Georgia",
+  "away": "Portugal",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 1.345,
+  "awayXg": 2.356,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-07-01|France|Belgium": {
+  "date": "2024-07-01",
+  "home": "France",
+  "away": "Belgium",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 1.262,
+  "awayXg": 0.363,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-07-06|England|Switzerland": {
+  "date": "2024-07-06",
+  "home": "England",
+  "away": "Switzerland",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 4.455,
+  "awayXg": 4.335,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-22|Turkey|Portugal": {
+  "date": "2024-06-22",
+  "home": "Turkey",
+  "away": "Portugal",
+  "homeScore": 0,
+  "awayScore": 3,
+  "homeXg": 0.779,
+  "awayXg": 1.901,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-16|Slovenia|Denmark": {
+  "date": "2024-06-16",
+  "home": "Slovenia",
+  "away": "Denmark",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 0.966,
+  "awayXg": 1.511,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-23|Switzerland|Germany": {
+  "date": "2024-06-23",
+  "home": "Switzerland",
+  "away": "Germany",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 0.28,
+  "awayXg": 1.542,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-19|Scotland|Switzerland": {
+  "date": "2024-06-19",
+  "home": "Scotland",
+  "away": "Switzerland",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 0.772,
+  "awayXg": 0.99,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-07-10|Netherlands|England": {
+  "date": "2024-07-10",
+  "home": "Netherlands",
+  "away": "England",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 0.412,
+  "awayXg": 1.237,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-07-14|Spain|England": {
+  "date": "2024-07-14",
+  "home": "Spain",
+  "away": "England",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 1.792,
+  "awayXg": 0.726,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-07-09|Spain|France": {
+  "date": "2024-07-09",
+  "home": "Spain",
+  "away": "France",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 0.422,
+  "awayXg": 0.851,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-07-06|Netherlands|Turkey": {
+  "date": "2024-07-06",
+  "home": "Netherlands",
+  "away": "Turkey",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 0.719,
+  "awayXg": 1.182,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-07-05|Portugal|France": {
+  "date": "2024-07-05",
+  "home": "Portugal",
+  "away": "France",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 4.543,
+  "awayXg": 4.985,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-25|Netherlands|Austria": {
+  "date": "2024-06-25",
+  "home": "Netherlands",
+  "away": "Austria",
+  "homeScore": 2,
+  "awayScore": 3,
+  "homeXg": 1.51,
+  "awayXg": 1.058,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-20|Denmark|England": {
+  "date": "2024-06-20",
+  "home": "Denmark",
+  "away": "England",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 0.733,
+  "awayXg": 1.173,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-07-05|Spain|Germany": {
+  "date": "2024-07-05",
+  "home": "Spain",
+  "away": "Germany",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 1.534,
+  "awayXg": 1.629,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-26|Ukraine|Belgium": {
+  "date": "2024-06-26",
+  "home": "Ukraine",
+  "away": "Belgium",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.709,
+  "awayXg": 0.634,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-26|Czech Republic|Turkey": {
+  "date": "2024-06-26",
+  "home": "Czech Republic",
+  "away": "Turkey",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 1.41,
+  "awayXg": 1.218,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-07-02|Austria|Turkey": {
+  "date": "2024-07-02",
+  "home": "Austria",
+  "away": "Turkey",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 2.487,
+  "awayXg": 0.883,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-07-02|Romania|Netherlands": {
+  "date": "2024-07-02",
+  "home": "Romania",
+  "away": "Netherlands",
+  "homeScore": 0,
+  "awayScore": 3,
+  "homeXg": 0.268,
+  "awayXg": 2.626,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-07-01|Portugal|Slovenia": {
+  "date": "2024-07-01",
+  "home": "Portugal",
+  "away": "Slovenia",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 4.072,
+  "awayXg": 3.066,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-30|Spain|Georgia": {
+  "date": "2024-06-30",
+  "home": "Spain",
+  "away": "Georgia",
+  "homeScore": 4,
+  "awayScore": 1,
+  "homeXg": 2.765,
+  "awayXg": 0.113,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-30|England|Slovakia": {
+  "date": "2024-06-30",
+  "home": "England",
+  "away": "Slovakia",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 1.587,
+  "awayXg": 1.548,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-25|Denmark|Serbia": {
+  "date": "2024-06-25",
+  "home": "Denmark",
+  "away": "Serbia",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.552,
+  "awayXg": 0.324,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-24|Albania|Spain": {
+  "date": "2024-06-24",
+  "home": "Albania",
+  "away": "Spain",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.503,
+  "awayXg": 0.952,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-29|Germany|Denmark": {
+  "date": "2024-06-29",
+  "home": "Germany",
+  "away": "Denmark",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 2.227,
+  "awayXg": 1.073,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-29|Switzerland|Italy": {
+  "date": "2024-06-29",
+  "home": "Switzerland",
+  "away": "Italy",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 0.782,
+  "awayXg": 0.726,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-23|Scotland|Hungary": {
+  "date": "2024-06-23",
+  "home": "Scotland",
+  "away": "Hungary",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.184,
+  "awayXg": 1.001,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-21|Netherlands|France": {
+  "date": "2024-06-21",
+  "home": "Netherlands",
+  "away": "France",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.738,
+  "awayXg": 1.218,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-20|Spain|Italy": {
+  "date": "2024-06-20",
+  "home": "Spain",
+  "away": "Italy",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 1.534,
+  "awayXg": 0.143,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-19|Croatia|Albania": {
+  "date": "2024-06-19",
+  "home": "Croatia",
+  "away": "Albania",
+  "homeScore": 2,
+  "awayScore": 2,
+  "homeXg": 1.859,
+  "awayXg": 1.326,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-19|Germany|Hungary": {
+  "date": "2024-06-19",
+  "home": "Germany",
+  "away": "Hungary",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 1.484,
+  "awayXg": 1.228,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-17|Austria|France": {
+  "date": "2024-06-17",
+  "home": "Austria",
+  "away": "France",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.748,
+  "awayXg": 1.905,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-17|Belgium|Slovakia": {
+  "date": "2024-06-17",
+  "home": "Belgium",
+  "away": "Slovakia",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 1.75,
+  "awayXg": 0.711,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-15|Italy|Albania": {
+  "date": "2024-06-15",
+  "home": "Italy",
+  "away": "Albania",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 1.45,
+  "awayXg": 0.355,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-26|Slovakia|Romania": {
+  "date": "2024-06-26",
+  "home": "Slovakia",
+  "away": "Romania",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 0.845,
+  "awayXg": 1.122,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-22|Belgium|Romania": {
+  "date": "2024-06-22",
+  "home": "Belgium",
+  "away": "Romania",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 1.646,
+  "awayXg": 1.246,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2024-06-14|Germany|Scotland": {
+  "date": "2024-06-14",
+  "home": "Germany",
+  "away": "Scotland",
+  "homeScore": 5,
+  "awayScore": 1,
+  "homeXg": 1.845,
+  "awayXg": 0.061,
+  "tournament": "UEFA Euro 2024"
+ },
+ "2021-06-17|Ukraine|North Macedonia": {
+  "date": "2021-06-17",
+  "home": "Ukraine",
+  "away": "North Macedonia",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 3.241,
+  "awayXg": 1.985,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-23|Portugal|France": {
+  "date": "2021-06-23",
+  "home": "Portugal",
+  "away": "France",
+  "homeScore": 2,
+  "awayScore": 2,
+  "homeXg": 2.042,
+  "awayXg": 1.507,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-20|Switzerland|Turkey": {
+  "date": "2021-06-20",
+  "home": "Switzerland",
+  "away": "Turkey",
+  "homeScore": 3,
+  "awayScore": 1,
+  "homeXg": 1.984,
+  "awayXg": 1.245,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-18|Sweden|Slovakia": {
+  "date": "2021-06-18",
+  "home": "Sweden",
+  "away": "Slovakia",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 1.584,
+  "awayXg": 0.553,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-18|Croatia|Czech Republic": {
+  "date": "2021-06-18",
+  "home": "Croatia",
+  "away": "Czech Republic",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 0.99,
+  "awayXg": 1.913,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-07-02|Switzerland|Spain": {
+  "date": "2021-07-02",
+  "home": "Switzerland",
+  "away": "Spain",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 3.958,
+  "awayXg": 6.928,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-27|Belgium|Portugal": {
+  "date": "2021-06-27",
+  "home": "Belgium",
+  "away": "Portugal",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 0.224,
+  "awayXg": 1.215,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-27|Netherlands|Czech Republic": {
+  "date": "2021-06-27",
+  "home": "Netherlands",
+  "away": "Czech Republic",
+  "homeScore": 0,
+  "awayScore": 2,
+  "homeXg": 0.838,
+  "awayXg": 1.273,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-26|Italy|Austria": {
+  "date": "2021-06-26",
+  "home": "Italy",
+  "away": "Austria",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 1.517,
+  "awayXg": 1.039,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-29|Sweden|Ukraine": {
+  "date": "2021-06-29",
+  "home": "Sweden",
+  "away": "Ukraine",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 0.912,
+  "awayXg": 1.344,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-26|Wales|Denmark": {
+  "date": "2021-06-26",
+  "home": "Wales",
+  "away": "Denmark",
+  "homeScore": 0,
+  "awayScore": 4,
+  "homeXg": 0.598,
+  "awayXg": 2.155,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-07-02|Belgium|Italy": {
+  "date": "2021-07-02",
+  "home": "Belgium",
+  "away": "Italy",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 1.803,
+  "awayXg": 1.143,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-07-03|Ukraine|England": {
+  "date": "2021-07-03",
+  "home": "Ukraine",
+  "away": "England",
+  "homeScore": 0,
+  "awayScore": 4,
+  "homeXg": 0.338,
+  "awayXg": 1.216,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-07-06|Italy|Spain": {
+  "date": "2021-07-06",
+  "home": "Italy",
+  "away": "Spain",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 4.316,
+  "awayXg": 4.536,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-28|Croatia|Spain": {
+  "date": "2021-06-28",
+  "home": "Croatia",
+  "away": "Spain",
+  "homeScore": 3,
+  "awayScore": 5,
+  "homeXg": 2.788,
+  "awayXg": 2.78,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-19|Hungary|France": {
+  "date": "2021-06-19",
+  "home": "Hungary",
+  "away": "France",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 0.473,
+  "awayXg": 1.69,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-07-11|Italy|England": {
+  "date": "2021-07-11",
+  "home": "Italy",
+  "away": "England",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 5.999,
+  "awayXg": 4.344,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-21|Russia|Denmark": {
+  "date": "2021-06-21",
+  "home": "Russia",
+  "away": "Denmark",
+  "homeScore": 1,
+  "awayScore": 4,
+  "homeXg": 1.091,
+  "awayXg": 2.33,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-20|Italy|Wales": {
+  "date": "2021-06-20",
+  "home": "Italy",
+  "away": "Wales",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 1.669,
+  "awayXg": 0.241,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-19|Portugal|Germany": {
+  "date": "2021-06-19",
+  "home": "Portugal",
+  "away": "Germany",
+  "homeScore": 2,
+  "awayScore": 4,
+  "homeXg": 1.936,
+  "awayXg": 2.131,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-16|Turkey|Wales": {
+  "date": "2021-06-16",
+  "home": "Turkey",
+  "away": "Wales",
+  "homeScore": 0,
+  "awayScore": 2,
+  "homeXg": 1.31,
+  "awayXg": 2.874,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-16|Italy|Switzerland": {
+  "date": "2021-06-16",
+  "home": "Italy",
+  "away": "Switzerland",
+  "homeScore": 3,
+  "awayScore": 0,
+  "homeXg": 1.706,
+  "awayXg": 0.334,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-19|Spain|Poland": {
+  "date": "2021-06-19",
+  "home": "Spain",
+  "away": "Poland",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 2.615,
+  "awayXg": 0.552,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-13|Austria|North Macedonia": {
+  "date": "2021-06-13",
+  "home": "Austria",
+  "away": "North Macedonia",
+  "homeScore": 3,
+  "awayScore": 1,
+  "homeXg": 1.441,
+  "awayXg": 0.84,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-11|Turkey|Italy": {
+  "date": "2021-06-11",
+  "home": "Turkey",
+  "away": "Italy",
+  "homeScore": 0,
+  "awayScore": 3,
+  "homeXg": 0.151,
+  "awayXg": 1.591,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-07-03|Czech Republic|Denmark": {
+  "date": "2021-07-03",
+  "home": "Czech Republic",
+  "away": "Denmark",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 1.162,
+  "awayXg": 1.212,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-21|North Macedonia|Netherlands": {
+  "date": "2021-06-21",
+  "home": "North Macedonia",
+  "away": "Netherlands",
+  "homeScore": 0,
+  "awayScore": 3,
+  "homeXg": 0.744,
+  "awayXg": 3.22,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-29|England|Germany": {
+  "date": "2021-06-29",
+  "home": "England",
+  "away": "Germany",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 1.164,
+  "awayXg": 1.059,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-23|Germany|Hungary": {
+  "date": "2021-06-23",
+  "home": "Germany",
+  "away": "Hungary",
+  "homeScore": 2,
+  "awayScore": 2,
+  "homeXg": 2.098,
+  "awayXg": 0.737,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-22|Croatia|Scotland": {
+  "date": "2021-06-22",
+  "home": "Croatia",
+  "away": "Scotland",
+  "homeScore": 3,
+  "awayScore": 1,
+  "homeXg": 0.781,
+  "awayXg": 1.111,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-22|Czech Republic|England": {
+  "date": "2021-06-22",
+  "home": "Czech Republic",
+  "away": "England",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.393,
+  "awayXg": 0.642,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-21|Finland|Belgium": {
+  "date": "2021-06-21",
+  "home": "Finland",
+  "away": "Belgium",
+  "homeScore": 0,
+  "awayScore": 2,
+  "homeXg": 0.24,
+  "awayXg": 1.14,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-21|Ukraine|Austria": {
+  "date": "2021-06-21",
+  "home": "Ukraine",
+  "away": "Austria",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.41,
+  "awayXg": 1.494,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-16|Finland|Russia": {
+  "date": "2021-06-16",
+  "home": "Finland",
+  "away": "Russia",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.965,
+  "awayXg": 1.259,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-18|England|Scotland": {
+  "date": "2021-06-18",
+  "home": "England",
+  "away": "Scotland",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.854,
+  "awayXg": 0.735,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-17|Denmark|Belgium": {
+  "date": "2021-06-17",
+  "home": "Denmark",
+  "away": "Belgium",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 1.623,
+  "awayXg": 1.052,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-13|England|Croatia": {
+  "date": "2021-06-13",
+  "home": "England",
+  "away": "Croatia",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 0.707,
+  "awayXg": 0.34,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-07-07|England|Denmark": {
+  "date": "2021-07-07",
+  "home": "England",
+  "away": "Denmark",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 3.05,
+  "awayXg": 0.376,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-13|Netherlands|Ukraine": {
+  "date": "2021-06-13",
+  "home": "Netherlands",
+  "away": "Ukraine",
+  "homeScore": 3,
+  "awayScore": 2,
+  "homeXg": 1.43,
+  "awayXg": 0.594,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-28|France|Switzerland": {
+  "date": "2021-06-28",
+  "home": "France",
+  "away": "Switzerland",
+  "homeScore": 3,
+  "awayScore": 3,
+  "homeXg": 6.563,
+  "awayXg": 5.772,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-17|Netherlands|Austria": {
+  "date": "2021-06-17",
+  "home": "Netherlands",
+  "away": "Austria",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 3.338,
+  "awayXg": 0.398,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-14|Poland|Slovakia": {
+  "date": "2021-06-14",
+  "home": "Poland",
+  "away": "Slovakia",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 1.389,
+  "awayXg": 0.354,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-14|Spain|Sweden": {
+  "date": "2021-06-14",
+  "home": "Spain",
+  "away": "Sweden",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 1.928,
+  "awayXg": 0.816,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-14|Scotland|Czech Republic": {
+  "date": "2021-06-14",
+  "home": "Scotland",
+  "away": "Czech Republic",
+  "homeScore": 0,
+  "awayScore": 2,
+  "homeXg": 1.733,
+  "awayXg": 0.811,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-15|France|Germany": {
+  "date": "2021-06-15",
+  "home": "France",
+  "away": "Germany",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 0.446,
+  "awayXg": 0.825,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-15|Hungary|Portugal": {
+  "date": "2021-06-15",
+  "home": "Hungary",
+  "away": "Portugal",
+  "homeScore": 0,
+  "awayScore": 3,
+  "homeXg": 0.198,
+  "awayXg": 2.681,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-12|Denmark|Finland": {
+  "date": "2021-06-12",
+  "home": "Denmark",
+  "away": "Finland",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 1.953,
+  "awayXg": 0.288,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-23|Slovakia|Spain": {
+  "date": "2021-06-23",
+  "home": "Slovakia",
+  "away": "Spain",
+  "homeScore": 0,
+  "awayScore": 5,
+  "homeXg": 0.093,
+  "awayXg": 3.223,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-23|Sweden|Poland": {
+  "date": "2021-06-23",
+  "home": "Sweden",
+  "away": "Poland",
+  "homeScore": 3,
+  "awayScore": 2,
+  "homeXg": 1.042,
+  "awayXg": 1.661,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-12|Belgium|Russia": {
+  "date": "2021-06-12",
+  "home": "Belgium",
+  "away": "Russia",
+  "homeScore": 3,
+  "awayScore": 0,
+  "homeXg": 1.393,
+  "awayXg": 0.257,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2021-06-12|Wales|Switzerland": {
+  "date": "2021-06-12",
+  "home": "Wales",
+  "away": "Switzerland",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 0.576,
+  "awayXg": 1.56,
+  "tournament": "UEFA Euro 2020"
+ },
+ "2024-07-03|Brazil|Colombia": {
+  "date": "2024-07-03",
+  "home": "Brazil",
+  "away": "Colombia",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 0.306,
+  "awayXg": 1.503,
+  "tournament": "Copa America 2024"
+ },
+ "2024-07-01|Jamaica|Venezuela": {
+  "date": "2024-07-01",
+  "home": "Jamaica",
+  "away": "Venezuela",
+  "homeScore": 0,
+  "awayScore": 3,
+  "homeXg": 0.668,
+  "awayXg": 1.714,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-28|Uruguay|Bolivia": {
+  "date": "2024-06-28",
+  "home": "Uruguay",
+  "away": "Bolivia",
+  "homeScore": 5,
+  "awayScore": 0,
+  "homeXg": 2.321,
+  "awayXg": 0.051,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-22|Peru|Chile": {
+  "date": "2024-06-22",
+  "home": "Peru",
+  "away": "Chile",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.677,
+  "awayXg": 1.025,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-26|Ecuador|Jamaica": {
+  "date": "2024-06-26",
+  "home": "Ecuador",
+  "away": "Jamaica",
+  "homeScore": 3,
+  "awayScore": 1,
+  "homeXg": 2.366,
+  "awayXg": 0.935,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-26|Chile|Argentina": {
+  "date": "2024-06-26",
+  "home": "Chile",
+  "away": "Argentina",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.131,
+  "awayXg": 2.784,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-24|Colombia|Paraguay": {
+  "date": "2024-06-24",
+  "home": "Colombia",
+  "away": "Paraguay",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 0.622,
+  "awayXg": 0.828,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-23|United States|Bolivia": {
+  "date": "2024-06-23",
+  "home": "United States",
+  "away": "Bolivia",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 2.405,
+  "awayXg": 0.15,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-30|Argentina|Peru": {
+  "date": "2024-06-30",
+  "home": "Argentina",
+  "away": "Peru",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 2.106,
+  "awayXg": 0.167,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-23|Mexico|Jamaica": {
+  "date": "2024-06-23",
+  "home": "Mexico",
+  "away": "Jamaica",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 1.136,
+  "awayXg": 0.506,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-27|Venezuela|Mexico": {
+  "date": "2024-06-27",
+  "home": "Venezuela",
+  "away": "Mexico",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 1.139,
+  "awayXg": 2.384,
+  "tournament": "Copa America 2024"
+ },
+ "2024-07-01|Mexico|Ecuador": {
+  "date": "2024-07-01",
+  "home": "Mexico",
+  "away": "Ecuador",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.938,
+  "awayXg": 0.306,
+  "tournament": "Copa America 2024"
+ },
+ "2024-07-02|United States|Uruguay": {
+  "date": "2024-07-02",
+  "home": "United States",
+  "away": "Uruguay",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.471,
+  "awayXg": 1.272,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-29|Paraguay|Brazil": {
+  "date": "2024-06-29",
+  "home": "Paraguay",
+  "away": "Brazil",
+  "homeScore": 1,
+  "awayScore": 4,
+  "homeXg": 0.692,
+  "awayXg": 3.748,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-22|Ecuador|Venezuela": {
+  "date": "2024-06-22",
+  "home": "Ecuador",
+  "away": "Venezuela",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 0.736,
+  "awayXg": 1.585,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-25|Peru|Canada": {
+  "date": "2024-06-25",
+  "home": "Peru",
+  "away": "Canada",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.576,
+  "awayXg": 0.909,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-25|Brazil|Costa Rica": {
+  "date": "2024-06-25",
+  "home": "Brazil",
+  "away": "Costa Rica",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 1.621,
+  "awayXg": 0.037,
+  "tournament": "Copa America 2024"
+ },
+ "2024-07-03|Costa Rica|Paraguay": {
+  "date": "2024-07-03",
+  "home": "Costa Rica",
+  "away": "Paraguay",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 0.272,
+  "awayXg": 1.44,
+  "tournament": "Copa America 2024"
+ },
+ "2024-07-06|Colombia|Panama": {
+  "date": "2024-07-06",
+  "home": "Colombia",
+  "away": "Panama",
+  "homeScore": 5,
+  "awayScore": 0,
+  "homeXg": 2.18,
+  "awayXg": 0.61,
+  "tournament": "Copa America 2024"
+ },
+ "2024-07-15|Argentina|Colombia": {
+  "date": "2024-07-15",
+  "home": "Argentina",
+  "away": "Colombia",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 1.083,
+  "awayXg": 0.972,
+  "tournament": "Copa America 2024"
+ },
+ "2024-07-14|Canada|Uruguay": {
+  "date": "2024-07-14",
+  "home": "Canada",
+  "away": "Uruguay",
+  "homeScore": 2,
+  "awayScore": 2,
+  "homeXg": 6.205,
+  "awayXg": 4.65,
+  "tournament": "Copa America 2024"
+ },
+ "2024-07-11|Uruguay|Colombia": {
+  "date": "2024-07-11",
+  "home": "Uruguay",
+  "away": "Colombia",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.755,
+  "awayXg": 1.172,
+  "tournament": "Copa America 2024"
+ },
+ "2024-07-10|Argentina|Canada": {
+  "date": "2024-07-10",
+  "home": "Argentina",
+  "away": "Canada",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 1.754,
+  "awayXg": 0.718,
+  "tournament": "Copa America 2024"
+ },
+ "2024-07-07|Uruguay|Brazil": {
+  "date": "2024-07-07",
+  "home": "Uruguay",
+  "away": "Brazil",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 4.547,
+  "awayXg": 3.81,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-24|Uruguay|Panama": {
+  "date": "2024-06-24",
+  "home": "Uruguay",
+  "away": "Panama",
+  "homeScore": 3,
+  "awayScore": 1,
+  "homeXg": 1.361,
+  "awayXg": 0.541,
+  "tournament": "Copa America 2024"
+ },
+ "2024-07-06|Venezuela|Canada": {
+  "date": "2024-07-06",
+  "home": "Venezuela",
+  "away": "Canada",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 5.623,
+  "awayXg": 6.052,
+  "tournament": "Copa America 2024"
+ },
+ "2024-07-05|Argentina|Ecuador": {
+  "date": "2024-07-05",
+  "home": "Argentina",
+  "away": "Ecuador",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 4.776,
+  "awayXg": 4.523,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-30|Canada|Chile": {
+  "date": "2024-06-30",
+  "home": "Canada",
+  "away": "Chile",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.699,
+  "awayXg": 0.454,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-28|Colombia|Costa Rica": {
+  "date": "2024-06-28",
+  "home": "Colombia",
+  "away": "Costa Rica",
+  "homeScore": 3,
+  "awayScore": 0,
+  "homeXg": 2.902,
+  "awayXg": 0.165,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-27|Panama|United States": {
+  "date": "2024-06-27",
+  "home": "Panama",
+  "away": "United States",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 0.731,
+  "awayXg": 0.914,
+  "tournament": "Copa America 2024"
+ },
+ "2024-07-02|Bolivia|Panama": {
+  "date": "2024-07-02",
+  "home": "Bolivia",
+  "away": "Panama",
+  "homeScore": 1,
+  "awayScore": 3,
+  "homeXg": 0.793,
+  "awayXg": 1.341,
+  "tournament": "Copa America 2024"
+ },
+ "2024-06-21|Argentina|Canada": {
+  "date": "2024-06-21",
+  "home": "Argentina",
+  "away": "Canada",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 3.538,
+  "awayXg": 0.977,
+  "tournament": "Copa America 2024"
+ },
+ "2024-01-28|Egypt|Congo DR": {
+  "date": "2024-01-28",
+  "home": "Egypt",
+  "away": "Congo DR",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 8.424,
+  "awayXg": 8.627,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-19|Cape Verde Islands|Mozambique": {
+  "date": "2024-01-19",
+  "home": "Cape Verde Islands",
+  "away": "Mozambique",
+  "homeScore": 3,
+  "awayScore": 0,
+  "homeXg": 0.599,
+  "awayXg": 0.331,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-23|Gambia|Cameroon": {
+  "date": "2024-01-23",
+  "home": "Gambia",
+  "away": "Cameroon",
+  "homeScore": 2,
+  "awayScore": 3,
+  "homeXg": 1.296,
+  "awayXg": 1.367,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-19|Senegal|Cameroon": {
+  "date": "2024-01-19",
+  "home": "Senegal",
+  "away": "Cameroon",
+  "homeScore": 3,
+  "awayScore": 1,
+  "homeXg": 1.231,
+  "awayXg": 0.249,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-22|Guinea-Bissau|Nigeria": {
+  "date": "2024-01-22",
+  "home": "Guinea-Bissau",
+  "away": "Nigeria",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.351,
+  "awayXg": 0.971,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-24|Namibia|Mali": {
+  "date": "2024-01-24",
+  "home": "Namibia",
+  "away": "Mali",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.656,
+  "awayXg": 0.681,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-17|Congo DR|Zambia": {
+  "date": "2024-01-17",
+  "home": "Congo DR",
+  "away": "Zambia",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 2.682,
+  "awayXg": 0.096,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-21|South Africa|Namibia": {
+  "date": "2024-01-21",
+  "home": "South Africa",
+  "away": "Namibia",
+  "homeScore": 4,
+  "awayScore": 0,
+  "homeXg": 2.216,
+  "awayXg": 0.569,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-23|Guinea|Senegal": {
+  "date": "2024-01-23",
+  "home": "Guinea",
+  "away": "Senegal",
+  "homeScore": 0,
+  "awayScore": 2,
+  "homeXg": 0.553,
+  "awayXg": 0.943,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-23|Mauritania|Algeria": {
+  "date": "2024-01-23",
+  "home": "Mauritania",
+  "away": "Algeria",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 1.328,
+  "awayXg": 1.186,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-20|Tunisia|Mali": {
+  "date": "2024-01-20",
+  "home": "Tunisia",
+  "away": "Mali",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 0.53,
+  "awayXg": 0.846,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-15|Cameroon|Guinea": {
+  "date": "2024-01-15",
+  "home": "Cameroon",
+  "away": "Guinea",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 0.879,
+  "awayXg": 0.71,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-16|Tunisia|Namibia": {
+  "date": "2024-01-16",
+  "home": "Tunisia",
+  "away": "Namibia",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.871,
+  "awayXg": 1.61,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-20|Mauritania|Angola": {
+  "date": "2024-01-20",
+  "home": "Mauritania",
+  "away": "Angola",
+  "homeScore": 2,
+  "awayScore": 3,
+  "homeXg": 1.111,
+  "awayXg": 2.044,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-17|Morocco|Tanzania": {
+  "date": "2024-01-17",
+  "home": "Morocco",
+  "away": "Tanzania",
+  "homeScore": 3,
+  "awayScore": 0,
+  "homeXg": 2.3,
+  "awayXg": 0.012,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-20|Algeria|Burkina Faso": {
+  "date": "2024-01-20",
+  "home": "Algeria",
+  "away": "Burkina Faso",
+  "homeScore": 2,
+  "awayScore": 2,
+  "homeXg": 1.998,
+  "awayXg": 1.259,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-23|Angola|Burkina Faso": {
+  "date": "2024-01-23",
+  "home": "Angola",
+  "away": "Burkina Faso",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 0.884,
+  "awayXg": 0.995,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-21|Morocco|Congo DR": {
+  "date": "2024-01-21",
+  "home": "Morocco",
+  "away": "Congo DR",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 1.055,
+  "awayXg": 2.31,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-24|South Africa|Tunisia": {
+  "date": "2024-01-24",
+  "home": "South Africa",
+  "away": "Tunisia",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.52,
+  "awayXg": 1.018,
+  "tournament": "AFCON 2023"
+ },
+ "2024-02-03|Cape Verde Islands|South Africa": {
+  "date": "2024-02-03",
+  "home": "Cape Verde Islands",
+  "away": "South Africa",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 5.427,
+  "awayXg": 4.231,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-14|Nigeria|Equatorial Guinea": {
+  "date": "2024-01-14",
+  "home": "Nigeria",
+  "away": "Equatorial Guinea",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 2.687,
+  "awayXg": 0.332,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-22|Equatorial Guinea|C\u00f4te d'Ivoire": {
+  "date": "2024-01-22",
+  "home": "Equatorial Guinea",
+  "away": "C\u00f4te d'Ivoire",
+  "homeScore": 4,
+  "awayScore": 0,
+  "homeXg": 1.093,
+  "awayXg": 2.069,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-18|Equatorial Guinea|Guinea-Bissau": {
+  "date": "2024-01-18",
+  "home": "Equatorial Guinea",
+  "away": "Guinea-Bissau",
+  "homeScore": 4,
+  "awayScore": 2,
+  "homeXg": 1.777,
+  "awayXg": 1.034,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-22|Mozambique|Ghana": {
+  "date": "2024-01-22",
+  "home": "Mozambique",
+  "away": "Ghana",
+  "homeScore": 2,
+  "awayScore": 2,
+  "homeXg": 1.54,
+  "awayXg": 1.843,
+  "tournament": "AFCON 2023"
+ },
+ "2024-02-11|Nigeria|C\u00f4te d'Ivoire": {
+  "date": "2024-02-11",
+  "home": "Nigeria",
+  "away": "C\u00f4te d'Ivoire",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 0.258,
+  "awayXg": 1.414,
+  "tournament": "AFCON 2023"
+ },
+ "2024-02-10|South Africa|Congo DR": {
+  "date": "2024-02-10",
+  "home": "South Africa",
+  "away": "Congo DR",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 5.751,
+  "awayXg": 7.166,
+  "tournament": "AFCON 2023"
+ },
+ "2024-02-07|C\u00f4te d'Ivoire|Congo DR": {
+  "date": "2024-02-07",
+  "home": "C\u00f4te d'Ivoire",
+  "away": "Congo DR",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 0.85,
+  "awayXg": 0.826,
+  "tournament": "AFCON 2023"
+ },
+ "2024-02-07|Nigeria|South Africa": {
+  "date": "2024-02-07",
+  "home": "Nigeria",
+  "away": "South Africa",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 5.409,
+  "awayXg": 4.892,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-29|Senegal|C\u00f4te d'Ivoire": {
+  "date": "2024-01-29",
+  "home": "Senegal",
+  "away": "C\u00f4te d'Ivoire",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 5.235,
+  "awayXg": 5.038,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-28|Equatorial Guinea|Guinea": {
+  "date": "2024-01-28",
+  "home": "Equatorial Guinea",
+  "away": "Guinea",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.956,
+  "awayXg": 0.557,
+  "tournament": "AFCON 2023"
+ },
+ "2024-02-03|Mali|C\u00f4te d'Ivoire": {
+  "date": "2024-02-03",
+  "home": "Mali",
+  "away": "C\u00f4te d'Ivoire",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 1.317,
+  "awayXg": 0.837,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-30|Mali|Burkina Faso": {
+  "date": "2024-01-30",
+  "home": "Mali",
+  "away": "Burkina Faso",
+  "homeScore": 2,
+  "awayScore": 1,
+  "homeXg": 0.666,
+  "awayXg": 1.46,
+  "tournament": "AFCON 2023"
+ },
+ "2024-02-02|Congo DR|Guinea": {
+  "date": "2024-02-02",
+  "home": "Congo DR",
+  "away": "Guinea",
+  "homeScore": 3,
+  "awayScore": 1,
+  "homeXg": 1.653,
+  "awayXg": 1.135,
+  "tournament": "AFCON 2023"
+ },
+ "2024-02-02|Nigeria|Angola": {
+  "date": "2024-02-02",
+  "home": "Nigeria",
+  "away": "Angola",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 1.462,
+  "awayXg": 0.955,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-27|Angola|Namibia": {
+  "date": "2024-01-27",
+  "home": "Angola",
+  "away": "Namibia",
+  "homeScore": 3,
+  "awayScore": 0,
+  "homeXg": 1.585,
+  "awayXg": 0.871,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-30|Morocco|South Africa": {
+  "date": "2024-01-30",
+  "home": "Morocco",
+  "away": "South Africa",
+  "homeScore": 0,
+  "awayScore": 2,
+  "homeXg": 2.09,
+  "awayXg": 0.241,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-29|Cape Verde Islands|Mauritania": {
+  "date": "2024-01-29",
+  "home": "Cape Verde Islands",
+  "away": "Mauritania",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 1.572,
+  "awayXg": 0.777,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-27|Nigeria|Cameroon": {
+  "date": "2024-01-27",
+  "home": "Nigeria",
+  "away": "Cameroon",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 1.31,
+  "awayXg": 0.301,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-18|Egypt|Ghana": {
+  "date": "2024-01-18",
+  "home": "Egypt",
+  "away": "Ghana",
+  "homeScore": 2,
+  "awayScore": 2,
+  "homeXg": 1.204,
+  "awayXg": 0.426,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-14|Egypt|Mozambique": {
+  "date": "2024-01-14",
+  "home": "Egypt",
+  "away": "Mozambique",
+  "homeScore": 2,
+  "awayScore": 2,
+  "homeXg": 1.929,
+  "awayXg": 0.728,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-14|Ghana|Cape Verde Islands": {
+  "date": "2024-01-14",
+  "home": "Ghana",
+  "away": "Cape Verde Islands",
+  "homeScore": 1,
+  "awayScore": 2,
+  "homeXg": 1.438,
+  "awayXg": 2.72,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-24|Zambia|Morocco": {
+  "date": "2024-01-24",
+  "home": "Zambia",
+  "away": "Morocco",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.44,
+  "awayXg": 2.421,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-24|Tanzania|Congo DR": {
+  "date": "2024-01-24",
+  "home": "Tanzania",
+  "away": "Congo DR",
+  "homeScore": 0,
+  "awayScore": 0,
+  "homeXg": 0.059,
+  "awayXg": 0.659,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-22|Cape Verde Islands|Egypt": {
+  "date": "2024-01-22",
+  "home": "Cape Verde Islands",
+  "away": "Egypt",
+  "homeScore": 2,
+  "awayScore": 2,
+  "homeXg": 0.407,
+  "awayXg": 1.764,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-21|Zambia|Tanzania": {
+  "date": "2024-01-21",
+  "home": "Zambia",
+  "away": "Tanzania",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 0.797,
+  "awayXg": 0.39,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-19|Guinea|Gambia": {
+  "date": "2024-01-19",
+  "home": "Guinea",
+  "away": "Gambia",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 2.439,
+  "awayXg": 0.254,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-18|C\u00f4te d'Ivoire|Nigeria": {
+  "date": "2024-01-18",
+  "home": "C\u00f4te d'Ivoire",
+  "away": "Nigeria",
+  "homeScore": 0,
+  "awayScore": 1,
+  "homeXg": 0.607,
+  "awayXg": 1.576,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-16|Burkina Faso|Mauritania": {
+  "date": "2024-01-16",
+  "home": "Burkina Faso",
+  "away": "Mauritania",
+  "homeScore": 1,
+  "awayScore": 0,
+  "homeXg": 1.137,
+  "awayXg": 0.516,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-16|Mali|South Africa": {
+  "date": "2024-01-16",
+  "home": "Mali",
+  "away": "South Africa",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 2.342,
+  "awayXg": 1.39,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-15|Algeria|Angola": {
+  "date": "2024-01-15",
+  "home": "Algeria",
+  "away": "Angola",
+  "homeScore": 1,
+  "awayScore": 1,
+  "homeXg": 0.697,
+  "awayXg": 1.197,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-15|Senegal|Gambia": {
+  "date": "2024-01-15",
+  "home": "Senegal",
+  "away": "Gambia",
+  "homeScore": 3,
+  "awayScore": 0,
+  "homeXg": 1.721,
+  "awayXg": 1.008,
+  "tournament": "AFCON 2023"
+ },
+ "2024-01-13|C\u00f4te d'Ivoire|Guinea-Bissau": {
+  "date": "2024-01-13",
+  "home": "C\u00f4te d'Ivoire",
+  "away": "Guinea-Bissau",
+  "homeScore": 2,
+  "awayScore": 0,
+  "homeXg": 0.707,
+  "awayXg": 0.53,
+  "tournament": "AFCON 2023"
+ }
+}

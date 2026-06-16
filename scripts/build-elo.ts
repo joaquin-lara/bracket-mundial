@@ -17,6 +17,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import path from 'path';
 import https from 'https';
+import { strengthAsOf, squadDataAvailable } from './squad-strength';
 
 const ROOT = process.cwd();
 const CSV_PATH = path.join(ROOT, 'data', 'results.csv');
@@ -154,6 +155,12 @@ function main() {
   let sumTotalGoals = 0;
   let sumHomeMargin = 0;
   let nonNeutral = 0;
+  // Squad talent-pool fit (only when FIFA data is on disk). A robust, rolling
+  // validated complementary signal: blended at SQUAD_WEIGHT on covered matches.
+  const hasSquad = squadDataAvailable();
+  const SQUAD_WEIGHT = 0.3;
+  let sumDiffXStr = 0; // sum(strengthGap * goalDiff)
+  let sumStrSq = 0; // sum(strengthGap^2)
 
   // --- Dixon-Coles online model (the live predictor's goal model) ------------
   // Each team carries a log-scale attack and defense rating; goal means are
@@ -200,6 +207,15 @@ function main() {
       sumHomeMargin += goalDiff;
       nonNeutral++;
     }
+    if (hasSquad) {
+      const hStr = strengthAsOf(r.home, r.date);
+      const aStr = strengthAsOf(r.away, r.date);
+      if (hStr != null && aStr != null) {
+        const strGap = hStr - aStr;
+        sumDiffXStr += strGap * goalDiff;
+        sumStrSq += strGap * strGap;
+      }
+    }
 
     // Dixon-Coles online step (predict-then-update, same as the backtest).
     const lh = Math.exp(dcBase + (r.neutral ? 0 : dcHome) + aOf(r.home) - dOf(r.away));
@@ -228,6 +244,8 @@ function main() {
   const goalsPerElo = sumDiffXElo / sumEloSq; // goals of supremacy per Elo point
   const avgTotalGoals = sumTotalGoals / rows.length;
   const homeMarginGoals = sumHomeMargin / nonNeutral;
+  const goalsPerStr = hasSquad && sumStrSq > 0 ? sumDiffXStr / sumStrSq : null;
+  const latestDate = rows[rows.length - 1].date; // for current squad strength
 
   // Global ranking across every team that has played >= 30 matches.
   const ranked = [...teams.entries()]
@@ -254,6 +272,10 @@ function main() {
         home: round(dcHome, 6),
         rho: DC_RHO,
       },
+      // Squad talent-pool model, blended on covered matches (rolling-validated).
+      ...(goalsPerStr != null
+        ? { squad: { goalsPerStr: round(goalsPerStr, 6), weight: SQUAD_WEIGHT } }
+        : {}),
     },
     totalRankedTeams: totalRanked,
     teams: {} as Record<string, unknown>,
@@ -282,6 +304,7 @@ function main() {
       // in log-goal space, learned over the full history. The live goal model.
       dcAtt: round(dcAtt.get(name) ?? 0, 4),
       dcDef: round(dcDef.get(name) ?? 0, 4),
+      squad: hasSquad ? (() => { const s = strengthAsOf(name, latestDate); return s == null ? null : round(s, 2); })() : null,
       form: {
         played: last10.length,
         won: w, drawn: d, lost: l,
