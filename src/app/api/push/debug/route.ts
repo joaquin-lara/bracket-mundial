@@ -55,6 +55,8 @@ export async function GET() {
     vapidSubject: process.env.VAPID_SUBJECT || '(default)',
     serviceRole: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
     supabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+    cronSecret: !!process.env.CRON_SECRET,
+    pushAdminSecret: !!process.env.PUSH_ADMIN_SECRET,
   };
 
   const supabase = createClient();
