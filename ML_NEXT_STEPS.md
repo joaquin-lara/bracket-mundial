@@ -256,6 +256,28 @@ goal, xG-based lambdas are the most promising lever (next). Next step (deliberat
 DC+Elo blend into `src/lib/ml/model.ts` (it already has both Elo and DC ratings in
 ratings.json), optionally add the altitude term, and update the predictor explainer.
 
+## xG: available for internationals but too sparse to help (2026-06-16)
+
+**Where international xG lives:** StatsBomb Open Data (free, GitHub, sandbox-reachable
+— unlike fbref, which has NO xG for international comps; confirmed by inspecting the
+Euro 2024 fixtures table). `scripts/pull-statsbomb-xg.py` aggregates shot xG per team
+for the six men's tournaments it covers → `xg/statsbomb_xg.json` (**314 matches**:
+World Cup 2018/2022, Euro 2020/2024, Copa 2024, AFCON 2023).
+
+**Does training on xG beat training on goals?** No (`scripts/xg-experiment.ts`).
+Update target = (1-α)·goals + α·xG for the xG matches; scored on competitive test
+(2018+): α=0 (shipped) RPS 0.1647, α=0.25 identical, α≥0.5 slightly worse. Only 290
+of ~49k rating updates have xG (<1%), so it can't move the ratings. Broader xG
+(qualifiers/friendlies) only exists behind bot-protected APIs (FotMob/SofaScore);
+this null result makes that lift low-priority.
+
+**The valuable finding — the luck ceiling.** In the 314 xG matches the side with more
+xG won only **53%** (drew 28%, lost 20%): **47% of the time the "deserved" winner did
+not win.** Nearly half of single-match football is noise the scoreline records but no
+model can foresee. This explains why squad / lineups / rest / travel / xG all failed:
+DC is already near the achievable ceiling, and there isn't much predictable signal
+left to add.
+
 ## Data (gitignored under `/data/`, must be re-fetched per session)
 
 ```bash
