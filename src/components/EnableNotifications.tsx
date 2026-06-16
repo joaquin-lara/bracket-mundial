@@ -29,30 +29,43 @@ export default function EnableNotifications() {
   useEffect(() => {
     if (!VAPID) return; // feature not configured
     if (typeof window === 'undefined') return;
-    if (localStorage.getItem('pushCtaDismissed') === '1') return;
 
+    const dismissed = localStorage.getItem('pushCtaDismissed') === '1';
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
     const standalone =
       window.matchMedia('(display-mode: standalone)').matches ||
       (navigator as unknown as { standalone?: boolean }).standalone === true;
     const supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
 
+    if (supported && Notification.permission === 'granted') {
+      // Already granted: make sure the SERVER actually has this subscription.
+      // An earlier save may have failed (e.g. before the DB table existed), and
+      // the app would otherwise never retry. Re-save on every load (idempotent).
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+      navigator.serviceWorker.ready
+        .then((reg) => reg.pushManager.getSubscription())
+        .then((sub) => {
+          if (sub) {
+            fetch('/api/push/subscribe', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(sub),
+            }).catch(() => {});
+            setState('hidden');
+          } else if (!dismissed) {
+            setState('prompt');
+          }
+        });
+      return;
+    }
+
+    if (dismissed) return; // remaining states are just the prompt pill
     if (isIOS && !standalone) {
       setState('iosInstall');
       return;
     }
     if (!supported) return;
-
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-    if (Notification.permission === 'granted') {
-      navigator.serviceWorker.ready
-        .then((reg) => reg.pushManager.getSubscription())
-        .then((sub) => setState(sub ? 'hidden' : 'prompt'));
-    } else if (Notification.permission === 'denied') {
-      setState('denied');
-    } else {
-      setState('prompt');
-    }
+    setState(Notification.permission === 'denied' ? 'denied' : 'prompt');
   }, []);
 
   async function enable() {
