@@ -25,6 +25,19 @@ export async function POST(req: NextRequest) {
     if (!duel || duel.challenger !== user.id) {
       return NextResponse.json({ error: 'not your duel' }, { status: 403 });
     }
+    // Rate-limit: at most 2 challenge pushes to this opponent per minute, so they
+    // can't be spammed. Counted from duels created against them in the last 60s
+    // (includes this one), so the 3rd+ within a minute is silently skipped.
+    const since = new Date(Date.now() - 60_000).toISOString();
+    const { count } = await admin
+      .from('duels')
+      .select('*', { count: 'exact', head: true })
+      .eq('opponent', duel.opponent as string)
+      .gte('created_at', since);
+    if ((count ?? 0) > 2) {
+      return NextResponse.json({ ok: true, skipped: 'rate-limited' });
+    }
+
     const { data: prof } = await admin.from('profiles').select('display_name').eq('id', user.id).maybeSingle();
     const name = (prof?.display_name as string) || 'Someone';
 
