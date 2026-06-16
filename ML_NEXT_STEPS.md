@@ -1,5 +1,16 @@
 # ML predictor — handoff notes
 
+> **CORRECTION (2026-06-16): squad strength is NOT dead — it is a real, robust,
+> shippable signal.** The earlier "squad ensemble: settled — DC stays solo" verdict
+> below was WRONG: it tuned the weight on a single unlucky validation window
+> (2015-18) that happened to pick zero. A proper rolling-window check
+> (`scripts/squad-rolling.ts`) shows squad strength, blended at ~0.3 on the
+> FIFA-covered matches, improves prediction in **all six** 2-year windows — and it
+> still adds **on top of the live DC+Elo blend** (Δ +0.0002..+0.0034, positive in
+> every window incl. all clean out-of-sample ones). Recommend wiring it live
+> (all 48 World Cup 2026 teams have FIFA pools, so it applies to every live match).
+> The narrative below is kept for history; read it through this correction.
+
 Working branch: `claude/ml-model-predictor-review-y1xufc`.
 
 ## What exists now
