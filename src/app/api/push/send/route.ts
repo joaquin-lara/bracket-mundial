@@ -21,11 +21,14 @@ export function OPTIONS() {
  * to everyone; with one it sends only to that account's devices.
  */
 export async function POST(req: NextRequest) {
-  const secret = process.env.CRON_SECRET;
+  // Accept either the existing CRON_SECRET or a dedicated PUSH_ADMIN_SECRET
+  // (so you can set a secret you actually know, without touching CRON_SECRET).
+  const secrets = [process.env.CRON_SECRET, process.env.PUSH_ADMIN_SECRET].filter(Boolean) as string[];
   const url = new URL(req.url);
-  const auth = req.headers.get('authorization');
-  const ok = secret && (auth === `Bearer ${secret}` || url.searchParams.get('secret') === secret);
-  if (!ok) return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: CORS });
+  const provided = req.headers.get('authorization')?.replace(/^Bearer\s+/i, '') || url.searchParams.get('secret') || '';
+  if (!provided || !secrets.includes(provided)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: CORS });
+  }
 
   const payload = await req.json().catch(() => null);
   if (!payload?.title || !payload?.body) {
