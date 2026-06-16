@@ -197,7 +197,33 @@ ship candidate.** Baseline DC on this window: RPS 0.1647, log-loss 0.8431.
 
 These improve the *core* model (not a bolt-on signal), so unlike squad/lineups they
 are worth shipping. (Tests 6-7 confirm the data scope is already right: full history
-+ down-weighted friendlies — not overfitting.) Next step (deliberate model change, not yet done): wire the
++ down-weighted friendlies — not overfitting.)
+
+### Rolling-window robustness check — `scripts/rolling-validation.ts`
+
+The above all scored on one 2018+ window; with many ideas tried, a small win could
+be luck specific to that era. So we replayed history once and scored fixed settings
+(blend 0.4, altCoef 0.15, tuned DC) on SIX separate 2-year windows. RPS Δ vs DC
+(positive = helped; * = clean out-of-sample, post-2018-tuning):
+
+| window | blend Δ | tuned Δ | altitude Δ (n) |
+|---|---|---|---|
+| 2014-16 | +0.0008 | +0.0006 | -0.0066 (21) |
+| 2016-18 | +0.0008 | +0.0006 | +0.0025 (31) |
+| 2018-20* | +0.0025 | +0.0005 | +0.0119 (9) |
+| 2020-22* | +0.0015 | +0.0003 | +0.0249 (28) |
+| 2022-24* | +0.0004 | +0.0003 | -0.0011 (20) |
+| 2024-26* | +0.0004 | +0.0003 | +0.0193 (19) |
+
+- **DC+Elo blend: ROBUST.** Positive in all 6 windows incl. all 4 clean ones —
+  direction never flips. Genuine, not an artifact of one era. **Ship candidate.**
+- **DC tuning: consistently positive but tiny** (+0.0003..0.0006). Free marginal bump.
+- **Altitude: NOISY / downgraded to low-confidence.** Only 9-31 altitude games per
+  window; helps big some windows, hurts in 2. Leans positive on aggregate but not
+  reliable on this evidence — do NOT ship until there are more altitude games.
+
+Net: the one thing to wire live is the **DC+Elo blend** (optionally fold in the
+tuned shrink/friendlyWeight). Altitude stays research-only for now. Next step (deliberate model change, not yet done): wire the
 DC+Elo blend into `src/lib/ml/model.ts` (it already has both Elo and DC ratings in
 ratings.json), optionally add the altitude term, and update the predictor explainer.
 
