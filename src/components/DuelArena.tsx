@@ -370,7 +370,15 @@ export default function DuelArena({
 
   async function challenge(opponent: string) {
     const id = await rpc('duel_create', { p_opponent: opponent });
-    if (typeof id === 'string') setActiveId(id);
+    if (typeof id === 'string') {
+      setActiveId(id);
+      // Notify the challenged player on their phone (best-effort, never blocks UI).
+      fetch('/api/push/duel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ duelId: id }),
+      }).catch(() => {});
+    }
   }
 
   const others = profiles.filter((p) => p.id !== me);
