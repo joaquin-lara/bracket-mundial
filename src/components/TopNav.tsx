@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import TransitionLink from './TransitionLink';
+import { signOut } from '@/app/actions';
 
 const BASE_LINKS: readonly (readonly [string, string])[] = [
   ['/rules', 'Rules'],
@@ -102,6 +103,9 @@ export default function TopNav({ achievementsRevealed = false }: { achievementsR
             {label}
           </TransitionLink>
         ))}
+        <form action={signOut}>
+          <button type="submit">Sign out</button>
+        </form>
       </nav>
 
       <span className="burger-spacer" />
@@ -127,6 +131,9 @@ export default function TopNav({ achievementsRevealed = false }: { achievementsR
           {label}
         </TransitionLink>
       ))}
+      <form action={signOut}>
+        <button type="submit">Sign out</button>
+      </form>
     </div>
     </>
   );
