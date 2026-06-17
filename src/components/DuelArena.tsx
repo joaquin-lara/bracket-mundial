@@ -124,6 +124,7 @@ export default function DuelArena({
   const [animating, setAnimating] = useState(false);
 
   const ballRef = useRef<SVGGElement>(null);
+  const ballYRef = useRef<SVGGElement>(null);
   const ballImgRef = useRef<SVGGElement>(null);
   const keeperRef = useRef<SVGGElement>(null);
   const strikerRef = useRef<SVGGElement>(null);
@@ -308,6 +309,7 @@ export default function DuelArena({
     const goal = round.goal;
     const decisive = duel.status === 'finished';
     const ballImg = ballImgRef.current;
+    const ballY = ballYRef.current; // vertical axis (kept separate so x/y never fight)
     const scene = sceneRef.current;
     const q = (sel: string) => striker.querySelector<SVGElement>(sel);
     const legL = q('.s-leg-l'), legR = q('.s-leg-r'), armL = q('.s-arm-l'), armR = q('.s-arm-r');
@@ -333,8 +335,9 @@ export default function DuelArena({
     const reset = () => {
       gsap.set(striker, { x: 0, rotation: 0 });
       gsap.set(limbs, { rotation: 0 });
-      gsap.set(ball, { x: 0, y: 0, scale: 1 });
-      gsap.set(ballImg, { rotation: 0 });
+      gsap.set(ball, { x: 0 });
+      gsap.set(ballY, { y: 0 });
+      gsap.set(ballImg, { rotation: 0, scale: 1 });
       gsap.set(keeper, { x: 0, y: 0, rotation: 0, scaleY: 1 });
       gsap.set([kArmL, kArmR], { rotation: 0 });
       gsap.set(trail, { opacity: 0 });
@@ -344,8 +347,9 @@ export default function DuelArena({
     // reveal shows the kicker, not a popped/recolored frame.
     gsap.set(striker, { x: -34, rotation: 0 });
     gsap.set(limbs, { rotation: 0, transformOrigin: '50% 0%' });
-    gsap.set(ball, { x: 0, y: 0, scale: 1 });
-    gsap.set(ballImg, { rotation: 0 });
+    gsap.set(ball, { x: 0 });
+    gsap.set(ballY, { y: 0 });
+    gsap.set(ballImg, { rotation: 0, scale: 1, transformOrigin: '50% 50%' });
     gsap.set(keeper, { x: 0, y: 0, rotation: 0, scaleY: 1 });
     gsap.set(trail, { opacity: 0, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } });
 
@@ -355,8 +359,9 @@ export default function DuelArena({
     // start pose: striker a few steps back, ball/keeper home
     tl.set(striker, { x: -34, rotation: 0 })
       .set(limbs, { rotation: 0, transformOrigin: '50% 0%' })
-      .set(ball, { x: 0, y: 0, scale: 1 })
-      .set(ballImg, { rotation: 0 })
+      .set(ball, { x: 0 })
+      .set(ballY, { y: 0 })
+      .set(ballImg, { rotation: 0, scale: 1 })
       .set(keeper, { x: 0, y: 0, rotation: 0, scaleY: 1 })
       .set(trail, { opacity: 0, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } })
       .add(() => sfx.whistle());
@@ -380,13 +385,14 @@ export default function DuelArena({
       .add('launch', 0.94)
       .add(() => { sfx.kick(); sfx.whoosh(); }, 'launch');
 
-    // ball: ONE clean parabola — x linear, y quadratic, so y ∝ x² (no wiggle)
+    // ball: ONE clean parabola. x (horizontal) and y (vertical) live on SEPARATE
+    // nested elements so their tweens can't fight over one transform matrix.
+    // x is linear, y is quadratic -> y ∝ x². Spin + shrink ride on the inner group.
     tl.fromTo(trail, { opacity: 0.9, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } },
         { attr: { x2: shot.x, y2: shot.y }, duration: 0.4, ease: 'power2.in' }, 'launch')
       .to(ball, { x: shot.x - 200, duration: 0.4, ease: 'none' }, 'launch')
-      .to(ball, { y: shot.y - 228, duration: 0.4, ease: 'power2.in' }, 'launch')
-      .to(ball, { scale: 0.58, duration: 0.4, ease: 'power1.in' }, 'launch')
-      .to(ballImg, { rotation: goal ? 560 : 380, duration: 0.4, ease: 'none' }, 'launch')
+      .to(ballY, { y: shot.y - 228, duration: 0.4, ease: 'power2.in' }, 'launch')
+      .to(ballImg, { rotation: goal ? 560 : 380, scale: 0.58, duration: 0.4, ease: 'power1.in', transformOrigin: '50% 50%' }, 'launch')
       .to(trail, { opacity: 0, duration: 0.2 }, 'launch+=0.4');
 
     // keeper: explosive dive to the chosen side (gloves move with the body)
@@ -415,11 +421,12 @@ export default function DuelArena({
 
     // ball settles in the net (goal) — or is parried wide and bounces on the grass (save)
     if (goal) {
-      tl.to(ball, { y: shot.y - 214, duration: 0.26, ease: 'bounce.out' }, 'launch+=0.42');
+      tl.to(ballY, { y: shot.y - 214, duration: 0.26, ease: 'bounce.out' }, 'launch+=0.42');
     } else {
       const deflectX = round.dive === 'left' ? -135 : round.dive === 'right' ? 135 : (round.shot === 'left' ? -120 : 120);
       tl.to(ball, { x: deflectX, duration: 0.55, ease: 'power2.out' }, 'launch+=0.42')
-        .to(ball, { y: 8, scale: 0.9, duration: 0.55, ease: 'bounce.out' }, 'launch+=0.42');
+        .to(ballY, { y: 8, duration: 0.55, ease: 'bounce.out' }, 'launch+=0.42')
+        .to(ballImg, { scale: 0.9, duration: 0.55, ease: 'power1.out' }, 'launch+=0.42');
     }
 
     if (decisive) tl.add(() => {
@@ -660,11 +667,11 @@ export default function DuelArena({
                   <rect x="-7" y="-15" width="14" height="26" rx="5" fill={keeperColor} />
                   <line x1="-7" y1="-10" x2="-22" y2="-22" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" className="keeper-arm-l" />
                   <line x1="7" y1="-10" x2="22" y2="-22" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" className="keeper-arm-r" />
-                  <g transform="translate(-22 -23) scale(-1,1)">
-                    <image href="/minigame_sounds/goalie_gloves.png" x="-8" y="-11" width="16" height="22" preserveAspectRatio="xMidYMid meet" />
+                  <g transform="translate(-24 -26) scale(-1,1)">
+                    <image href="/minigame_sounds/goalie_gloves.png" x="-13" y="-17" width="26" height="34" preserveAspectRatio="xMidYMid meet" />
                   </g>
-                  <g transform="translate(22 -23)">
-                    <image href="/minigame_sounds/goalie_gloves.png" x="-8" y="-11" width="16" height="22" preserveAspectRatio="xMidYMid meet" />
+                  <g transform="translate(24 -26)">
+                    <image href="/minigame_sounds/goalie_gloves.png" x="-13" y="-17" width="26" height="34" preserveAspectRatio="xMidYMid meet" />
                   </g>
                   <line x1="-4" y1="11" x2="-7" y2="30" stroke="#f4f1e8" strokeWidth="5" strokeLinecap="round" />
                   <line x1="4" y1="11" x2="7" y2="30" stroke="#f4f1e8" strokeWidth="5" strokeLinecap="round" />
@@ -700,12 +707,14 @@ export default function DuelArena({
             {/* shot trail + ball */}
             <line ref={trailRef} x1="200" y1="224" x2="200" y2="224" stroke="url(#dTrail)" strokeWidth="4" strokeLinecap="round" opacity="0" />
             <g ref={ballRef}>
-              <g transform="translate(200 228)">
-                <ellipse cx="2" cy="9" rx="10" ry="3" fill="rgba(0,0,0,0.3)" />
-                <g ref={ballImgRef}>
-                  {/* fallback ball shows if the PNG is missing */}
-                  <circle r="11" fill="#f4f1e8" stroke="#0b3d2c" strokeWidth="0.5" />
-                  <image href="/minigame_ball.png" x="-12" y="-12" width="24" height="24" preserveAspectRatio="xMidYMid meet" />
+              <g ref={ballYRef}>
+                <g transform="translate(200 228)">
+                  <ellipse cx="2" cy="9" rx="10" ry="3" fill="rgba(0,0,0,0.3)" />
+                  <g ref={ballImgRef}>
+                    {/* fallback ball shows if the PNG is missing */}
+                    <circle r="11" fill="#f4f1e8" stroke="#0b3d2c" strokeWidth="0.5" />
+                    <image href="/minigame_ball.png" x="-12" y="-12" width="24" height="24" preserveAspectRatio="xMidYMid meet" />
+                  </g>
                 </g>
               </g>
             </g>
