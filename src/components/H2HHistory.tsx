@@ -29,9 +29,9 @@ export default function H2HHistory({ home, away }: { home: TeamRating; away: Tea
   if (!data) return null;
   if (!pair || pair.played === 0) {
     return (
-      <div style={{ marginTop: 18 }}>
-        <div style={{ fontWeight: 700, marginBottom: 2 }}>Head-to-head</div>
-        <div style={{ fontSize: 13, color: '#667' }}>No recorded meetings between {home.name} and {away.name}.</div>
+      <div style={{ marginTop: 22 }}>
+        <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)' }}>Head-to-head</div>
+        <div style={{ fontSize: 13, color: 'var(--muted)' }}>No recorded meetings between {home.name} and {away.name}.</div>
       </div>
     );
   }
@@ -45,34 +45,34 @@ export default function H2HHistory({ home, away }: { home: TeamRating; away: Tea
   const total = pair.played || 1;
 
   return (
-    <div style={{ marginTop: 18 }}>
-      <div style={{ fontWeight: 700, marginBottom: 2 }}>Head-to-head</div>
-      <div style={{ fontSize: 12, color: '#667', marginBottom: 8 }}>
+    <div style={{ marginTop: 22 }}>
+      <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)' }}>Head-to-head</div>
+      <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 8 }}>
         {pair.played} meetings on record · {homeGf}–{awayGf} on aggregate goals.
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 700, marginBottom: 4 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13.5, fontWeight: 800, marginBottom: 5, color: 'var(--cream)' }}>
         <span>{home.name} {homeWins}</span>
-        <span style={{ color: '#667' }}>{pair.draws} draws</span>
+        <span style={{ color: 'var(--dim)' }}>{pair.draws} draws</span>
         <span>{awayWins} {away.name}</span>
       </div>
-      <div style={{ display: 'flex', height: 10, borderRadius: 6, overflow: 'hidden', background: '#eee' }}>
-        <span style={{ width: `${(homeWins / total) * 100}%`, background: 'rgb(11,95,58)' }} />
-        <span style={{ width: `${(pair.draws / total) * 100}%`, background: 'rgb(150,150,150)' }} />
-        <span style={{ width: `${(awayWins / total) * 100}%`, background: 'rgb(193,140,30)' }} />
+      <div style={{ display: 'flex', height: 11, borderRadius: 6, overflow: 'hidden', background: 'rgba(244,241,232,0.1)' }}>
+        <span style={{ width: `${(homeWins / total) * 100}%`, background: 'rgb(52,211,153)' }} />
+        <span style={{ width: `${(pair.draws / total) * 100}%`, background: 'rgba(244,241,232,0.35)' }} />
+        <span style={{ width: `${(awayWins / total) * 100}%`, background: 'rgb(230,179,55)' }} />
       </div>
 
-      <div style={{ marginTop: 12, fontSize: 12, color: '#667' }}>Recent meetings</div>
-      <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <div style={{ marginTop: 14, fontSize: 12, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: 0.5 }}>Recent meetings</div>
+      <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column' }}>
         {pair.recent.map((m, i) => {
           const ht = byCode(m.h); const at = byCode(m.a);
           return (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, padding: '3px 0' }}>
-              <span style={{ width: 64, color: '#889', fontVariantNumeric: 'tabular-nums' }}>{m.date.slice(0, 4)}</span>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, padding: '5px 0', borderTop: '1px solid var(--line)', color: 'var(--cream)' }}>
+              <span style={{ width: 42, color: 'var(--dim)', fontVariantNumeric: 'tabular-nums' }}>{m.date.slice(0, 4)}</span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 5, flex: 1, justifyContent: 'flex-end' }}>
                 {ht?.name ?? m.h} <Flag code={m.h} name={ht?.name ?? m.h} />
               </span>
-              <strong style={{ fontVariantNumeric: 'tabular-nums' }}>{m.hs}–{m.as}</strong>
+              <strong style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--gold)' }}>{m.hs}–{m.as}</strong>
               <span style={{ display: 'flex', alignItems: 'center', gap: 5, flex: 1 }}>
                 <Flag code={m.a} name={at?.name ?? m.a} /> {at?.name ?? m.a}
               </span>

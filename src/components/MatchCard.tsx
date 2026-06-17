@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { submitPrediction } from '@/app/actions';
 import Flag from './Flag';
+import VenueInfo from './VenueInfo';
 import TransitionLink from './TransitionLink';
 import { lockTime, stageLabel, type Match, type Prediction, type RevealedPick } from '@/lib/types';
 
@@ -92,7 +93,6 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
         </div>
 
         <div className="match-center">
-          {match.venue && <span className="match-venue">{match.venue}</span>}
           {started ? (
             <div className="final-score">
               {match.home_score ?? '–'} : {match.away_score ?? '–'}
@@ -131,6 +131,8 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
           <Flag code={match.away_code} name={match.away_team} />
         </div>
       </div>
+
+      <VenueInfo venue={match.venue} />
 
       <div className="match-footer">
         {teamsTbd && !started ? (
