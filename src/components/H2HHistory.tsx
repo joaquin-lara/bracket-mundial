@@ -84,8 +84,10 @@ export default function H2HHistory({ home, away }: { home: TeamRating; away: Tea
         </div>
       )}
 
-      <div style={{ marginTop: 14, fontSize: 12, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: 0.5 }}>Recent meetings</div>
-      <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ marginTop: 14, fontSize: 12, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+        Recent meetings{meetings.length > 6 ? ` · scroll for all ${meetings.length}` : ''}
+      </div>
+      <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', maxHeight: 180, overflowY: 'auto' }}>
         {meetings.map((m, i) => {
           const ht = byCode(m.h); const at = byCode(m.a);
           return (
