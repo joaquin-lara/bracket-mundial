@@ -1,10 +1,7 @@
 'use client';
 
 import gsap from 'gsap';
-import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-
-gsap.registerPlugin(MotionPathPlugin);
 
 // Run the reveal trigger before paint so the "who's shown" swap can't flash a frame.
 const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
@@ -373,26 +370,21 @@ export default function DuelArena({
       .fromTo(armR, { rotation: -22 }, { rotation: 22, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0)
       .to(keeper, { y: -3, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0);
 
-    // plant + strike
-    tl.set(limbs, { rotation: 0 }, 0.72)
-      .to(legR, { rotation: -48, duration: 0.1, ease: 'power1.out' }, 0.72)
-      .to(striker, { rotation: -8, duration: 0.1 }, 0.72)
-      .to(legR, { rotation: 58, duration: 0.09, ease: 'power3.in' }, 0.82)
-      .to(striker, { rotation: 7, duration: 0.12 }, 0.84)
-      .add('launch', 0.9)
+    // plant, wind the kicking leg back, then swing it through and HOLD it
+    // extended forward for the rest of the shot (no reset until idle).
+    tl.set(limbs, { rotation: 0 }, 0.7)
+      .to(legR, { rotation: 45, duration: 0.12, ease: 'power1.out' }, 0.72)
+      .to(striker, { rotation: -6, duration: 0.12 }, 0.72)
+      .to(legR, { rotation: -62, duration: 0.1, ease: 'power3.in' }, 0.86)
+      .to(striker, { rotation: 8, duration: 0.14 }, 0.86)
+      .add('launch', 0.94)
       .add(() => { sfx.kick(); sfx.whoosh(); }, 'launch');
 
-    // ball: ONE smooth curved flight (single bezier), spinning, with a trail
+    // ball: ONE clean parabola — x linear, y quadratic, so y ∝ x² (no wiggle)
     tl.fromTo(trail, { opacity: 0.9, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } },
         { attr: { x2: shot.x, y2: shot.y }, duration: 0.4, ease: 'power2.in' }, 'launch')
-      .to(ball, {
-          motionPath: {
-            path: [{ x: 0, y: 0 }, { x: (shot.x - 200) * 0.5, y: -90 }, { x: shot.x - 200, y: shot.y - 228 }],
-            curviness: 1.3,
-            autoRotate: false,
-          },
-          duration: 0.4, ease: 'power2.in',
-        }, 'launch')
+      .to(ball, { x: shot.x - 200, duration: 0.4, ease: 'none' }, 'launch')
+      .to(ball, { y: shot.y - 228, duration: 0.4, ease: 'power2.in' }, 'launch')
       .to(ball, { scale: 0.58, duration: 0.4, ease: 'power1.in' }, 'launch')
       .to(ballImg, { rotation: goal ? 560 : 380, duration: 0.4, ease: 'none' }, 'launch')
       .to(trail, { opacity: 0, duration: 0.2 }, 'launch+=0.4');
