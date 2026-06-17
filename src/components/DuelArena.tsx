@@ -140,8 +140,8 @@ export default function DuelArena({
   const [muted, setMutedState] = useState(false);
   useEffect(() => { setMutedState(isMuted()); }, []);
 
-  // Loop background crowd ambience (public/crowd-loop.mp3) while a game is open,
-  // unless muted. Silently does nothing if the file isn't present.
+  // Loop background stadium ambience (public/minigame_sounds/stadium_noise.mp3)
+  // while a game is open, unless muted. Silent no-op if the file isn't present.
   const inGame = !!duels.find((d) => d.id === activeId) || activeId === CPU_DUEL_ID;
   useEffect(() => {
     const a = ambienceRef.current;
