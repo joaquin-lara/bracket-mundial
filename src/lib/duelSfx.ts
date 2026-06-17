@@ -101,7 +101,7 @@ export const sfx = {
   },
   goal() {
     // One of the three real goal clips, chosen at random with equal odds.
-    playRandomFile(GOAL_FILES, 0.9);
+    playRandomFile(GOAL_FILES, 0.45);
   },
   save() {
     if (isMuted()) return;
