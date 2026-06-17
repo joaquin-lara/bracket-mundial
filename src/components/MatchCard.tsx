@@ -189,7 +189,7 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
         match.away_code &&
         match.status !== 'FINISHED' &&
         lockAt - now < 65 * 60 * 1000 && (
-          <div className="lineup-wait">Confirmed lineups expected ~40 min before kickoff.</div>
+          <div className="lineup-wait">Confirmed lineup loads once the match kicks off.</div>
         )
       )}
 
