@@ -188,7 +188,8 @@ body:has(.home-intro) .pitch-stripes {
 
 .topnav button {
   background: none;
-  border: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
   color: var(--dim);
   cursor: pointer;
   font-family: var(--narrow);
@@ -196,7 +197,7 @@ body:has(.home-intro) .pitch-stripes {
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  padding: 0;
+  padding: 6px 10px;
 }
 
 .topnav button:hover {
