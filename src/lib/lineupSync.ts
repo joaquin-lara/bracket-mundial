@@ -7,7 +7,7 @@ import { lookup } from './ml/teams';
 // free tier is 100 req/day and a heavy day is ~6 games, so we can afford to start
 // early and poll often; MAX_ATTEMPTS bounds the worst case (a never-posted match).
 const OPEN_BEFORE_MS = 60 * 60_000; // start polling 60 min before kickoff
-const LATE_AFTER_MS = 30 * 60_000; // give up 30 min after kickoff if never posted
+const LATE_AFTER_MS = 3 * 60 * 60_000; // keep trying through a full live match (cap bounds it)
 // Keep the recheck gap just *under* the 5-min cron interval, or clock jitter makes
 // a tick land at 4:58 and get skipped -- effectively halving the poll rate.
 const RECHECK_MS = 4 * 60_000; // min gap between polls for one match
