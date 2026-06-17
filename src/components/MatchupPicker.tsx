@@ -3,6 +3,9 @@
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Flag from './Flag';
+import ScoreGrid from './ScoreGrid';
+import TeamRadar from './TeamRadar';
+import H2HHistory from './H2HHistory';
 import { TEAMS, byCode } from '@/lib/ml/teams';
 import { predict, pct } from '@/lib/ml/model';
 
@@ -151,6 +154,10 @@ export default function MatchupPicker() {
             ))}
           </div>
         </div>
+
+        <ScoreGrid grid={result.scoreGrid} home={H} away={A} />
+        <TeamRadar home={H} away={A} />
+        <H2HHistory home={H} away={A} />
       </div>
     </div>
   );
