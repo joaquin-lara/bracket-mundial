@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Flag from './Flag';
+import ChartTag from './ChartTag';
 import { byCode, type TeamRating } from '@/lib/ml/teams';
 
 interface Meeting { date: string; h: string; a: string; hs: number; as: number; t: string }
@@ -54,9 +55,9 @@ export default function H2HHistory({ home, away }: { home: TeamRating; away: Tea
 
   return (
     <div style={{ marginTop: 22 }}>
-      <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)' }}>Head-to-head</div>
+      <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)' }}>Head-to-head<ChartTag kind="history" /></div>
       <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 10 }}>
-        {pair.played} meetings on record · showing the last {n}{n === maxN ? '' : ` of ${maxN}`} · {homeGf}–{awayGf} goals.
+        Actual past results, not a prediction. {pair.played} meetings on record · showing the last {n}{n === maxN ? '' : ` of ${maxN}`} · {homeGf}–{awayGf} goals.
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13.5, fontWeight: 800, marginBottom: 5, color: 'var(--cream)' }}>

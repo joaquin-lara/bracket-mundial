@@ -1,4 +1,5 @@
 import { Fragment } from 'react';
+import ChartTag from './ChartTag';
 import type { TeamRating } from '@/lib/ml/teams';
 
 /** Heatmap of exact-scoreline probabilities (home goals = rows, away = columns). */
@@ -9,9 +10,9 @@ export default function ScoreGrid({ grid, home, away }: { grid: number[][]; home
 
   return (
     <div style={{ marginTop: 22, textAlign: 'center' }}>
-      <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)' }}>Scoreline probability</div>
+      <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)' }}>Scoreline probability<ChartTag kind="prediction" /></div>
       <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 10 }}>
-        {home.name} goals down the side, {away.name} across the top. Brighter = more likely; the diagonal (gold) is draws.
+        Predicted by the Dixon-Coles model from each side&apos;s expected goals. {home.name} goals down the side, {away.name} across the top. Brighter = more likely; the diagonal (gold) is draws.
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: `1.4rem repeat(6, 1fr)`, gap: 3, maxWidth: 400, margin: '0 auto' }}>
         <div />

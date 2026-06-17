@@ -7,6 +7,7 @@ import ScoreGrid from './ScoreGrid';
 import TeamRadar from './TeamRadar';
 import H2HHistory from './H2HHistory';
 import Lineup from './Lineup';
+import ChartTag from './ChartTag';
 import { TEAMS, byCode } from '@/lib/ml/teams';
 import { predict, pct } from '@/lib/ml/model';
 
@@ -99,6 +100,12 @@ export default function MatchupPicker() {
       </label>
 
       <div className="ml-result">
+        <div style={{ fontWeight: 800, color: 'var(--cream)', marginBottom: 2 }}>
+          Match prediction<ChartTag kind="prediction" />
+        </div>
+        <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 12 }}>
+          Win / draw / win odds from the model — a blend of Dixon-Coles form, Elo strength and FIFA squad talent.
+        </div>
         <div className="ml-prob-head">
           <span className="ml-prob-team">
             {H.name} win
@@ -138,9 +145,9 @@ export default function MatchupPicker() {
         </div>
 
         <div className="ml-scorelines">
-          <span className="ml-scorelines-label">Most likely scorelines</span>
+          <span className="ml-scorelines-label">Most likely scorelines<ChartTag kind="prediction" /></span>
           <span className="ml-scorelines-hint">
-            Chance of each exact final score. {H.name} listed first.
+            Predicted by the model. Chance of each exact final score, {H.name} listed first.
           </span>
           <div className="ml-score-grid">
             {result.topScores.map((s, i) => (
@@ -161,9 +168,9 @@ export default function MatchupPicker() {
         <H2HHistory home={H} away={A} />
 
         <div style={{ marginTop: 22 }}>
-          <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)', textAlign: 'center' }}>Projected lineups</div>
+          <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)', textAlign: 'center' }}>Projected lineups<ChartTag kind="history" /></div>
           <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 10, textAlign: 'center' }}>
-            Each team&apos;s most recent known formation and XI. Positions on the pitch are approximate.
+            Not a prediction — each team&apos;s most recent known formation and XI from match records. Positions on the pitch are approximate.
           </div>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Lineup team={H} accent="rgb(52,211,153)" />
