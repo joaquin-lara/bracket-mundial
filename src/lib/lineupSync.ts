@@ -7,7 +7,10 @@ import { lookup } from './ml/teams';
 // free tier is 100 req/day and a heavy day is ~6 games, so we can afford to start
 // early and poll often; MAX_ATTEMPTS bounds the worst case (a never-posted match).
 const OPEN_BEFORE_MS = 60 * 60_000; // start polling 60 min before kickoff
-const LATE_AFTER_MS = 3 * 60 * 60_000; // keep trying through a full live match (cap bounds it)
+// Reach back across the whole tournament so already-played matches that finished
+// before this feature shipped get backfilled (one-time, ~1 call each since their
+// lineup is already posted). MAX_CALLS caps each run, so it can't spike the quota.
+const BACKFILL_BEFORE_MS = 45 * 24 * 60 * 60_000;
 // Keep the recheck gap just *under* the 5-min cron interval, or clock jitter makes
 // a tick land at 4:58 and get skipped -- effectively halving the poll rate.
 const RECHECK_MS = 4 * 60_000; // min gap between polls for one match
@@ -43,7 +46,7 @@ export async function runLineupSync(admin: SupabaseClient): Promise<string[]> {
     if (!key) return done;
 
     const now = Date.now();
-    const from = new Date(now - LATE_AFTER_MS).toISOString();
+    const from = new Date(now - BACKFILL_BEFORE_MS).toISOString();
     const to = new Date(now + OPEN_BEFORE_MS).toISOString();
 
     const { data } = await admin
@@ -55,13 +58,17 @@ export async function runLineupSync(admin: SupabaseClient): Promise<string[]> {
 
     const rows = (data as Row[] | null) ?? [];
     // Only matches with both teams known, under the attempt cap, and due for a recheck.
-    const due = rows.filter(
-      (m) =>
-        m.home_code &&
-        m.away_code &&
-        (m.lineup_attempts ?? 0) < MAX_ATTEMPTS &&
-        (!m.lineup_checked_at || now - Date.parse(m.lineup_checked_at) >= RECHECK_MS)
-    );
+    const due = rows
+      .filter(
+        (m) =>
+          m.home_code &&
+          m.away_code &&
+          (m.lineup_attempts ?? 0) < MAX_ATTEMPTS &&
+          (!m.lineup_checked_at || now - Date.parse(m.lineup_checked_at) >= RECHECK_MS)
+      )
+      // Process matches nearest to now first (live/imminent), so when the per-run
+      // cap is hit during backfill the relevant games still get done first.
+      .sort((a, b) => Math.abs(Date.parse(a.kickoff) - now) - Math.abs(Date.parse(b.kickoff) - now));
     if (due.length === 0) return done;
 
     // Map our football-data rows to API-Football fixture ids (one call, reused).
