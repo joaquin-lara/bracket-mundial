@@ -1347,6 +1347,28 @@ h1 {
   margin-bottom: 14px;
 }
 
+.duel-mute {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  width: 40px;
+  height: 40px;
+  font-size: 22px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(4, 21, 15, 0.6);
+  cursor: pointer;
+  padding: 0;
+}
+.duel-mute:hover {
+  background: rgba(4, 21, 15, 0.85);
+}
+
 .duel-overlay {
   position: absolute;
   inset: 0;

@@ -1,7 +1,10 @@
 'use client';
 
 import gsap from 'gsap';
+import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
 import { useCallback, useEffect, useRef, useState } from 'react';
+
+gsap.registerPlugin(MotionPathPlugin);
 import PresenceDot from '@/components/PresenceDot';
 import DuelEdge from '@/components/DuelEdge';
 import { flagUrl } from '@/lib/flags';
@@ -93,6 +96,13 @@ const CROWD = Array.from({ length: 160 }, (_, i) => ({
 }));
 const CROWD_FILLS = ['#1d5a47', '#16493a', '#27654f'];
 const CONFETTI_COLORS = ['#e6b337', '#7fc8a9', '#c9a0dc', '#e89a7c', '#f4f1e8'];
+// Confetti in each player's national flag colors (the scorer's burst).
+const FLAG_CONFETTI: Record<string, string[]> = {
+  Carlos: ['#0067C6', '#FFFFFF', '#C8A95B'], // Nicaragua
+  Sebas: ['#4997D0', '#FFFFFF'], // Guatemala
+  Mauri: ['#0073CF', '#FFFFFF'], // Honduras
+  Joaquin: ['#D52B1E', '#FFFFFF', '#0039A6'], // Chile
+};
 
 export default function DuelArena({
   me,
@@ -121,9 +131,25 @@ export default function DuelArena({
   const confettiRef = useRef<SVGGElement>(null);
   const netRef = useRef<SVGGElement>(null);
   const sceneRef = useRef<SVGSVGElement>(null);
+  const ambienceRef = useRef<HTMLAudioElement>(null);
   const animatedKicks = useRef<Map<string, number>>(new Map());
+  const sdArmed = useRef<Set<string>>(new Set());
   const [muted, setMutedState] = useState(false);
   useEffect(() => { setMutedState(isMuted()); }, []);
+
+  // Loop background crowd ambience (public/crowd-loop.mp3) while a game is open,
+  // unless muted. Silently does nothing if the file isn't present.
+  const inGame = !!duels.find((d) => d.id === activeId) || activeId === CPU_DUEL_ID;
+  useEffect(() => {
+    const a = ambienceRef.current;
+    if (!a) return;
+    if (inGame && !muted) {
+      a.volume = 0.25;
+      a.play().catch(() => {});
+    } else {
+      a.pause();
+    }
+  }, [inGame, muted]);
 
   const [cpuDuel, setCpuDuel] = useState<Duel | null>(null);
   const [cpuRecord, setCpuRecord] = useState({ w: 0, l: 0 });
@@ -195,20 +221,23 @@ export default function DuelArena({
   function startCpu() {
     animatedKicks.current.set(CPU_DUEL_ID, 0);
     sdShown.current.delete(CPU_DUEL_ID);
+    sdArmed.current.delete(CPU_DUEL_ID);
     setCpuDuel(freshCpuDuel(me));
     setActiveId(CPU_DUEL_ID);
   }
 
-  // one-time MUERTE SÚBITA flash when a duel reaches sudden death. It must land
-  // on the beat the turn actually flips, i.e. the instant the equalizer's
-  // reveal animation finishes — so fire only on the animating true→false edge.
-  // (Firing whenever `animating` is merely false lit it up a beat early, the
-  // moment the new kick arrived, before its reveal even played.)
+  // one-time MUERTE SÚBITA flash, only at the REAL crossing into sudden death:
+  // we must have witnessed this duel at kick <= 10 (armed) first, so opening a
+  // game already in sudden death never flashes. Fires the instant the equalizing
+  // kick's reveal finishes (the animating true->false edge).
   useEffect(() => {
     const justFinishedReveal = prevAnimating.current && !animating;
     prevAnimating.current = animating;
-    if (!duel || duel.status !== 'active' || duel.kick <= 10) return;
+    if (!duel) return;
+    if (duel.status === 'active' && duel.kick <= 10) sdArmed.current.add(duel.id);
+    if (duel.status !== 'active' || duel.kick <= 10) return;
     if (sdShown.current.has(duel.id)) return;
+    if (!sdArmed.current.has(duel.id)) return; // opened mid-sudden-death -> don't flash
     if (!justFinishedReveal) return;
     sdShown.current.add(duel.id);
     setSdFlash(true);
@@ -288,10 +317,12 @@ export default function DuelArena({
     const crowd = scene ? Array.from(scene.querySelectorAll<SVGElement>('.duel-crowd-0, .duel-crowd-1, .duel-crowd-2')) : [];
     const limbs = [legL, legR, armL, armR].filter(Boolean) as SVGElement[];
 
+    const pal = FLAG_CONFETTI[nameOf(round.shooter)] ?? CONFETTI_COLORS;
     const confettiBurst = () => {
       const bits = confettiRef.current?.children;
       if (!bits) return;
       Array.from(bits).forEach((bit, i) => {
+        gsap.set(bit, { attr: { fill: pal[i % pal.length] } });
         gsap.fromTo(bit, { x: 0, y: 0, rotation: 0, opacity: 1 }, {
           x: -110 + Math.random() * 220, y: -40 + Math.random() * 130, rotation: Math.random() * 720,
           opacity: 0, duration: 0.9 + Math.random() * 0.6, delay: (i % 6) * 0.02, ease: 'power2.out',
@@ -310,24 +341,24 @@ export default function DuelArena({
     };
 
     const tl = gsap.timeline({ onComplete: () => { setAnimating(false); setBanner(null); reset(); } });
-    if (decisive) tl.timeScale(0.85);
+    if (decisive) tl.timeScale(0.6); // slow-mo on the deciding kick
 
     // start pose: striker a few steps back, ball/keeper home
-    tl.set(striker, { x: -30, rotation: 0 })
-      .set(limbs, { rotation: 0, transformOrigin: '50% 10%' })
+    tl.set(striker, { x: -34, rotation: 0 })
+      .set(limbs, { rotation: 0, transformOrigin: '50% 0%' })
       .set(ball, { x: 0, y: 0, scale: 1 })
       .set(ballImg, { rotation: 0 })
       .set(keeper, { x: 0, y: 0, rotation: 0, scaleY: 1 })
-      .set([kArmL, kArmR], { rotation: 0, transformOrigin: '0% 100%' })
       .set(trail, { opacity: 0, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } })
       .add(() => sfx.whistle());
 
-    // run-up: stride toward the ball with cycling legs + pumping arms
+    // run-up: legs cross and alternate (a real stride), arms pump opposite,
+    // while the body travels toward the ball.
     tl.to(striker, { x: 8, duration: 0.72, ease: 'power1.in' }, 0)
-      .to(legL, { rotation: 28, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0)
-      .to(legR, { rotation: -28, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0)
-      .to(armL, { rotation: -24, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0)
-      .to(armR, { rotation: 24, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0)
+      .fromTo(legL, { rotation: -26 }, { rotation: 26, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0)
+      .fromTo(legR, { rotation: 26 }, { rotation: -26, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0)
+      .fromTo(armL, { rotation: 22 }, { rotation: -22, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0)
+      .fromTo(armR, { rotation: -22 }, { rotation: 22, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0)
       .to(keeper, { y: -3, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0);
 
     // plant + strike
@@ -339,24 +370,27 @@ export default function DuelArena({
       .add('launch', 0.9)
       .add(() => { sfx.kick(); sfx.whoosh(); }, 'launch');
 
-    // ball: curved, spinning flight + tracking trail
+    // ball: ONE smooth curved flight (single bezier), spinning, with a trail
     tl.fromTo(trail, { opacity: 0.9, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } },
         { attr: { x2: shot.x, y2: shot.y }, duration: 0.4, ease: 'power2.in' }, 'launch')
-      .to(ball, { keyframes: [
-          { x: (shot.x - 200) * 0.55, y: -72, scale: 0.82, duration: 0.2 },
-          { x: shot.x - 200, y: shot.y - 228, scale: 0.6, duration: 0.2 },
-        ], ease: 'power1.inOut' }, 'launch')
+      .to(ball, {
+          motionPath: {
+            path: [{ x: 0, y: 0 }, { x: (shot.x - 200) * 0.5, y: -90 }, { x: shot.x - 200, y: shot.y - 228 }],
+            curviness: 1.3,
+            autoRotate: false,
+          },
+          duration: 0.4, ease: 'power2.in',
+        }, 'launch')
+      .to(ball, { scale: 0.58, duration: 0.4, ease: 'power1.in' }, 'launch')
       .to(ballImg, { rotation: goal ? 560 : 380, duration: 0.4, ease: 'none' }, 'launch')
       .to(trail, { opacity: 0, duration: 0.2 }, 'launch+=0.4');
 
-    // keeper: explosive dive + arm reach to the dived side
+    // keeper: explosive dive to the chosen side (gloves move with the body)
     tl.to(keeper, {
         x: diveX, y: round.dive === 'center' ? -6 : -16,
-        rotation: round.dive === 'center' ? 0 : round.dive === 'left' ? -34 : 34,
+        rotation: round.dive === 'center' ? 0 : round.dive === 'left' ? -38 : 38,
         scaleY: round.dive === 'center' ? 0.82 : 1, duration: 0.4, ease: 'power2.out',
-      }, 'launch')
-      .to(kArmL, { rotation: round.dive === 'left' ? -45 : 0, duration: 0.3 }, 'launch')
-      .to(kArmR, { rotation: round.dive === 'right' ? 45 : 0, duration: 0.3 }, 'launch');
+      }, 'launch');
 
     // impact
     tl.add(() => {
@@ -375,10 +409,14 @@ export default function DuelArena({
       }
     }, 'launch+=0.4');
 
-    // ball settles (in-net bounce) or is parried clear
-    tl.to(ball, goal
-        ? { y: shot.y - 214, duration: 0.26, ease: 'bounce.out' }
-        : { x: diveX, y: -58, scale: 0.5, duration: 0.3, ease: 'power1.out' }, 'launch+=0.42');
+    // ball settles in the net (goal) — or is parried wide and bounces on the grass (save)
+    if (goal) {
+      tl.to(ball, { y: shot.y - 214, duration: 0.26, ease: 'bounce.out' }, 'launch+=0.42');
+    } else {
+      const deflectX = round.dive === 'left' ? -135 : round.dive === 'right' ? 135 : (round.shot === 'left' ? -120 : 120);
+      tl.to(ball, { x: deflectX, duration: 0.55, ease: 'power2.out' }, 'launch+=0.42')
+        .to(ball, { y: 8, scale: 0.9, duration: 0.55, ease: 'bounce.out' }, 'launch+=0.42');
+    }
 
     if (decisive) tl.add(() => {
       sfx.win();
@@ -475,18 +513,9 @@ export default function DuelArena({
 
     return (
       <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <button className="link-btn duel-back" onClick={() => setActiveId(null)}>
-            ← Back to lobby
-          </button>
-          <button
-            className="link-btn"
-            aria-label={muted ? 'Unmute' : 'Mute'}
-            onClick={() => { const n = !muted; setMuted(n); setMutedState(n); }}
-          >
-            {muted ? '🔇' : '🔊'}
-          </button>
-        </div>
+        <button className="link-btn duel-back" onClick={() => setActiveId(null)}>
+          ← Back to lobby
+        </button>
 
         <div className="duel-scoreboard">
           {[duel.challenger, duel.opponent].map((pid) => (
@@ -512,6 +541,15 @@ export default function DuelArena({
         </div>
 
         <div className="duel-scene">
+          <button
+            type="button"
+            className="duel-mute"
+            aria-label={muted ? 'Unmute' : 'Mute'}
+            onClick={() => { const n = !muted; setMuted(n); setMutedState(n); }}
+          >
+            {muted ? '🔇' : '🔊'}
+          </button>
+          <audio ref={ambienceRef} src="/crowd-loop.mp3" loop preload="auto" />
           <svg ref={sceneRef} viewBox="0 0 400 260" className={`duel-svg${suddenDeath ? ' sd' : ''}`}>
             <defs>
               <linearGradient id="dSky" x1="0" y1="0" x2="0" y2="1">
@@ -618,6 +656,8 @@ export default function DuelArena({
                   <rect x="-7" y="-15" width="14" height="26" rx="5" fill={keeperColor} />
                   <line x1="-7" y1="-10" x2="-22" y2="-22" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" className="keeper-arm-l" />
                   <line x1="7" y1="-10" x2="22" y2="-22" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" className="keeper-arm-r" />
+                  <circle cx="-23" cy="-23" r="4" fill="#ffffff" stroke="#0b3d2c" strokeWidth="0.7" />
+                  <circle cx="23" cy="-23" r="4" fill="#ffffff" stroke="#0b3d2c" strokeWidth="0.7" />
                   <line x1="-4" y1="11" x2="-7" y2="30" stroke="#f4f1e8" strokeWidth="5" strokeLinecap="round" />
                   <line x1="4" y1="11" x2="7" y2="30" stroke="#f4f1e8" strokeWidth="5" strokeLinecap="round" />
                 </g>
