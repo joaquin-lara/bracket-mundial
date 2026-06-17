@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { submitPrediction } from '@/app/actions';
 import Flag from './Flag';
 import VenueInfo from './VenueInfo';
+import ConfirmedLineups from './ConfirmedLineups';
 import TransitionLink from './TransitionLink';
 import { lockTime, stageLabel, type Match, type Prediction, type RevealedPick } from '@/lib/types';
 
@@ -133,6 +134,8 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
       </div>
 
       <VenueInfo venue={match.venue} />
+
+      {match.lineups && <ConfirmedLineups lineups={match.lineups} leftCode={match.home_code} />}
 
       <div className="match-footer">
         {teamsTbd && !started ? (
