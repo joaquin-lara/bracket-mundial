@@ -20,7 +20,7 @@ export default function Pitch({ players, accent, formation }: { players: PitchPl
       <rect x={W - PAD / 2 - 40} y={H / 2 - 34} width={40} height={68} fill="none" stroke={line} strokeWidth={1} />
       {players.map((p, i) => (
         <g key={i}>
-          <circle cx={px(p.ny)} cy={py(p.nx)} r={p.gk ? 9 : 8} fill={p.gk ? '#ffffff' : accent} stroke="#06281c" strokeWidth={p.gk ? 1.5 : 1} />
+          <circle cx={px(p.ny)} cy={py(p.nx)} r={p.gk ? 9 : 8} fill={accent} stroke="#06281c" strokeWidth={p.gk ? 1.5 : 1} />
           {p.gk && (
             <text x={px(p.ny)} y={py(p.nx) + 3.4} fontSize={10} textAnchor="middle">🧤</text>
           )}
