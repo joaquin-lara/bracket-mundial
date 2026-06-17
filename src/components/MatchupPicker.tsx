@@ -7,12 +7,14 @@ import TeamCombobox from './TeamCombobox';
 import ScoreGrid from './ScoreGrid';
 import TeamRadar from './TeamRadar';
 import H2HHistory from './H2HHistory';
-import Lineup from './Lineup';
 import ConfirmedLineups from './ConfirmedLineups';
+import TeamPitch from './TeamPitch';
 import ChartTag from './ChartTag';
 import { TEAMS, byCode } from '@/lib/ml/teams';
 import { predict, pct } from '@/lib/ml/model';
-import type { MatchLineups } from '@/lib/types';
+import type { MatchLineups, TeamLineup } from '@/lib/types';
+
+export interface LastLineup { team: TeamLineup; caption: string }
 
 /** Validate a ?home= / ?away= code from the URL, or null if not one of the 48. */
 function validCode(raw: string | null): string | null {
@@ -30,10 +32,23 @@ function ProbBar({ home, draw, away }: { home: number; draw: number; away: numbe
   );
 }
 
-export default function MatchupPicker({ confirmedByPair = {} }: { confirmedByPair?: Record<string, MatchLineups> }) {
+export default function MatchupPicker({
+  confirmedByPair = {},
+  lastLineupByTeam = {},
+  defaultHome,
+  defaultAway,
+}: {
+  confirmedByPair?: Record<string, MatchLineups>;
+  lastLineupByTeam?: Record<string, LastLineup>;
+  /** Teams of the current/most-recent WC match, used when no ?home=/?away= is set. */
+  defaultHome?: string;
+  defaultAway?: string;
+}) {
   const params = useSearchParams();
-  const presetHome = validCode(params.get('home')) ?? 'ARG';
-  let presetAway = validCode(params.get('away')) ?? (presetHome === 'BRA' ? 'ARG' : 'BRA');
+  const presetHome = validCode(params.get('home')) ?? (defaultHome && byCode(defaultHome) ? defaultHome : 'ARG');
+  let presetAway =
+    validCode(params.get('away')) ??
+    (defaultAway && byCode(defaultAway) && defaultAway !== presetHome ? defaultAway : presetHome === 'BRA' ? 'ARG' : 'BRA');
   if (presetAway === presetHome) {
     presetAway = TEAMS.find((t) => t.code !== presetHome)!.code;
   }
@@ -156,13 +171,15 @@ export default function MatchupPicker({ confirmedByPair = {} }: { confirmedByPai
           <ConfirmedLineups lineups={confirmed} leftCode={H.code} />
         ) : (
           <div style={{ marginTop: 22 }}>
-            <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)', textAlign: 'center' }}>Projected lineups<ChartTag kind="history" /></div>
+            <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)', textAlign: 'center' }}>Latest World Cup lineups<ChartTag kind="history" /></div>
             <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 10, textAlign: 'center' }}>
-              Not a prediction — each team&apos;s most recent known formation and XI from match records. Positions on the pitch are approximate.
+              Each team&apos;s starting XI from their most recent 2026 World Cup match.
             </div>
             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Lineup team={H} accent="rgb(52,211,153)" />
-              <Lineup team={A} accent="rgb(230,179,55)" />
+              <TeamPitch teamName={H.name} lineup={lastLineupByTeam[H.code]?.team ?? null} caption={lastLineupByTeam[H.code]?.caption}
+                accent="rgb(52,211,153)" emptyNote="No 2026 World Cup match on record yet." />
+              <TeamPitch teamName={A.name} lineup={lastLineupByTeam[A.code]?.team ?? null} caption={lastLineupByTeam[A.code]?.caption}
+                accent="rgb(230,179,55)" emptyNote="No 2026 World Cup match on record yet." />
             </div>
           </div>
         )}

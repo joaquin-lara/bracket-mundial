@@ -1,18 +1,7 @@
-import type { MatchLineups, TeamLineup } from '@/lib/types';
+import type { MatchLineups } from '@/lib/types';
 import { lookup } from '@/lib/ml/teams';
-import Pitch from './Pitch';
+import TeamPitch from './TeamPitch';
 import ChartTag from './ChartTag';
-import { fromConfirmed } from '@/lib/lineupLayout';
-
-function OneTeam({ team, accent }: { team: TeamLineup; accent: string }) {
-  return (
-    <div style={{ flex: '1 1 200px', minWidth: 180, textAlign: 'center' }}>
-      <div style={{ fontWeight: 700, color: 'var(--cream)', fontSize: 13.5 }}>{team.teamName}</div>
-      <div style={{ fontSize: 12, color: 'var(--gold)', marginBottom: 6, fontWeight: 700 }}>{team.formation}</div>
-      <Pitch players={fromConfirmed(team.startXI)} accent={accent} formation={team.formation} />
-    </div>
-  );
-}
 
 /**
  * Real confirmed starting XIs (API-Football), oriented so `leftCode` is on the
@@ -39,8 +28,8 @@ export default function ConfirmedLineups({
         Official starting XIs for this match.
       </div>
       <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-        <OneTeam team={left} accent="rgb(52,211,153)" />
-        <OneTeam team={right} accent="rgb(230,179,55)" />
+        <TeamPitch teamName={left.teamName} lineup={left} accent="rgb(52,211,153)" />
+        <TeamPitch teamName={right.teamName} lineup={right} accent="rgb(230,179,55)" />
       </div>
     </div>
   );
