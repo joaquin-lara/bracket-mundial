@@ -50,13 +50,13 @@ function polygon(team: TeamRating): string {
 /** Overlaid radar comparing two teams across attack/defence/strength/form/squad. */
 export default function TeamRadar({ home, away }: { home: TeamRating; away: TeamRating }) {
   const rings = [0.25, 0.5, 0.75, 1];
-  const HOME = '11,95,58'; // green
-  const AWAY = '193,140,30'; // gold
+  const HOME = '52,211,153'; // emerald
+  const AWAY = '230,179,55'; // gold
 
   return (
-    <div style={{ marginTop: 18 }}>
-      <div style={{ fontWeight: 700, marginBottom: 2 }}>Team comparison</div>
-      <div style={{ fontSize: 12, color: '#667', marginBottom: 8 }}>
+    <div style={{ marginTop: 22 }}>
+      <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)' }}>Team comparison</div>
+      <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 8 }}>
         Each axis is scored against all 48 World Cup teams. Bigger shape = stronger.
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
@@ -65,29 +65,29 @@ export default function TeamRadar({ home, away }: { home: TeamRating; away: Team
           {rings.map((r, ri) => (
             <polygon key={ri}
               points={AXES.map((_, i) => point(i, r * R).map((n) => n.toFixed(1)).join(',')).join(' ')}
-              fill="none" stroke="#0001" strokeWidth={1} />
+              fill="none" stroke="rgba(244,241,232,0.16)" strokeWidth={1} />
           ))}
           {AXES.map((_, i) => {
             const [x, y] = point(i, R);
-            return <line key={i} x1={C} y1={C} x2={x} y2={y} stroke="#0001" strokeWidth={1} />;
+            return <line key={i} x1={C} y1={C} x2={x} y2={y} stroke="rgba(244,241,232,0.16)" strokeWidth={1} />;
           })}
-          <polygon points={polygon(away)} fill={`rgba(${AWAY},0.18)`} stroke={`rgb(${AWAY})`} strokeWidth={2} />
-          <polygon points={polygon(home)} fill={`rgba(${HOME},0.22)`} stroke={`rgb(${HOME})`} strokeWidth={2} />
+          <polygon points={polygon(away)} fill={`rgba(${AWAY},0.22)`} stroke={`rgb(${AWAY})`} strokeWidth={2.5} />
+          <polygon points={polygon(home)} fill={`rgba(${HOME},0.22)`} stroke={`rgb(${HOME})`} strokeWidth={2.5} />
           {AXES.map((ax, i) => {
             const [x, y] = point(i, R + 16);
             return (
-              <text key={ax.key} x={x} y={y} fontSize={11} fontWeight={600} fill="#445"
+              <text key={ax.key} x={x} y={y} fontSize={11.5} fontWeight={700} fill="var(--cream)"
                 textAnchor="middle" dominantBaseline="middle">{ax.key}</text>
             );
           })}
         </svg>
-        <div style={{ fontSize: 13 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-            <span style={{ width: 12, height: 12, borderRadius: 3, background: `rgb(${HOME})`, display: 'inline-block' }} />
+        <div style={{ fontSize: 13.5, color: 'var(--cream)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            <span style={{ width: 14, height: 14, borderRadius: 3, background: `rgb(${HOME})`, display: 'inline-block' }} />
             {home.name}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ width: 12, height: 12, borderRadius: 3, background: `rgb(${AWAY})`, display: 'inline-block' }} />
+            <span style={{ width: 14, height: 14, borderRadius: 3, background: `rgb(${AWAY})`, display: 'inline-block' }} />
             {away.name}
           </div>
         </div>
