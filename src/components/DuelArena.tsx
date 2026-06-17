@@ -2,9 +2,12 @@
 
 import gsap from 'gsap';
 import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 gsap.registerPlugin(MotionPathPlugin);
+
+// Run the reveal trigger before paint so the "who's shown" swap can't flash a frame.
+const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 import PresenceDot from '@/components/PresenceDot';
 import DuelEdge from '@/components/DuelEdge';
 import { flagUrl } from '@/lib/flags';
@@ -273,7 +276,7 @@ export default function DuelArena({
   }
 
   // ── reveal animation when a new resolved kick arrives ──────────────────────
-  useEffect(() => {
+  useIsoLayoutEffect(() => {
     if (!duel) return;
     const seen = animatedKicks.current.get(duel.id);
     const rounds = duel.rounds ?? [];
@@ -339,6 +342,15 @@ export default function DuelArena({
       gsap.set([kArmL, kArmR], { rotation: 0 });
       gsap.set(trail, { opacity: 0 });
     };
+
+    // Pin the start pose synchronously (before paint) so the first frame of the
+    // reveal shows the kicker, not a popped/recolored frame.
+    gsap.set(striker, { x: -34, rotation: 0 });
+    gsap.set(limbs, { rotation: 0, transformOrigin: '50% 0%' });
+    gsap.set(ball, { x: 0, y: 0, scale: 1 });
+    gsap.set(ballImg, { rotation: 0 });
+    gsap.set(keeper, { x: 0, y: 0, rotation: 0, scaleY: 1 });
+    gsap.set(trail, { opacity: 0, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } });
 
     const tl = gsap.timeline({ onComplete: () => { setAnimating(false); setBanner(null); reset(); } });
     if (decisive) tl.timeScale(0.6); // slow-mo on the deciding kick
