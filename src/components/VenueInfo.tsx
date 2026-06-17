@@ -9,18 +9,18 @@ const ROOF_LABEL = { open: 'Open air', fixed: 'Indoor', retractable: 'Retractabl
  */
 export default function VenueInfo({ venue }: { venue: string | null }) {
   const v = lookupVenue(venue);
-  if (!v) return venue ? <div className="venue-info venue-info-plain">🏟 {venue}</div> : null;
+  if (!v) return venue ? <div className="venue-info venue-info-plain">{venue}</div> : null;
 
   return (
     <div className="venue-info">
       <div className="venue-head">
-        <span className="venue-stadium">🏟 {v.stadium}</span>
+        <span className="venue-stadium">{v.stadium}</span>
         <span className="venue-city">{v.city}</span>
       </div>
       <div className="venue-facts">
-        <span>👥 {v.capacity.toLocaleString()}</span>
+        <span>{v.capacity.toLocaleString()} capacity</span>
         <span>{ROOF_LABEL[v.roof]}</span>
-        {v.elevationM >= 500 && <span>⛰ {v.elevationM.toLocaleString()} m</span>}
+        {v.elevationM >= 500 && <span>{v.elevationM.toLocaleString()} m elevation</span>}
       </div>
     </div>
   );

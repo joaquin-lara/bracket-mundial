@@ -57,7 +57,7 @@ function Row({ m }: { m: Match }) {
           </span>
         </div>
       </div>
-      {venueLabel(m.venue) && <div className="sched-venue">🏟 {venueLabel(m.venue)}</div>}
+      {venueLabel(m.venue) && <div className="sched-venue">{venueLabel(m.venue)}</div>}
     </div>
   );
 }
