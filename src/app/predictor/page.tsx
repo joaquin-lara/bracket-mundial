@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import './predictor.css';
 import Flag from '@/components/Flag';
+import ChartTag from '@/components/ChartTag';
 import MatchupPicker from '@/components/MatchupPicker';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { createClient } from '@/lib/supabase/server';
@@ -204,8 +205,10 @@ export default async function PredictorPage() {
       {/* ---- real fixtures ---- */}
       {upcoming.length > 0 && (
         <section className="ml-section">
-          <h2 className="ml-h2">Upcoming fixtures, rated</h2>
-          <p className="ml-lead">The model&apos;s read on the next World Cup 2026 matches.</p>
+          <h2 className="ml-h2">Upcoming fixtures, rated<ChartTag kind="prediction" /></h2>
+          <p className="ml-lead">
+            Model predictions for the next World Cup 2026 matches — win/draw/win odds and the single likeliest score.
+          </p>
           <div className="ml-fixtures">
             {upcoming.map((m) => {
               const r = predict({ home: m.home_code!, away: m.away_code!, neutral: true })!;

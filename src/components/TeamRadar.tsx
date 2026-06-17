@@ -1,4 +1,5 @@
 import { TEAMS, type TeamRating } from '@/lib/ml/teams';
+import ChartTag from './ChartTag';
 
 // Five axes, each scored 0..1 by min-max across the 48 WC teams so the shape is
 // readable rather than dominated by raw-unit scale differences. Squad falls back
@@ -55,9 +56,9 @@ export default function TeamRadar({ home, away }: { home: TeamRating; away: Team
 
   return (
     <div style={{ marginTop: 22, textAlign: 'center' }}>
-      <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)' }}>Team comparison</div>
+      <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)' }}>Team comparison<ChartTag kind="prediction" /></div>
       <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 8 }}>
-        Each axis is scored against all 48 World Cup teams. Bigger shape = stronger.
+        Based on the model&apos;s ratings — attack, defence, Elo strength, recent form and squad talent — each axis scored against all 48 World Cup teams. Bigger shape = stronger.
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
         <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} role="img"
