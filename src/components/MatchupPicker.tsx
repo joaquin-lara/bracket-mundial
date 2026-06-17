@@ -8,9 +8,11 @@ import ScoreGrid from './ScoreGrid';
 import TeamRadar from './TeamRadar';
 import H2HHistory from './H2HHistory';
 import Lineup from './Lineup';
+import ConfirmedLineups from './ConfirmedLineups';
 import ChartTag from './ChartTag';
 import { TEAMS, byCode } from '@/lib/ml/teams';
 import { predict, pct } from '@/lib/ml/model';
+import type { MatchLineups } from '@/lib/types';
 
 /** Validate a ?home= / ?away= code from the URL, or null if not one of the 48. */
 function validCode(raw: string | null): string | null {
@@ -28,7 +30,7 @@ function ProbBar({ home, draw, away }: { home: number; draw: number; away: numbe
   );
 }
 
-export default function MatchupPicker() {
+export default function MatchupPicker({ confirmedByPair = {} }: { confirmedByPair?: Record<string, MatchLineups> }) {
   const params = useSearchParams();
   const presetHome = validCode(params.get('home')) ?? 'ARG';
   let presetAway = validCode(params.get('away')) ?? (presetHome === 'BRA' ? 'ARG' : 'BRA');
@@ -52,6 +54,8 @@ export default function MatchupPicker() {
 
   if (!result) return null;
   const { home: H, away: A } = result;
+  // Real confirmed XIs when these two teams are an actual fixture that has them.
+  const confirmed = confirmedByPair[[home, away].slice().sort().join('|')];
 
   return (
     <div className="ml-picker">
@@ -148,16 +152,20 @@ export default function MatchupPicker() {
         <TeamRadar home={H} away={A} />
         <H2HHistory home={H} away={A} />
 
-        <div style={{ marginTop: 22 }}>
-          <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)', textAlign: 'center' }}>Projected lineups<ChartTag kind="history" /></div>
-          <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 10, textAlign: 'center' }}>
-            Not a prediction — each team&apos;s most recent known formation and XI from match records. Positions on the pitch are approximate.
+        {confirmed ? (
+          <ConfirmedLineups lineups={confirmed} leftCode={H.code} />
+        ) : (
+          <div style={{ marginTop: 22 }}>
+            <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)', textAlign: 'center' }}>Projected lineups<ChartTag kind="history" /></div>
+            <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 10, textAlign: 'center' }}>
+              Not a prediction — each team&apos;s most recent known formation and XI from match records. Positions on the pitch are approximate.
+            </div>
+            <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Lineup team={H} accent="rgb(52,211,153)" />
+              <Lineup team={A} accent="rgb(230,179,55)" />
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Lineup team={H} accent="rgb(52,211,153)" />
-            <Lineup team={A} accent="rgb(230,179,55)" />
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

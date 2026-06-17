@@ -12,6 +12,23 @@ export interface Match {
   away_score: number | null;
   scored: boolean;
   venue: string | null;
+  lineups?: MatchLineups | null;
+}
+
+export interface LineupPlayer {
+  name: string;
+  pos: string; // G / D / M / F
+  grid: string | null; // "row:col" pitch position, row 1 = goalkeeper end
+  number: number | null;
+}
+export interface TeamLineup {
+  teamName: string;
+  formation: string;
+  startXI: LineupPlayer[];
+}
+export interface MatchLineups {
+  home: TeamLineup;
+  away: TeamLineup;
 }
 
 export interface Prediction {

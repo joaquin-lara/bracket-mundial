@@ -6,7 +6,7 @@ import ChartTag from '@/components/ChartTag';
 import MatchupPicker from '@/components/MatchupPicker';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { createClient } from '@/lib/supabase/server';
-import type { Match } from '@/lib/types';
+import type { Match, MatchLineups } from '@/lib/types';
 import { stageLabel } from '@/lib/types';
 import { predict, pct } from '@/lib/ml/model';
 import { DATASET, MODEL, lookup, TEAMS } from '@/lib/ml/teams';
@@ -37,6 +37,14 @@ export default async function PredictorPage() {
     .select('*')
     .order('kickoff', { ascending: true });
   const matches = (data ?? []) as Match[];
+
+  // Real confirmed XIs keyed by sorted team-code pair, for the matchup picker.
+  const confirmedByPair: Record<string, MatchLineups> = {};
+  for (const m of matches) {
+    if (m.lineups && m.home_code && m.away_code) {
+      confirmedByPair[[m.home_code, m.away_code].slice().sort().join('|')] = m.lineups;
+    }
+  }
 
   // Upcoming fixtures we can rate (both teams known).
   const upcoming = matches
@@ -78,7 +86,7 @@ export default async function PredictorPage() {
           Choose two of the 48 qualified teams. Everything updates live in your browser.
         </p>
         <Suspense fallback={null}>
-          <MatchupPicker />
+          <MatchupPicker confirmedByPair={confirmedByPair} />
         </Suspense>
       </section>
 
