@@ -21,11 +21,6 @@ export default async function DuelsPage({
 
   return (
     <main>
-      <h1>Penalty Shootouts</h1>
-      <p className="subtitle">
-        Challenge a bro to a best-of-5 shootout. Pick in secret, reveal together. Bragging rights
-        only.
-      </p>
       <DuelArena
         me={user.id}
         profiles={(profiles ?? []) as { id: string; display_name: string }[]}
