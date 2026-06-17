@@ -112,7 +112,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { id: 'unbeaten_run', name: 'Unbeaten Run', emoji: '🛡️', tier: 'legendary', category: 'Duels', description: 'Win 5 duels in a row.' },
   { id: 'on_a_roll', name: 'On a Roll', emoji: '🎳', tier: 'rare', category: 'Duels', description: 'Win 3 duels in a row.' },
   { id: 'five_for_five', name: 'Five for Five', emoji: '🖐️', tier: 'epic', category: 'Duels', description: 'Win a duel scoring all five of your kicks.' },
-  { id: 'rivalry_sweep', name: 'Rivalry Sweep', emoji: '🧹', tier: 'legendary', category: 'Duels', description: 'Beat all three other players at least once.' },
+  { id: 'rivalry_sweep', name: 'Rivalry Sweep', emoji: '🧹', tier: 'rare', category: 'Duels', description: 'Beat all three other players at least once.' },
   { id: 'apex_predator', name: 'Apex Predator', emoji: '🐅', tier: 'legendary', category: 'Duels', description: 'Beat each of the other three players at least twice.' },
   { id: 'duelist', name: 'Duelist', emoji: '🤺', tier: 'rare', category: 'Duels', description: 'Play 10 duels (win or lose).' },
   { id: 'marathon_man', name: 'Marathon Man', emoji: '🏃', tier: 'epic', category: 'Duels', description: 'Win a duel that goes 14+ kicks.' },
