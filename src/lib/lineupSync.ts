@@ -8,8 +8,12 @@ import { lookup } from './ml/teams';
 // early and poll often; MAX_ATTEMPTS bounds the worst case (a never-posted match).
 const OPEN_BEFORE_MS = 60 * 60_000; // start polling 60 min before kickoff
 const LATE_AFTER_MS = 30 * 60_000; // give up 30 min after kickoff if never posted
-const RECHECK_MS = 5 * 60_000; // min gap between polls for one match
-const MAX_ATTEMPTS = 8; // hard cap on polls per match (worst case ~8 x 6 games/day)
+// Keep the recheck gap just *under* the 5-min cron interval, or clock jitter makes
+// a tick land at 4:58 and get skipped -- effectively halving the poll rate.
+const RECHECK_MS = 4 * 60_000; // min gap between polls for one match
+// 12 polls at ~5 min spacing from 60 min before reaches ~5 min before kickoff, so
+// we never stop before the 20-40-min publish window. Worst case ~12 x 6 = 72/day.
+const MAX_ATTEMPTS = 12; // hard cap on polls per match
 const MAX_CALLS = 12; // hard cap on lineup calls per single run
 
 interface Row {
