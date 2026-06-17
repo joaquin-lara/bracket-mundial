@@ -133,20 +133,6 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
         </div>
       </div>
 
-      <VenueInfo venue={match.venue} />
-
-      {match.lineups ? (
-        <ConfirmedLineups lineups={match.lineups} leftCode={match.home_code} />
-      ) : (
-        !teamsTbd &&
-        match.home_code &&
-        match.away_code &&
-        match.status !== 'FINISHED' &&
-        lockAt - now < 65 * 60 * 1000 && (
-          <div className="lineup-wait">Confirmed lineups expected ~40 min before kickoff.</div>
-        )
-      )}
-
       <div className="match-footer">
         {teamsTbd && !started ? (
           <span className="locked-tag">Teams TBD — opens when both are decided</span>
@@ -192,6 +178,20 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
           </button>
         )}
       </div>
+
+      <VenueInfo venue={match.venue} />
+
+      {match.lineups ? (
+        <ConfirmedLineups lineups={match.lineups} leftCode={match.home_code} />
+      ) : (
+        !teamsTbd &&
+        match.home_code &&
+        match.away_code &&
+        match.status !== 'FINISHED' &&
+        lockAt - now < 65 * 60 * 1000 && (
+          <div className="lineup-wait">Confirmed lineups expected ~40 min before kickoff.</div>
+        )
+      )}
 
       {started && revealedPicks && revealedPicks.length > 0 && (
         <div className="picks">
