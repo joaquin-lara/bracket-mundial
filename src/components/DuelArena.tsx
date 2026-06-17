@@ -804,6 +804,11 @@ export default function DuelArena({
   // ── lobby ──────────────────────────────────────────────────────────────────
   return (
     <div>
+      <h1>Penalty Shootouts</h1>
+      <p className="subtitle">
+        Challenge a bro to a best-of-5 shootout. Pick in secret, reveal together. Bragging rights
+        only.
+      </p>
       <div className="groups-head">
         <span className="groups-title">{isGuest ? 'Practice' : 'Challenge'}</span>
         <div className="contenders-line" />
