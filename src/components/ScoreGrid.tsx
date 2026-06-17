@@ -8,12 +8,12 @@ export default function ScoreGrid({ grid, home, away }: { grid: number[][]; home
   const cellBase: React.CSSProperties = { textAlign: 'center', padding: '7px 0', fontSize: 12, borderRadius: 4, fontVariantNumeric: 'tabular-nums' };
 
   return (
-    <div style={{ marginTop: 22 }}>
+    <div style={{ marginTop: 22, textAlign: 'center' }}>
       <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)' }}>Scoreline probability</div>
       <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 10 }}>
         {home.name} goals down the side, {away.name} across the top. Brighter = more likely; the diagonal (gold) is draws.
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: `1.4rem repeat(6, 1fr)`, gap: 3, maxWidth: 400 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: `1.4rem repeat(6, 1fr)`, gap: 3, maxWidth: 400, margin: '0 auto' }}>
         <div />
         {[0, 1, 2, 3, 4, 5].map((a) => (
           <div key={`h${a}`} style={head}>{a}{a === 5 ? '+' : ''}</div>

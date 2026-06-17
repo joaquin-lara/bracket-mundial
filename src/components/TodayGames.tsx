@@ -2,6 +2,7 @@
 
 import Flag from './Flag';
 import { stageLabel, type Match } from '@/lib/types';
+import { venueLabel } from '@/lib/venues';
 
 export default function TodayGames({ matches }: { matches: Match[] }) {
   const localToday = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in local time
@@ -53,6 +54,7 @@ export default function TodayGames({ matches }: { matches: Match[] }) {
                   </span>
                 </div>
               </div>
+              {venueLabel(m.venue) && <div className="sched-venue">🏟 {venueLabel(m.venue)}</div>}
             </div>
           );
         })}

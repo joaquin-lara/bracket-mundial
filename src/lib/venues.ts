@@ -38,8 +38,6 @@ function norm(s: string): string {
   return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 }
 
-const FLAG: Record<Venue['country'], string> = { USA: '🇺🇸', Mexico: '🇲🇽', Canada: '🇨🇦' };
-
 /** Resolve a fixture's free-text venue string to a known host venue, or null. */
 export function lookupVenue(raw: string | null | undefined): Venue | null {
   if (!raw) return null;
@@ -51,16 +49,9 @@ export function lookupVenue(raw: string | null | undefined): Venue | null {
   return null;
 }
 
-export function countryFlag(c: Venue['country']): string {
-  return FLAG[c];
-}
-
-/** Short human note about what the venue does to the game (altitude/roof/size). */
-export function venueNote(v: Venue): string {
-  if (v.elevationM >= 1500) return `High altitude (${v.elevationM.toLocaleString()} m) — thinner air, the ball flies and legs tire faster.`;
-  if (v.elevationM >= 500) return `Moderate altitude (${v.elevationM.toLocaleString()} m).`;
-  if (v.roof === 'fixed') return 'Enclosed roof — loud, climate-controlled, no weather.';
-  if (v.roof === 'retractable') return 'Retractable roof — can be sealed against heat or rain.';
-  if (v.capacity >= 75000) return 'One of the largest hosts — a huge, intense crowd.';
-  return 'Open-air stadium.';
+/** Compact one-line label ("Stadium · City") for list rows, or the raw string. */
+export function venueLabel(raw: string | null | undefined): string | null {
+  const v = lookupVenue(raw);
+  if (v) return `${v.stadium} · ${v.city}`;
+  return raw ?? null;
 }
