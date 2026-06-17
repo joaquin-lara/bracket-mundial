@@ -19,11 +19,28 @@ function lastName(name: string): string {
   return parts.length > 1 ? parts.slice(1).join(' ') : name;
 }
 
+/**
+ * Short pitch labels: surname only, but when two starters share a surname (e.g.
+ * the two Martínez / Hernández), prefix the first initial so they're distinct.
+ */
+function shortLabels(names: string[]): string[] {
+  const surnames = names.map(lastName);
+  const counts = new Map<string, number>();
+  for (const s of surnames) counts.set(s, (counts.get(s) ?? 0) + 1);
+  return names.map((name, i) => {
+    const sur = surnames[i];
+    if ((counts.get(sur) ?? 0) <= 1) return sur;
+    const first = name.trim().split(/\s+/)[0];
+    return `${first[0]}. ${sur}`;
+  });
+}
+
 /** A starting XI laid out on a vertical pitch in its formation (attacking up). */
 function Pitch({ lu, accent }: { lu: TeamLineup; accent: string }) {
   const lines = lu.formation.split('-').map(Number).filter((k) => k > 0);
   const rows = [1, ...lines]; // GK + outfield lines, defence -> attack
   const R = rows.length;
+  const labels = shortLabels(lu.starters.map((s) => s.name));
 
   // Assign starters in listed order: GK first, then each line filled L->R.
   const dots: { x: number; y: number; label: string; gk: boolean }[] = [];
@@ -32,8 +49,7 @@ function Pitch({ lu, accent }: { lu: TeamLineup; accent: string }) {
     const y = (H - PAD - 12) - (R > 1 ? (r * (H - 2 * PAD - 30)) / (R - 1) : 0);
     for (let i = 0; i < k; i++) {
       const x = PAD + ((i + 1) * (W - 2 * PAD)) / (k + 1);
-      const s = lu.starters[idx++];
-      dots.push({ x, y, label: s ? lastName(s.name) : '', gk: r === 0 });
+      dots.push({ x, y, label: labels[idx++] ?? '', gk: r === 0 });
     }
   });
 
