@@ -54,7 +54,7 @@ export default function TodayGames({ matches }: { matches: Match[] }) {
                   </span>
                 </div>
               </div>
-              {venueLabel(m.venue) && <div className="sched-venue">🏟 {venueLabel(m.venue)}</div>}
+              {venueLabel(m.venue) && <div className="sched-venue">{venueLabel(m.venue)}</div>}
             </div>
           );
         })}
