@@ -133,6 +133,7 @@ export default function DuelArena({
   const netRef = useRef<SVGGElement>(null);
   const sceneRef = useRef<SVGSVGElement>(null);
   const ambienceRef = useRef<HTMLAudioElement>(null);
+  const drumsRef = useRef<HTMLAudioElement>(null);
   const animatedKicks = useRef<Map<string, number>>(new Map());
   const sdArmed = useRef<Set<string>>(new Set());
   const [muted, setMutedState] = useState(false);
@@ -145,7 +146,7 @@ export default function DuelArena({
     const a = ambienceRef.current;
     if (!a) return;
     if (inGame && !muted) {
-      a.volume = 0.25;
+      a.volume = 1;
       a.play().catch(() => {});
     } else {
       a.pause();
@@ -218,6 +219,19 @@ export default function DuelArena({
   }
 
   const duel = activeId === CPU_DUEL_ID ? cpuDuel : duels.find((d) => d.id === activeId) ?? null;
+
+  const isSuddenDeath = !!(duel && duel.kick > 10 && duel.status === 'active');
+  useEffect(() => {
+    const d = drumsRef.current;
+    if (!d) return;
+    if (isSuddenDeath && !muted) {
+      d.volume = 0.5;
+      d.play().catch(() => {});
+    } else {
+      d.pause();
+      d.currentTime = 0;
+    }
+  }, [isSuddenDeath, muted]);
 
   function startCpu() {
     animatedKicks.current.set(CPU_DUEL_ID, 0);
@@ -338,7 +352,7 @@ export default function DuelArena({
       gsap.set(ball, { x: 0 });
       gsap.set(ballY, { y: 0 });
       gsap.set(ballImg, { rotation: 0, scale: 1 });
-      gsap.set(keeper, { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 });
+      gsap.set(keeper, { clearProps: 'transform,transformOrigin' });
       gsap.set([kArmL, kArmR], { rotation: 0 });
       gsap.set(trail, { opacity: 0 });
     };
@@ -350,7 +364,7 @@ export default function DuelArena({
     gsap.set(ball, { x: 0 });
     gsap.set(ballY, { y: 0 });
     gsap.set(ballImg, { rotation: 0, scale: 1, transformOrigin: '50% 50%' });
-    gsap.set(keeper, { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 });
+    gsap.set(keeper, { clearProps: 'transform,transformOrigin' });
     gsap.set(trail, { opacity: 0, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } });
 
     const tl = gsap.timeline({ onComplete: () => { setAnimating(false); setBanner(null); reset(); } });
@@ -362,7 +376,7 @@ export default function DuelArena({
       .set(ball, { x: 0 })
       .set(ballY, { y: 0 })
       .set(ballImg, { rotation: 0, scale: 1 })
-      .set(keeper, { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 })
+      .set(keeper, { clearProps: 'transform,transformOrigin' })
       .set(trail, { opacity: 0, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } })
       .add(() => sfx.whistle());
 
@@ -397,11 +411,11 @@ export default function DuelArena({
 
     // keeper: explosive dive to the chosen side. The left dive is an exact mirror
     // of the right (same rotation magnitude, flipped via scaleX) so it never leans
-    // further one way than the other.
     tl.to(keeper, {
+        svgOrigin: '200 150',
         x: diveX, y: round.dive === 'center' ? -6 : -16,
-        rotation: round.dive === 'center' ? 0 : 38,
-        scaleX: round.dive === 'left' ? -1 : 1,
+        rotation: round.dive === 'center' ? 0 : round.dive === 'left' ? -38 : 38,
+        scaleX: 1,
         scaleY: round.dive === 'center' ? 0.82 : 1, duration: 0.4, ease: 'power2.out',
       }, 'launch');
 
@@ -564,6 +578,7 @@ export default function DuelArena({
             {muted ? '🔇' : '🔊'}
           </button>
           <audio ref={ambienceRef} src="/minigame_sounds/stadium_noise.mp3" loop preload="auto" />
+          <audio ref={drumsRef} src="/minigame_sounds/drums.mp3" loop preload="auto" />
           <svg ref={sceneRef} viewBox="0 0 400 260" className={`duel-svg${suddenDeath ? ' sd' : ''}`}>
             <defs>
               <linearGradient id="dSky" x1="0" y1="0" x2="0" y2="1">
@@ -670,11 +685,11 @@ export default function DuelArena({
                   <rect x="-7" y="-15" width="14" height="26" rx="5" fill={keeperColor} />
                   <line x1="-7" y1="-10" x2="-22" y2="-22" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" className="keeper-arm-l" />
                   <line x1="7" y1="-10" x2="22" y2="-22" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" className="keeper-arm-r" />
-                  <g transform="translate(-24 -26) scale(-1,1)">
-                    <image href="/goalie_gloves.png" x="-13" y="-17" width="26" height="34" preserveAspectRatio="xMidYMid meet" />
+                  <g transform="translate(-24 -26) scale(-1,1) rotate(51) scale(-1,1)">
+                    <image href="/goalie_gloves.png" x="-10" y="-13" width="20" height="26" preserveAspectRatio="xMidYMid meet" />
                   </g>
-                  <g transform="translate(24 -26)">
-                    <image href="/goalie_gloves.png" x="-13" y="-17" width="26" height="34" preserveAspectRatio="xMidYMid meet" />
+                  <g transform="translate(24 -26) rotate(51) scale(-1,1)">
+                    <image href="/goalie_gloves.png" x="-10" y="-13" width="20" height="26" preserveAspectRatio="xMidYMid meet" />
                   </g>
                   <line x1="-4" y1="11" x2="-7" y2="30" stroke="#f4f1e8" strokeWidth="5" strokeLinecap="round" />
                   <line x1="4" y1="11" x2="7" y2="30" stroke="#f4f1e8" strokeWidth="5" strokeLinecap="round" />
