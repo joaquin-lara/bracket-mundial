@@ -75,19 +75,28 @@ export async function runLineupSync(admin: SupabaseClient): Promise<string[]> {
     if (due.some((m) => !m.af_fixture_id)) {
       try {
         const fixtures = await fetchWcFixtures(key);
-        const byKey = new Map<string, number>();
+        // Key by the sorted code pair (providers disagree on who's "home" in a
+        // neutral WC game), with the kickoff time to disambiguate repeat pairings.
+        const byPair = new Map<string, { id: number; t: number }[]>();
         for (const f of fixtures) {
-          const hc = codeOf(f.home);
-          const ac = codeOf(f.away);
-          if (hc && ac) byKey.set(`${hc}|${ac}|${f.date.slice(0, 10)}`, f.id);
+          const a = codeOf(f.home);
+          const b = codeOf(f.away);
+          if (!a || !b) continue;
+          const key2 = [a, b].sort().join('|');
+          const arr = byPair.get(key2) ?? [];
+          arr.push({ id: f.id, t: Date.parse(f.date) });
+          byPair.set(key2, arr);
         }
         for (const m of due) {
           if (m.af_fixture_id) continue;
-          const id = byKey.get(`${m.home_code}|${m.away_code}|${m.kickoff.slice(0, 10)}`);
-          if (id) {
-            m.af_fixture_id = id;
-            await admin.from('matches').update({ af_fixture_id: id }).eq('id', m.id);
-          }
+          const cands = byPair.get([m.home_code!, m.away_code!].sort().join('|'));
+          if (!cands?.length) continue;
+          const kt = Date.parse(m.kickoff);
+          // Closest kickoff within ~2 days handles minor date/timezone offsets.
+          const best = cands.reduce((p, c) => (Math.abs(c.t - kt) < Math.abs(p.t - kt) ? c : p));
+          if (Math.abs(best.t - kt) > 2 * 24 * 60 * 60_000) continue;
+          m.af_fixture_id = best.id;
+          await admin.from('matches').update({ af_fixture_id: best.id }).eq('id', m.id);
         }
       } catch {
         /* mapping failed; try again next run */
