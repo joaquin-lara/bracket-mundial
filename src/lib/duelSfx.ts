@@ -68,6 +68,20 @@ function noise(t0: number, dur: number, gain: number, type: BiquadFilterType, fr
 
 const now = () => ac()?.currentTime ?? 0;
 
+// Play a random clip from a list of public audio files (equal probability).
+const GOAL_FILES = ['/minigame_sounds/goal.mp3', '/minigame_sounds/goal2.mp3', '/minigame_sounds/goal3.mp3'];
+function playRandomFile(files: string[], volume = 0.9) {
+  if (isMuted() || typeof Audio === 'undefined' || files.length === 0) return;
+  const src = files[Math.floor(Math.random() * files.length)];
+  try {
+    const a = new Audio(src);
+    a.volume = volume;
+    a.play().catch(() => {});
+  } catch {
+    /* ignore */
+  }
+}
+
 export const sfx = {
   whistle() {
     if (isMuted()) return;
@@ -86,10 +100,8 @@ export const sfx = {
     noise(now(), 0.34, 0.12, 'bandpass', 700, 1.4, 2600);
   },
   goal() {
-    if (isMuted()) return;
-    const t = now();
-    noise(t, 1.4, 0.5, 'lowpass', 500, 1, 1400); // crowd roar swell
-    [523, 659, 784, 1046].forEach((f, i) => tone(f, t + i * 0.09, 0.5, 'triangle', 0.16));
+    // One of the three real goal clips, chosen at random with equal odds.
+    playRandomFile(GOAL_FILES, 0.9);
   },
   save() {
     if (isMuted()) return;
