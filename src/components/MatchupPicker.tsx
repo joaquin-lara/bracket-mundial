@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Flag from './Flag';
+import TeamCombobox from './TeamCombobox';
 import ScoreGrid from './ScoreGrid';
 import TeamRadar from './TeamRadar';
 import H2HHistory from './H2HHistory';
@@ -10,8 +11,6 @@ import Lineup from './Lineup';
 import ChartTag from './ChartTag';
 import { TEAMS, byCode } from '@/lib/ml/teams';
 import { predict, pct } from '@/lib/ml/model';
-
-const OPTIONS = TEAMS.map((t) => ({ code: t.code, name: t.name }));
 
 /** Validate a ?home= / ?away= code from the URL, or null if not one of the 48. */
 function validCode(raw: string | null): string | null {
@@ -59,16 +58,7 @@ export default function MatchupPicker() {
       <div className="ml-pick-row">
         <label className="ml-pick">
           <span className="ml-pick-label">Team A</span>
-          <div className="ml-select-wrap">
-            <Flag code={H.code} name={H.name} />
-            <select value={home} onChange={(e) => setHome(e.target.value)} aria-label="Team A">
-              {OPTIONS.map((o) => (
-                <option key={o.code} value={o.code} disabled={o.code === away}>
-                  {o.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <TeamCombobox value={home} onChange={setHome} exclude={away} label="Team A" />
         </label>
 
         <button className="ml-swap" onClick={swap} aria-label="Swap teams" type="button">
@@ -77,16 +67,7 @@ export default function MatchupPicker() {
 
         <label className="ml-pick">
           <span className="ml-pick-label">Team B</span>
-          <div className="ml-select-wrap">
-            <Flag code={A.code} name={A.name} />
-            <select value={away} onChange={(e) => setAway(e.target.value)} aria-label="Team B">
-              {OPTIONS.map((o) => (
-                <option key={o.code} value={o.code} disabled={o.code === home}>
-                  {o.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <TeamCombobox value={away} onChange={setAway} exclude={home} label="Team B" />
         </label>
       </div>
 
