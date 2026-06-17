@@ -54,12 +54,12 @@ export default function TeamRadar({ home, away }: { home: TeamRating; away: Team
   const AWAY = '230,179,55'; // gold
 
   return (
-    <div style={{ marginTop: 22 }}>
+    <div style={{ marginTop: 22, textAlign: 'center' }}>
       <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)' }}>Team comparison</div>
       <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 8 }}>
         Each axis is scored against all 48 World Cup teams. Bigger shape = stronger.
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
         <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} role="img"
           aria-label={`Radar comparing ${home.name} and ${away.name}`}>
           {rings.map((r, ri) => (

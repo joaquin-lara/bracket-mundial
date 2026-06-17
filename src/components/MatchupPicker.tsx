@@ -6,6 +6,7 @@ import Flag from './Flag';
 import ScoreGrid from './ScoreGrid';
 import TeamRadar from './TeamRadar';
 import H2HHistory from './H2HHistory';
+import Lineup from './Lineup';
 import { TEAMS, byCode } from '@/lib/ml/teams';
 import { predict, pct } from '@/lib/ml/model';
 
@@ -158,6 +159,17 @@ export default function MatchupPicker() {
         <ScoreGrid grid={result.scoreGrid} home={H} away={A} />
         <TeamRadar home={H} away={A} />
         <H2HHistory home={H} away={A} />
+
+        <div style={{ marginTop: 22 }}>
+          <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)', textAlign: 'center' }}>Projected lineups</div>
+          <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 10, textAlign: 'center' }}>
+            Each team&apos;s most recent known formation and XI. Positions on the pitch are approximate.
+          </div>
+          <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Lineup team={H} accent="rgb(52,211,153)" />
+            <Lineup team={A} accent="rgb(230,179,55)" />
+          </div>
+        </div>
       </div>
     </div>
   );

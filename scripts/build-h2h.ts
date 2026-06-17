@@ -13,7 +13,7 @@ import { lookup, TEAMS } from '../src/lib/ml/teams';
 const ROOT = process.cwd();
 const CSV = path.join(ROOT, 'data', 'results.csv');
 const OUT = path.join(ROOT, 'public', 'h2h.json');
-const RECENT = 12; // recent meetings kept per pair for display
+const RECENT = 30; // recent meetings kept per pair (also the slider's max range)
 
 interface Meeting { date: string; h: string; a: string; hs: number; as: number; t: string }
 interface Pair {
