@@ -671,10 +671,10 @@ export default function DuelArena({
                   <line x1="-7" y1="-10" x2="-22" y2="-22" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" className="keeper-arm-l" />
                   <line x1="7" y1="-10" x2="22" y2="-22" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" className="keeper-arm-r" />
                   <g transform="translate(-24 -26) scale(-1,1)">
-                    <image href="/minigame_sounds/goalie_gloves.png" x="-13" y="-17" width="26" height="34" preserveAspectRatio="xMidYMid meet" />
+                    <image href="/goalie_gloves.png" x="-13" y="-17" width="26" height="34" preserveAspectRatio="xMidYMid meet" />
                   </g>
                   <g transform="translate(24 -26)">
-                    <image href="/minigame_sounds/goalie_gloves.png" x="-13" y="-17" width="26" height="34" preserveAspectRatio="xMidYMid meet" />
+                    <image href="/goalie_gloves.png" x="-13" y="-17" width="26" height="34" preserveAspectRatio="xMidYMid meet" />
                   </g>
                   <line x1="-4" y1="11" x2="-7" y2="30" stroke="#f4f1e8" strokeWidth="5" strokeLinecap="round" />
                   <line x1="4" y1="11" x2="7" y2="30" stroke="#f4f1e8" strokeWidth="5" strokeLinecap="round" />
