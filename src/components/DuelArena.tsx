@@ -383,9 +383,11 @@ export default function DuelArena({
   }
 
   const others = profiles.filter((p) => p.id !== me);
-  const pending = duels.filter((d) => d.status === 'pending');
-  const active = duels.filter((d) => d.status === 'active');
-  const finished = duels.filter((d) => d.status === 'finished');
+  const isMine = (d: Duel) => d.challenger === me || d.opponent === me;
+  const pending = duels.filter((d) => d.status === 'pending' && isMine(d));
+  const active = duels.filter((d) => d.status === 'active' && isMine(d));
+  const othersActive = duels.filter((d) => d.status === 'active' && !isMine(d));
+  const finished = duels.filter((d) => d.status === 'finished' && isMine(d));
 
   const record = (other: string) => {
     let w = 0;
@@ -404,6 +406,7 @@ export default function DuelArena({
     const shooterId = duel.kick % 2 === 1 ? duel.challenger : duel.opponent;
     const keeperId = shooterId === duel.challenger ? duel.opponent : duel.challenger;
     const iShoot = shooterId === me;
+    const iAmIn = me === duel.challenger || me === duel.opponent; // false = spectator
 
     // Two reveal timings: scores/dots update with the GOL/ATAJADO banner;
     // shirts, role tags, and sudden-death effects wait for the figures to
@@ -592,7 +595,7 @@ export default function DuelArena({
             </g>
 
             {/* YOU marker */}
-            {duel.status === 'active' && !animating && (
+            {duel.status === 'active' && !animating && iAmIn && (
               <g transform={iShoot ? 'translate(156 180)' : 'translate(200 96)'}>
                 <g className="duel-you-bob">
                   <rect x="-21" y="-15" width="42" height="16" rx="5" fill="#e6b337" />
@@ -700,6 +703,7 @@ export default function DuelArena({
                 {(() => {
                   const winnerKicks = (duel.rounds ?? []).filter((r) => r.shooter === duel.winner);
                   const perfect = winnerKicks.length >= 5 && winnerKicks.every((r) => r.goal);
+                  if (!iAmIn) return `${nameOf(duel.winner ?? '')} wins 🏆`;
                   if (duel.winner === me) {
                     return perfect ? 'You win! Como un animal! 🏆' : 'You win! Que crack. 🏆';
                   }
@@ -710,17 +714,19 @@ export default function DuelArena({
                 })()}
               </div>
               <div className="duel-overlay-actions">
-                <button
-                  className="save-btn"
-                  disabled={busy}
-                  onClick={() =>
-                    duel.id === CPU_DUEL_ID
-                      ? startCpu()
-                      : challenge(duel.challenger === me ? duel.opponent : duel.challenger)
-                  }
-                >
-                  Rematch
-                </button>
+                {iAmIn && (
+                  <button
+                    className="save-btn"
+                    disabled={busy}
+                    onClick={() =>
+                      duel.id === CPU_DUEL_ID
+                        ? startCpu()
+                        : challenge(duel.challenger === me ? duel.opponent : duel.challenger)
+                    }
+                  >
+                    Rematch
+                  </button>
+                )}
                 <button className="link-btn" onClick={() => setActiveId(null)}>
                   Back to lobby
                 </button>
@@ -731,6 +737,8 @@ export default function DuelArena({
 
         {duel.status === 'finished' ? null : animating ? (
           <p className="duel-status">…</p>
+        ) : !iAmIn ? (
+          <p className="duel-status">👀 Spectating · {nameOf(shooterId)} to shoot, kick {duel.kick}</p>
         ) : !iPicked ? (
           <div>
             <div className={`duel-role ${iShoot ? 'shoot' : 'keep'}`}>
@@ -776,8 +784,8 @@ export default function DuelArena({
           </p>
         )}
 
-        {/* Private edge readout — Joaquin only, real opponents only (CPU is random). */}
-        {duel.status === 'active' && !animating && nameOf(me) === 'Joaquin' && keeperId !== CPU_ID && shooterId !== CPU_ID && (
+        {/* Private edge readout — Joaquin only, his own games, real opponents only. */}
+        {duel.status === 'active' && !animating && iAmIn && nameOf(me) === 'Joaquin' && keeperId !== CPU_ID && shooterId !== CPU_ID && (
           <DuelEdge
             duels={duels}
             me={me}
@@ -788,7 +796,7 @@ export default function DuelArena({
           />
         )}
 
-        {duel.status === 'active' && (
+        {duel.status === 'active' && iAmIn && (
           <div className="duel-endwrap">
             <button className="duel-end" disabled={busy} onClick={() => endGame(duel.id)}>
               End game
@@ -912,6 +920,27 @@ export default function DuelArena({
                 </button>
                 <button className="duel-end" disabled={busy} onClick={() => endGame(d.id)}>
                   End
+                </button>
+              </span>
+            </div>
+          ))}
+        </>
+      )}
+
+      {!isGuest && othersActive.length > 0 && (
+        <>
+          <div className="groups-head">
+            <span className="groups-title">Live now</span>
+            <div className="contenders-line" />
+          </div>
+          {othersActive.map((d) => (
+            <div className="duel-row" key={d.id}>
+              <span>
+                {nameOf(d.challenger)} {d.challenger_score} – {d.opponent_score} {nameOf(d.opponent)}
+              </span>
+              <span className="duel-row-actions">
+                <button className="save-btn" onClick={() => setActiveId(d.id)}>
+                  👀 Spectate
                 </button>
               </span>
             </div>
