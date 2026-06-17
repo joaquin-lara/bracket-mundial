@@ -338,7 +338,7 @@ export default function DuelArena({
       gsap.set(ball, { x: 0 });
       gsap.set(ballY, { y: 0 });
       gsap.set(ballImg, { rotation: 0, scale: 1 });
-      gsap.set(keeper, { x: 0, y: 0, rotation: 0, scaleY: 1 });
+      gsap.set(keeper, { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 });
       gsap.set([kArmL, kArmR], { rotation: 0 });
       gsap.set(trail, { opacity: 0 });
     };
@@ -350,7 +350,7 @@ export default function DuelArena({
     gsap.set(ball, { x: 0 });
     gsap.set(ballY, { y: 0 });
     gsap.set(ballImg, { rotation: 0, scale: 1, transformOrigin: '50% 50%' });
-    gsap.set(keeper, { x: 0, y: 0, rotation: 0, scaleY: 1 });
+    gsap.set(keeper, { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 });
     gsap.set(trail, { opacity: 0, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } });
 
     const tl = gsap.timeline({ onComplete: () => { setAnimating(false); setBanner(null); reset(); } });
@@ -362,7 +362,7 @@ export default function DuelArena({
       .set(ball, { x: 0 })
       .set(ballY, { y: 0 })
       .set(ballImg, { rotation: 0, scale: 1 })
-      .set(keeper, { x: 0, y: 0, rotation: 0, scaleY: 1 })
+      .set(keeper, { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 })
       .set(trail, { opacity: 0, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } })
       .add(() => sfx.whistle());
 
@@ -395,10 +395,13 @@ export default function DuelArena({
       .to(ballImg, { rotation: goal ? 560 : 380, scale: 0.58, duration: 0.4, ease: 'power1.in', transformOrigin: '50% 50%' }, 'launch')
       .to(trail, { opacity: 0, duration: 0.2 }, 'launch+=0.4');
 
-    // keeper: explosive dive to the chosen side (gloves move with the body)
+    // keeper: explosive dive to the chosen side. The left dive is an exact mirror
+    // of the right (same rotation magnitude, flipped via scaleX) so it never leans
+    // further one way than the other.
     tl.to(keeper, {
         x: diveX, y: round.dive === 'center' ? -6 : -16,
-        rotation: round.dive === 'center' ? 0 : round.dive === 'left' ? -38 : 38,
+        rotation: round.dive === 'center' ? 0 : 38,
+        scaleX: round.dive === 'left' ? -1 : 1,
         scaleY: round.dive === 'center' ? 0.82 : 1, duration: 0.4, ease: 'power2.out',
       }, 'launch');
 
