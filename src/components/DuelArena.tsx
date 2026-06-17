@@ -561,7 +561,7 @@ export default function DuelArena({
           >
             {muted ? '🔇' : '🔊'}
           </button>
-          <audio ref={ambienceRef} src="/crowd-loop.mp3" loop preload="auto" />
+          <audio ref={ambienceRef} src="/minigame_sounds/stadium_noise.mp3" loop preload="auto" />
           <svg ref={sceneRef} viewBox="0 0 400 260" className={`duel-svg${suddenDeath ? ' sd' : ''}`}>
             <defs>
               <linearGradient id="dSky" x1="0" y1="0" x2="0" y2="1">
