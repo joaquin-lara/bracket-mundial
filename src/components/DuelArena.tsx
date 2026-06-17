@@ -3,6 +3,7 @@
 import gsap from 'gsap';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PresenceDot from '@/components/PresenceDot';
+import DuelEdge from '@/components/DuelEdge';
 import { flagUrl } from '@/lib/flags';
 import { PLAYER_META, type Player } from '@/lib/players';
 import { createClient } from '@/lib/supabase/client';
@@ -773,6 +774,18 @@ export default function DuelArena({
           <p className="duel-status waiting">
             {theyPicked ? 'Revealing…' : `Waiting for ${nameOf(iShoot ? keeperId : shooterId)}…`}
           </p>
+        )}
+
+        {/* Private edge readout — Joaquin only, real opponents only (CPU is random). */}
+        {duel.status === 'active' && !animating && nameOf(me) === 'Joaquin' && keeperId !== CPU_ID && shooterId !== CPU_ID && (
+          <DuelEdge
+            duels={duels}
+            me={me}
+            oppId={duel.challenger === me ? duel.opponent : duel.challenger}
+            oppName={nameOf(duel.challenger === me ? duel.opponent : duel.challenger)}
+            role={iShoot ? 'shoot' : 'keep'}
+            currentDuelId={duel.id}
+          />
         )}
 
         {duel.status === 'active' && (
