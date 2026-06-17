@@ -660,8 +660,12 @@ export default function DuelArena({
                   <rect x="-7" y="-15" width="14" height="26" rx="5" fill={keeperColor} />
                   <line x1="-7" y1="-10" x2="-22" y2="-22" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" className="keeper-arm-l" />
                   <line x1="7" y1="-10" x2="22" y2="-22" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" className="keeper-arm-r" />
-                  <circle cx="-23" cy="-23" r="4" fill="#ffffff" stroke="#0b3d2c" strokeWidth="0.7" />
-                  <circle cx="23" cy="-23" r="4" fill="#ffffff" stroke="#0b3d2c" strokeWidth="0.7" />
+                  <g transform="translate(-22 -23) scale(-1,1)">
+                    <image href="/minigame_sounds/goalie_gloves.png" x="-8" y="-11" width="16" height="22" preserveAspectRatio="xMidYMid meet" />
+                  </g>
+                  <g transform="translate(22 -23)">
+                    <image href="/minigame_sounds/goalie_gloves.png" x="-8" y="-11" width="16" height="22" preserveAspectRatio="xMidYMid meet" />
+                  </g>
                   <line x1="-4" y1="11" x2="-7" y2="30" stroke="#f4f1e8" strokeWidth="5" strokeLinecap="round" />
                   <line x1="4" y1="11" x2="7" y2="30" stroke="#f4f1e8" strokeWidth="5" strokeLinecap="round" />
                 </g>
