@@ -19,17 +19,38 @@ async function af<T>(path: string, key: string): Promise<AfEnvelope<T>> {
   return (await res.json()) as AfEnvelope<T>;
 }
 
-interface AfFixture { fixture: { id: number; date: string }; teams: { home: { name: string }; away: { name: string } } }
+interface AfFixture {
+  fixture: { id: number; date: string };
+  league?: { id: number };
+  teams: { home: { name: string }; away: { name: string } };
+}
 
-/** All WC 2026 fixtures with API-Football ids, for mapping to our football-data rows. */
+/**
+ * World Cup fixtures with API-Football ids, for mapping to our football-data rows.
+ * The free tier serves `?live=all` (confirmed) but may block season queries for the
+ * current season, so we use live as the reliable source and merge the season query
+ * when it's allowed. Dedupe by fixture id.
+ */
 export async function fetchWcFixtures(key: string): Promise<{ id: number; date: string; home: string; away: string }[]> {
-  const env = await af<AfFixture[]>(`/fixtures?league=${WC_LEAGUE}&season=${WC_SEASON}`, key);
-  return (env.response ?? []).map((f) => ({
-    id: f.fixture.id,
-    date: f.fixture.date,
-    home: f.teams.home.name,
-    away: f.teams.away.name,
-  }));
+  const out = new Map<number, { id: number; date: string; home: string; away: string }>();
+  const add = (f: AfFixture) => {
+    out.set(f.fixture.id, { id: f.fixture.id, date: f.fixture.date, home: f.teams.home.name, away: f.teams.away.name });
+  };
+  // Currently-live fixtures (works on the free tier) — filter to the World Cup.
+  try {
+    const live = await af<AfFixture[]>(`/fixtures?live=all`, key);
+    for (const f of live.response ?? []) if (f.league?.id === WC_LEAGUE) add(f);
+  } catch {
+    /* ignore; try the season query below */
+  }
+  // Scheduled/finished by season (may be blocked on the free tier; harmless if empty).
+  try {
+    const env = await af<AfFixture[]>(`/fixtures?league=${WC_LEAGUE}&season=${WC_SEASON}`, key);
+    for (const f of env.response ?? []) add(f);
+  } catch {
+    /* ignore */
+  }
+  return [...out.values()];
 }
 
 interface AfLineup {
