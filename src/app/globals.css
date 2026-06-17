@@ -868,6 +868,15 @@ h1 {
   line-height: 1.35;
 }
 
+.lineup-wait {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--dim);
+  font-style: italic;
+}
+
 .match-footer {
   position: relative;
   display: flex;

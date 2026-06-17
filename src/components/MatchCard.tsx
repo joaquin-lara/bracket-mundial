@@ -135,7 +135,17 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
 
       <VenueInfo venue={match.venue} />
 
-      {match.lineups && <ConfirmedLineups lineups={match.lineups} leftCode={match.home_code} />}
+      {match.lineups ? (
+        <ConfirmedLineups lineups={match.lineups} leftCode={match.home_code} />
+      ) : (
+        !teamsTbd &&
+        match.home_code &&
+        match.away_code &&
+        match.status !== 'FINISHED' &&
+        lockAt - now < 65 * 60 * 1000 && (
+          <div className="lineup-wait">Confirmed lineups expected ~40 min before kickoff.</div>
+        )
+      )}
 
       <div className="match-footer">
         {teamsTbd && !started ? (
