@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import AsItStands from '@/components/AsItStands';
 import GroupTables from '@/components/GroupTables';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { flagUrl } from '@/lib/flags';
@@ -110,7 +111,9 @@ export default async function BracketPage() {
   }
 
   const thirdPlace = byStage.get('THIRD_PLACE') ?? [];
-  const hasKnockout = matches.length > 0;
+  // The real draw has landed once a knockout fixture carries actual teams.
+  const hasRealKnockout = matches.some((m) => m.home_team !== 'TBD' && m.away_team !== 'TBD');
+  const anyGroupPlayed = allMatches.some((m) => m.group_name && m.status === 'FINISHED');
 
   return (
     <div className="bracket-page">
@@ -122,15 +125,12 @@ export default async function BracketPage() {
 
       <GroupTables tables={groupTables} />
 
-      <div className="groups-head">
-        <span className="groups-title">Knockout Stage</span>
-        <div className="contenders-line" />
-      </div>
-
-      {!hasKnockout ? (
-        <p className="empty">The knockout fixtures appear here once the sync loads them.</p>
-      ) : (
+      {hasRealKnockout ? (
         <>
+          <div className="groups-head">
+            <span className="groups-title">Knockout Stage</span>
+            <div className="contenders-line" />
+          </div>
           <div className="bracket">
             {ROUNDS.map((round, roundIndex) => {
               const roundMatches = byStage.get(round.stage) ?? [];
@@ -162,6 +162,18 @@ export default async function BracketPage() {
               );
             })}
           </div>
+        </>
+      ) : anyGroupPlayed ? (
+        <AsItStands tables={groupTables} matches={allMatches} />
+      ) : (
+        <>
+          <div className="groups-head">
+            <span className="groups-title">Knockout Stage</span>
+            <div className="contenders-line" />
+          </div>
+          <p className="empty">
+            The knockout picture appears here once the group games get underway.
+          </p>
         </>
       )}
     </div>

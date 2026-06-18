@@ -82,6 +82,29 @@ describe('computeGroupTables', () => {
     expect(y).toBeLessThan(x);
   });
 
+  it('breaks a three-way tie by head-to-head goal difference, not overall', () => {
+    // AAA, BBB, CCC all finish on 6 pts. Head-to-head points are level (3 each),
+    // so head-to-head goal difference decides: AAA +2, CCC 0, BBB -2 -> A,C,B.
+    // Overall goal difference would order them C, A, B (CCC thrashed DDD 9-0),
+    // so the result proves head-to-head takes precedence over overall.
+    const tables = computeGroupTables([
+      match('Group E', 'AAA', 'BBB', 3, 0),
+      match('Group E', 'CCC', 'AAA', 1, 0),
+      match('Group E', 'BBB', 'CCC', 1, 0),
+      match('Group E', 'AAA', 'DDD', 1, 0),
+      match('Group E', 'BBB', 'DDD', 1, 0),
+      match('Group E', 'CCC', 'DDD', 9, 0),
+    ]);
+    expect(tables[0].rows.map((r) => r.team)).toEqual(['AAA', 'CCC', 'BBB', 'DDD']);
+  });
+
+  it('exposes fair-play and FIFA-rank fields on every row', () => {
+    const tables = computeGroupTables([match('Group A', 'Mexico', 'Canada', 1, 0)]);
+    const row = tables[0].rows[0];
+    expect(row).toHaveProperty('fairPlay');
+    expect(row).toHaveProperty('rank');
+  });
+
   it('ignores knockout matches and TBD placeholders', () => {
     const ko = match('', 'Mexico', 'Brazil', 1, 0);
     ko.group_name = null;

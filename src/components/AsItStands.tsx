@@ -1,0 +1,153 @@
+import Flag from './Flag';
+import type { GroupTable } from '@/lib/groups';
+import {
+  groupOutlooks,
+  projectBracket,
+  rankThirds,
+  type ProjectedSeed,
+  type QualStatus,
+  type TeamOutlook,
+} from '@/lib/qualification';
+import type { Match } from '@/lib/types';
+
+const STATUS_LABEL: Record<QualStatus, string> = {
+  won_group: '1st',
+  through: 'Qualified',
+  in_contention: 'In contention',
+  third_race: '3rd-place race',
+  eliminated: 'Out',
+};
+
+function StatusPill({ status }: { status: QualStatus }) {
+  return <span className={`ais-pill ais-${status}`}>{STATUS_LABEL[status]}</span>;
+}
+
+function GroupOutlookCard({ table, outlooks }: { table: GroupTable; outlooks: TeamOutlook[] }) {
+  const byTeam = new Map(table.rows.map((r) => [r.team, r]));
+  return (
+    <div className="group-card ais-card">
+      <div className="group-name">{table.name}</div>
+      <ul className="ais-teams">
+        {outlooks.map((o) => {
+          const row = byTeam.get(o.team);
+          return (
+            <li key={o.team} className="ais-team">
+              <div className="ais-team-top">
+                <Flag code={o.code} name={o.team} />
+                <span className="ais-team-name">{o.team}</span>
+                <span className="ais-pts">{row?.pts ?? 0} pts</span>
+                <StatusPill status={o.status} />
+              </div>
+              <p className="ais-note">{o.note}</p>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+function SeedCell({ seed }: { seed: ProjectedSeed }) {
+  const team = seed.team;
+  return (
+    <div className="ais-seed">
+      <span className="ais-seed-label">{seed.label}</span>
+      {team ? (
+        <span className="ais-seed-team">
+          <Flag code={team.code} name={team.team} />
+          {team.team}
+        </span>
+      ) : (
+        <span className="ais-seed-team ais-tbd">To be decided</span>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Live "as it stands" projection: where each team currently sits, what the
+ * teams on the bubble still need, the best-third race, and the Round-of-32
+ * bracket those placings would produce. Shown while the group stage plays out,
+ * before the real knockout draw lands.
+ */
+export default function AsItStands({
+  tables,
+  matches,
+}: {
+  tables: GroupTable[];
+  matches: Match[];
+}) {
+  if (tables.length === 0) return null;
+
+  const thirds = rankThirds(tables);
+  const bracket = projectBracket(tables);
+
+  return (
+    <section className="ais-section">
+      <div className="groups-head">
+        <span className="groups-title">As It Stands</span>
+        <div className="contenders-line" />
+      </div>
+      <p className="subtitle">
+        A live projection from the results so far — current placings, what the teams on the
+        bubble still need, and the Round of 32 these standings would produce. Updates as games
+        finish; replaced by the real draw once the knockouts are set.
+      </p>
+
+      <div className="groups-grid">
+        {tables.map((t) => (
+          <GroupOutlookCard key={t.name} table={t} outlooks={groupOutlooks(t, matches)} />
+        ))}
+      </div>
+
+      <div className="groups-head">
+        <span className="groups-title">Best Third-Placed Teams</span>
+        <div className="contenders-line" />
+      </div>
+      <p className="subtitle">The eight best third-placed teams (gold) advance with the group winners and runners-up.</p>
+      <div className="ais-thirds">
+        <table className="group-table">
+          <thead>
+            <tr>
+              <th className="gt-team">Team</th>
+              <th title="Group">Grp</th>
+              <th title="Points">Pts</th>
+              <th title="Goal difference">GD</th>
+              <th className="gt-wide" title="Goals for">GF</th>
+            </tr>
+          </thead>
+          <tbody>
+            {thirds.map((t, i) => (
+              <tr key={t.group} className={t.qualifies ? 'qualify' : i === 8 ? 'maybe' : ''}>
+                <td className="gt-team">
+                  <Flag code={t.row.code} name={t.row.team} />
+                  <span className="gt-name">{t.row.team}</span>
+                </td>
+                <td>{t.group}</td>
+                <td className="gt-pts">{t.row.pts}</td>
+                <td>{t.row.gd > 0 ? `+${t.row.gd}` : t.row.gd}</td>
+                <td className="gt-wide">{t.row.gf}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="groups-head">
+        <span className="groups-title">Projected Round of 32</span>
+        <div className="contenders-line" />
+      </div>
+      <p className="subtitle">If the group stage ended now. Third-placed slots are assigned to the bracket positions FIFA reserves for them.</p>
+      <div className="ais-bracket">
+        {bracket.map((m) => (
+          <div className="ais-fixture" key={m.match}>
+            <span className="ais-fixture-no">{m.match}</span>
+            <SeedCell seed={m.home} />
+            <span className="ais-vs">v</span>
+            <SeedCell seed={m.away} />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}

@@ -21,8 +21,8 @@ export default function GroupTables({ tables }: { tables: GroupTable[] }) {
       </p>
       <p className="groups-key">
         Teams earn <strong>3</strong> points for a win, <strong>1</strong> for a draw,{' '}
-        <strong>0</strong> for a loss. Ties in the table break by goal difference, then goals
-        scored, then the head-to-head result.
+        <strong>0</strong> for a loss. Ties break first on the head-to-head record between the
+        level teams, then overall goal difference, goals scored, fair play, and FIFA ranking.
       </p>
       <div className="groups-grid">
         {tables.map((t) => (
