@@ -242,7 +242,7 @@ export default function DuelArena({
     const a = oleRef.current;
     if (!a) return;
     if (oleOn) {
-      a.volume = 0.4;
+      a.volume = 0.2;
       a.play().catch(() => {});
     } else {
       a.pause();
