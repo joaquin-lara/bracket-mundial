@@ -56,6 +56,7 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
   // live-data sync. (The server/RLS already gate the rows on kickoff <= now; the
   // UI just holds the reveal those few extra minutes.)
   const kickedOff = now >= REVEAL_AT;
+  const showPicks = kickedOff && !!revealedPicks && revealedPicks.length > 0;
 
   const [home, setHome] = useState(prediction ? String(prediction.pred_home) : '');
   const [away, setAway] = useState(prediction ? String(prediction.pred_away) : '');
@@ -190,10 +191,10 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
 
       <VenueInfo venue={match.venue} />
 
-      {kickedOff && revealedPicks && revealedPicks.length > 0 && (
+      {showPicks && (
         <div className="picks">
           <div className="picks-title">Everyone&apos;s picks</div>
-          {revealedPicks.map((p) => (
+          {revealedPicks!.map((p) => (
             <div className="picks-row" key={p.display_name}>
               <span>{p.display_name}</span>
               <span>
@@ -209,6 +210,8 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
           ))}
         </div>
       )}
+
+      {showPicks && match.lineups && <div className="card-sep" />}
 
       {match.lineups ? (
         <ConfirmedLineups lineups={match.lineups} leftCode={match.home_code} />
