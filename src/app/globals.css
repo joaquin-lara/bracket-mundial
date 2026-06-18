@@ -2979,8 +2979,10 @@ table.standings tr.me td {
 
 .cards-table {
   width: 100%;
+  min-width: 540px;
   border-collapse: collapse;
   font-size: 13px;
+  table-layout: fixed;
 }
 
 .cards-table th {
@@ -2991,38 +2993,56 @@ table.standings tr.me td {
   letter-spacing: 0.07em;
   color: var(--dim);
   text-align: center;
-  padding: 8px 6px;
+  padding: 10px 8px;
   white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* Team name takes the slack; the five number columns are even and fixed. */
+.cards-table th:not(.ce-team),
+.cards-table td:not(.ce-team) {
+  width: 78px;
+}
+
+.cards-table th.ce-fp,
+.cards-table td.ce-fp {
+  width: 54px;
 }
 
 .cards-table th.ce-team {
   text-align: left;
   padding-left: 14px;
+  width: auto;
 }
 
 .cards-table td {
   text-align: center;
-  padding: 5px 6px;
+  padding: 7px 8px;
   border-top: 1px solid rgba(244, 241, 232, 0.06);
+  vertical-align: middle;
 }
 
 .cards-table td.ce-team {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   font-weight: 600;
   color: var(--cream);
   padding-left: 14px;
   text-align: left;
+  min-width: 0;
 }
 
 .cards-table .ce-name {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .cards-table input {
-  width: 46px;
-  padding: 4px 0;
+  width: 52px;
+  padding: 5px 0;
   text-align: center;
   background: rgba(244, 241, 232, 0.05);
   border: 1px solid var(--line);

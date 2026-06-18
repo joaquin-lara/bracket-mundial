@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import AsItStands from '@/components/AsItStands';
+import CardsEditor, { type CardsRow } from '@/components/CardsEditor';
 import GroupTables from '@/components/GroupTables';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { fairPlayByCode, type DisciplineRow } from '@/lib/fairPlay';
 import { flagUrl } from '@/lib/flags';
 import { computeGroupTables } from '@/lib/groups';
+import { TEAMS } from '@/lib/ml/teams';
 import { createClient } from '@/lib/supabase/server';
 import type { Match } from '@/lib/types';
 
@@ -101,8 +103,22 @@ export default async function BracketPage() {
   ]);
 
   const allMatches = (data ?? []) as Match[];
-  const fairPlay = fairPlayByCode((discipline ?? []) as DisciplineRow[]);
+  const disciplineRows = (discipline ?? []) as DisciplineRow[];
+  const fairPlay = fairPlayByCode(disciplineRows);
   const groupTables = computeGroupTables(allMatches, fairPlay);
+
+  const discByCode = new Map(disciplineRows.map((r) => [r.team_code.toUpperCase(), r]));
+  const cardsRows: CardsRow[] = TEAMS.map((t) => {
+    const d = discByCode.get(t.code);
+    return {
+      code: t.code,
+      name: t.name,
+      yellow: d?.yellow ?? 0,
+      second_yellow: d?.second_yellow ?? 0,
+      direct_red: d?.direct_red ?? 0,
+      yellow_direct_red: d?.yellow_direct_red ?? 0,
+    };
+  });
 
   const knockoutStages = new Set([...ROUNDS.map((r) => r.stage), 'THIRD_PLACE']);
   const matches = allMatches.filter((m) => knockoutStages.has(m.stage));
@@ -113,6 +129,7 @@ export default async function BracketPage() {
   }
 
   const thirdPlace = byStage.get('THIRD_PLACE') ?? [];
+  const hasKnockout = matches.length > 0;
   // The real draw has landed once a knockout fixture carries actual teams.
   const hasRealKnockout = matches.some((m) => m.home_team !== 'TBD' && m.away_team !== 'TBD');
   const anyGroupPlayed = allMatches.some((m) => m.group_name && m.status === 'FINISHED');
@@ -127,57 +144,60 @@ export default async function BracketPage() {
 
       <GroupTables tables={groupTables} />
 
-      {hasRealKnockout ? (
-        <>
-          <div className="groups-head">
-            <span className="groups-title">Knockout Stage</span>
-            <div className="contenders-line" />
-          </div>
-          <div className="bracket">
-            {ROUNDS.map((round, roundIndex) => {
-              const roundMatches = byStage.get(round.stage) ?? [];
-              const slotClass = `match-slot${roundIndex > 0 ? ' has-in' : ''}${
-                roundIndex < ROUNDS.length - 1 ? ' has-out' : ''
-              }`;
-              return (
-                <div className="round" key={round.stage}>
-                  <div className="round-label">{round.label}</div>
-                  <div className="round-body">
-                    {roundMatches.length === 0 ? (
-                      <p className="empty">TBD</p>
-                    ) : (
-                      roundMatches.map((m) => (
-                        <div className={slotClass} key={m.id}>
-                          <BracketMatch m={m} highlight={round.stage === 'FINAL'} />
-                        </div>
-                      ))
-                    )}
-                    {round.stage === 'SEMI_FINALS' && thirdPlace.length > 0 && (
-                      <div className="third-abs">
-                        {thirdPlace.map((m) => (
-                          <BracketMatch m={m} key={m.id} />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </>
-      ) : anyGroupPlayed ? (
+      {!hasRealKnockout && anyGroupPlayed && (
         <AsItStands tables={groupTables} matches={allMatches} />
-      ) : (
-        <>
-          <div className="groups-head">
-            <span className="groups-title">Knockout Stage</span>
-            <div className="contenders-line" />
-          </div>
-          <p className="empty">
-            The knockout picture appears here once the group games get underway.
-          </p>
-        </>
       )}
+
+      <div className="groups-head">
+        <span className="groups-title">Knockout Stage</span>
+        <div className="contenders-line" />
+      </div>
+      {!hasKnockout ? (
+        <p className="empty">The knockout fixtures appear here once the sync loads them.</p>
+      ) : (
+        <div className="bracket">
+          {ROUNDS.map((round, roundIndex) => {
+            const roundMatches = byStage.get(round.stage) ?? [];
+            const slotClass = `match-slot${roundIndex > 0 ? ' has-in' : ''}${
+              roundIndex < ROUNDS.length - 1 ? ' has-out' : ''
+            }`;
+            return (
+              <div className="round" key={round.stage}>
+                <div className="round-label">{round.label}</div>
+                <div className="round-body">
+                  {roundMatches.length === 0 ? (
+                    <p className="empty">TBD</p>
+                  ) : (
+                    roundMatches.map((m) => (
+                      <div className={slotClass} key={m.id}>
+                        <BracketMatch m={m} highlight={round.stage === 'FINAL'} />
+                      </div>
+                    ))
+                  )}
+                  {round.stage === 'SEMI_FINALS' && thirdPlace.length > 0 && (
+                    <div className="third-abs">
+                      {thirdPlace.map((m) => (
+                        <BracketMatch m={m} key={m.id} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="groups-head">
+        <span className="groups-title">Card Tracker</span>
+        <div className="contenders-line" />
+      </div>
+      <p className="subtitle">
+        Enter each team&apos;s group-stage cards. Fair-play points (FP) are worked out automatically
+        — yellow −1, second yellow −3, direct red −4, yellow + red −5 — and break ties in the group
+        tables above. Closer to zero is better.
+      </p>
+      <CardsEditor initial={cardsRows} />
     </div>
   );
 }
