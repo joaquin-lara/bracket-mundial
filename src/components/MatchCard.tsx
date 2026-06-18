@@ -44,9 +44,19 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
   const live = match.status === 'IN_PLAY' || match.status === 'PAUSED';
   const started = ['IN_PLAY', 'PAUSED', 'FINISHED'].includes(match.status);
   const teamsTbd = match.home_team === 'TBD' || match.away_team === 'TBD';
+  const kickoffMs = new Date(match.kickoff).getTime();
+  // Reveal everyone's picks a few minutes after kickoff, not right on the hour.
+  const REVEAL_AT = kickoffMs + 5 * 60 * 1000;
 
-  const now = useNow(!started && Date.now() < lockAt + 5000);
+  // Keep ticking until the reveal moment so it can flip on the clock, not on the
+  // API/sync status (which lags behind real kickoff because it rides the cron sync).
+  const now = useNow(Date.now() < REVEAL_AT + 2000);
   const locked = started || now >= lockAt;
+  // Everyone's picks unlock 5 minutes after kickoff time — independent of the
+  // live-data sync. (The server/RLS already gate the rows on kickoff <= now; the
+  // UI just holds the reveal those few extra minutes.)
+  const kickedOff = now >= REVEAL_AT;
+  const showPicks = kickedOff && !!revealedPicks && revealedPicks.length > 0;
 
   const [home, setHome] = useState(prediction ? String(prediction.pred_home) : '');
   const [away, setAway] = useState(prediction ? String(prediction.pred_away) : '');
@@ -181,22 +191,10 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
 
       <VenueInfo venue={match.venue} />
 
-      {match.lineups ? (
-        <ConfirmedLineups lineups={match.lineups} leftCode={match.home_code} />
-      ) : (
-        !teamsTbd &&
-        match.home_code &&
-        match.away_code &&
-        match.status !== 'FINISHED' &&
-        lockAt - now < 65 * 60 * 1000 && (
-          <div className="lineup-wait">Confirmed lineup loads once the match kicks off.</div>
-        )
-      )}
-
-      {started && revealedPicks && revealedPicks.length > 0 && (
+      {showPicks && (
         <div className="picks">
           <div className="picks-title">Everyone&apos;s picks</div>
-          {revealedPicks.map((p) => (
+          {revealedPicks!.map((p) => (
             <div className="picks-row" key={p.display_name}>
               <span>{p.display_name}</span>
               <span>
@@ -211,6 +209,20 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
             </div>
           ))}
         </div>
+      )}
+
+      {showPicks && match.lineups && <div className="card-sep" />}
+
+      {match.lineups ? (
+        <ConfirmedLineups lineups={match.lineups} leftCode={match.home_code} />
+      ) : (
+        !teamsTbd &&
+        match.home_code &&
+        match.away_code &&
+        match.status !== 'FINISHED' &&
+        lockAt - now < 65 * 60 * 1000 && (
+          <div className="lineup-wait">Confirmed lineup loads once the match kicks off.</div>
+        )
       )}
     </div>
   );

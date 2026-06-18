@@ -967,6 +967,12 @@ h1 {
   padding: 2px 0;
 }
 
+/* separator between everyone's picks and the confirmed lineups */
+.card-sep {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
 /* ---- read-only schedule ---- */
 
 .seg-toggle {

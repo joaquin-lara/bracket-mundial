@@ -527,6 +527,7 @@ export default function DuelArena({
   const active = duels.filter((d) => d.status === 'active' && isMine(d));
   const othersActive = duels.filter((d) => d.status === 'active' && !isMine(d));
   const finished = duels.filter((d) => d.status === 'finished' && isMine(d));
+  const allFinished = duels.filter((d) => d.status === 'finished');
 
   const record = (other: string) => {
     let w = 0;
@@ -1110,14 +1111,14 @@ export default function DuelArena({
         </>
       )}
 
-      {!isGuest && finished.length > 0 && (
+      {!isGuest && allFinished.length > 0 && (
         <>
           <div className="groups-head">
             <span className="groups-title">History</span>
             <div className="contenders-line" />
           </div>
           <div style={{ maxHeight: 420, overflowY: 'auto' }}>
-            {finished.map((d) => {
+            {allFinished.map((d) => {
               const cMeta = metaOf(d.challenger);
               const oMeta = metaOf(d.opponent);
               return (
