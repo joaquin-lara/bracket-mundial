@@ -52,7 +52,8 @@ export const FLAG_CODES: Record<string, string> = {
   SWE: 'se', // Sweden
   TUN: 'tn', // Tunisia
   TUR: 'tr', // Turkey
-  URY: 'uy', // Uruguay
+  URU: 'uy', // Uruguay
+  URY: 'uy', // Uruguay (alternate code)
   USA: 'us', // United States
   UZB: 'uz', // Uzbekistan
 };

@@ -3,9 +3,7 @@ import type { GroupRow, GroupTable } from '@/lib/groups';
 import {
   groupLetter,
   groupOutlooks,
-  projectBracket,
   rankThirds,
-  type ProjectedSeed,
   type QualStatus,
   type TeamOutlook,
 } from '@/lib/qualification';
@@ -84,29 +82,6 @@ function SummaryTable({ rows, colHeader }: { rows: SummaryRow[]; colHeader: stri
   );
 }
 
-function SeedCell({ seed }: { seed: ProjectedSeed }) {
-  const team = seed.team;
-  return (
-    <div className="ais-seed">
-      <span className="ais-seed-label">{seed.label}</span>
-      {team ? (
-        <span className="ais-seed-team">
-          <Flag code={team.code} name={team.team} />
-          {team.team}
-        </span>
-      ) : (
-        <span className="ais-seed-team ais-tbd">To be decided</span>
-      )}
-    </div>
-  );
-}
-
-/**
- * Live "as it stands" projection: where each team currently sits, what the
- * teams on the bubble still need, the best-third race, and the Round-of-32
- * bracket those placings would produce. Shown while the group stage plays out,
- * before the real knockout draw lands.
- */
 export default function AsItStands({
   tables,
   matches,
@@ -117,7 +92,6 @@ export default function AsItStands({
   if (tables.length === 0) return null;
 
   const thirds = rankThirds(tables);
-  const bracket = projectBracket(tables);
 
   const qualifiers: SummaryRow[] = tables.flatMap((t) => {
     const g = groupLetter(t.name);
@@ -171,21 +145,6 @@ export default function AsItStands({
         </div>
       </div>
 
-      <div className="groups-head">
-        <span className="groups-title">Projected Round of 32</span>
-        <div className="contenders-line" />
-      </div>
-      <p className="subtitle">If the group stage ended now. Third-placed slots are assigned to the bracket positions FIFA reserves for them.</p>
-      <div className="ais-bracket">
-        {bracket.map((m) => (
-          <div className="ais-fixture" key={m.match}>
-            <span className="ais-fixture-no">{m.match}</span>
-            <SeedCell seed={m.home} />
-            <span className="ais-vs">v</span>
-            <SeedCell seed={m.away} />
-          </div>
-        ))}
-      </div>
     </section>
   );
 }

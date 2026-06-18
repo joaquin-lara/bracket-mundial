@@ -314,9 +314,9 @@ function noteFor(
   remaining: Match[],
   combos: { pts: Map<string, number>; own: Map<string, 'W' | 'D' | 'L'> }[]
 ): string {
-  if (status === 'won_group') return 'Group winners — qualified for the Round of 32.';
+  if (status === 'won_group') return 'Group winners. Qualified for the Round of 32.';
   if (status === 'through') return 'Qualified for the Round of 32.';
-  if (status === 'eliminated') return 'Eliminated — out of the tournament.';
+  if (status === 'eliminated') return 'Eliminated. Out of the tournament.';
 
   const ownGames = remaining.filter((m) => m.home_team === team || m.away_team === team);
 
@@ -339,16 +339,16 @@ function noteFor(
     const parts: string[] = [];
     if (draw.clinchedTop2) parts.push('A draw is enough to finish in the top two and qualify.');
     else if (win.clinchedTop2) parts.push('A win guarantees qualification.');
-    else if (win.canTop2) parts.push('A win might be enough — other results need to go their way.');
+    else if (win.canTop2) parts.push('A win might be enough, but other results need to go their way.');
 
     if (!loss.canTop3) parts.push('A loss means elimination.');
-    else if (!loss.canTop2) parts.push('A loss rules out a top-two finish — they\'d need a best third-place spot to go through.');
-    return parts.join(' ') || 'Still in contention — results to play for.';
+    else if (!loss.canTop2) parts.push('A loss rules out a top-two finish. They would need a best third-place spot to go through.');
+    return parts.join(' ') || 'Still in contention. Results to play for.';
   }
 
   // Earlier rounds (more than one game left): keep it short.
-  if (status === 'third_race') return 'Out of top-two contention — can only advance as a best third-place team.';
-  return ev.canWin ? 'In contention — can still win the group.' : 'Still in contention for a top-two finish.';
+  if (status === 'third_race') return 'Out of top-two contention. Can only advance as a best third-place team.';
+  return ev.canWin ? 'In contention. Can still win the group.' : 'Still in contention for a top-two finish.';
 }
 
 /** Re-evaluate restricted to the combos where `team` got a given own result. */
