@@ -127,7 +127,6 @@ export async function saveDiscipline(rows: DisciplineInput[]): Promise<Predictio
   if (error) return { ok: false, error: error.message };
 
   revalidatePath('/bracket');
-  revalidatePath('/cards');
   return { ok: true };
 }
 

@@ -13,7 +13,6 @@ const BASE_LINKS: readonly (readonly [string, string])[] = [
   ['/standings', 'Player Standings'],
   ['/predictor', 'ML Predictor'],
   ['/duels', 'Penalty Shootouts'],
-  ['/cards', 'Card Tracker'],
 ];
 
 export default function TopNav({ achievementsRevealed = false }: { achievementsRevealed?: boolean }) {
