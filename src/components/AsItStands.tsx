@@ -1,6 +1,7 @@
 import Flag from './Flag';
-import type { GroupTable } from '@/lib/groups';
+import type { GroupRow, GroupTable } from '@/lib/groups';
 import {
+  groupLetter,
   groupOutlooks,
   projectBracket,
   rankThirds,
@@ -47,6 +48,42 @@ function GroupOutlookCard({ table, outlooks }: { table: GroupTable; outlooks: Te
   );
 }
 
+interface SummaryRow {
+  label: string; // "1A", "2A", "3A"
+  row: GroupRow;
+  className: string;
+}
+
+function SummaryTable({ rows, colHeader }: { rows: SummaryRow[]; colHeader: string }) {
+  return (
+    <table className="group-table">
+      <thead>
+        <tr>
+          <th className="gt-team">Team</th>
+          <th title="Group placement">{colHeader}</th>
+          <th title="Points">Pts</th>
+          <th title="Goal difference">GD</th>
+          <th className="gt-wide" title="Goals for">GF</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((r) => (
+          <tr key={r.label} className={r.className}>
+            <td className="gt-team">
+              <Flag code={r.row.code} name={r.row.team} />
+              <span className="gt-name">{r.row.team}</span>
+            </td>
+            <td>{r.label}</td>
+            <td className="gt-pts">{r.row.pts}</td>
+            <td>{r.row.gd > 0 ? `+${r.row.gd}` : r.row.gd}</td>
+            <td className="gt-wide">{r.row.gf}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
 function SeedCell({ seed }: { seed: ProjectedSeed }) {
   const team = seed.team;
   return (
@@ -82,6 +119,19 @@ export default function AsItStands({
   const thirds = rankThirds(tables);
   const bracket = projectBracket(tables);
 
+  const qualifiers: SummaryRow[] = tables.flatMap((t) => {
+    const g = groupLetter(t.name);
+    const out: SummaryRow[] = [];
+    if (t.rows[0]) out.push({ label: `1${g}`, row: t.rows[0], className: 'qualify' });
+    if (t.rows[1]) out.push({ label: `2${g}`, row: t.rows[1], className: 'qualify' });
+    return out;
+  });
+  const thirdRows: SummaryRow[] = thirds.map((t, i) => ({
+    label: `3${t.group}`,
+    row: t.row,
+    className: t.qualifies ? 'qualify' : i === 8 ? 'maybe' : '',
+  }));
+
   return (
     <section className="ais-section">
       <div className="groups-head">
@@ -101,36 +151,22 @@ export default function AsItStands({
       </div>
 
       <div className="groups-head">
-        <span className="groups-title">Best Third-Placed Teams</span>
+        <span className="groups-title">Placement Summary</span>
         <div className="contenders-line" />
       </div>
-      <p className="subtitle">The eight best third-placed teams (gold) advance with the group winners and runners-up.</p>
-      <div className="ais-thirds">
-        <table className="group-table">
-          <thead>
-            <tr>
-              <th className="gt-team">Team</th>
-              <th title="Group">Grp</th>
-              <th title="Points">Pts</th>
-              <th title="Goal difference">GD</th>
-              <th className="gt-wide" title="Goals for">GF</th>
-            </tr>
-          </thead>
-          <tbody>
-            {thirds.map((t, i) => (
-              <tr key={t.group} className={t.qualifies ? 'qualify' : i === 8 ? 'maybe' : ''}>
-                <td className="gt-team">
-                  <Flag code={t.row.code} name={t.row.team} />
-                  <span className="gt-name">{t.row.team}</span>
-                </td>
-                <td>{t.group}</td>
-                <td className="gt-pts">{t.row.pts}</td>
-                <td>{t.row.gd > 0 ? `+${t.row.gd}` : t.row.gd}</td>
-                <td className="gt-wide">{t.row.gf}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <p className="subtitle">
+        Where every team sits if the group stage ended now. Group winners (1) and runners-up (2)
+        all advance; the eight best third-placed teams (gold) join them.
+      </p>
+      <div className="ais-summary">
+        <div className="ais-summary-table">
+          <p className="ais-table-label">Group winners &amp; runners-up</p>
+          <SummaryTable rows={qualifiers} colHeader="Pos" />
+        </div>
+        <div className="ais-summary-table">
+          <p className="ais-table-label">Best third-placed teams</p>
+          <SummaryTable rows={thirdRows} colHeader="Pos" />
+        </div>
       </div>
 
       <div className="groups-head">
