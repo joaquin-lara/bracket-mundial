@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import AsItStands from '@/components/AsItStands';
 import GroupTables from '@/components/GroupTables';
 import { ensureFreshScores } from '@/lib/autoSync';
+import { fairPlayByCode, type DisciplineRow } from '@/lib/fairPlay';
 import { flagUrl } from '@/lib/flags';
 import { computeGroupTables } from '@/lib/groups';
 import { createClient } from '@/lib/supabase/server';
@@ -94,13 +95,14 @@ export default async function BracketPage() {
   await ensureFreshScores();
   const supabase = createClient();
 
-  const { data } = await supabase
-    .from('matches')
-    .select('*')
-    .order('kickoff', { ascending: true });
+  const [{ data }, { data: discipline }] = await Promise.all([
+    supabase.from('matches').select('*').order('kickoff', { ascending: true }),
+    supabase.from('discipline').select('*'),
+  ]);
 
   const allMatches = (data ?? []) as Match[];
-  const groupTables = computeGroupTables(allMatches);
+  const fairPlay = fairPlayByCode((discipline ?? []) as DisciplineRow[]);
+  const groupTables = computeGroupTables(allMatches, fairPlay);
 
   const knockoutStages = new Set([...ROUNDS.map((r) => r.stage), 'THIRD_PLACE']);
   const matches = allMatches.filter((m) => knockoutStages.has(m.stage));

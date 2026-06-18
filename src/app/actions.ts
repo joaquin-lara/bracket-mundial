@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { TEAMS } from '@/lib/ml/teams';
 import { isGuestEmail } from '@/lib/players';
 
 export interface PredictionResult {
@@ -85,6 +86,48 @@ export async function submitPrediction(
   }
 
   revalidatePath('/matches');
+  return { ok: true };
+}
+
+export interface DisciplineInput {
+  team_code: string;
+  yellow: number;
+  second_yellow: number;
+  direct_red: number;
+  yellow_direct_red: number;
+}
+
+const VALID_CODES = new Set(TEAMS.map((t) => t.code));
+
+/** Save the card counts for every team (any signed-in player may edit). */
+export async function saveDiscipline(rows: DisciplineInput[]): Promise<PredictionResult> {
+  const fields = ['yellow', 'second_yellow', 'direct_red', 'yellow_direct_red'] as const;
+  const clean: DisciplineInput[] = [];
+  for (const r of rows) {
+    const code = String(r.team_code ?? '').toUpperCase();
+    if (!VALID_CODES.has(code)) return { ok: false, error: `Unknown team code: ${r.team_code}` };
+    const row: DisciplineInput = { team_code: code, yellow: 0, second_yellow: 0, direct_red: 0, yellow_direct_red: 0 };
+    for (const f of fields) {
+      const v = Number(r[f]);
+      if (!Number.isInteger(v) || v < 0 || v > 99) {
+        return { ok: false, error: 'Card counts must be whole numbers between 0 and 99.' };
+      }
+      row[f] = v;
+    }
+    clean.push(row);
+  }
+
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: 'Not signed in.' };
+
+  const { error } = await supabase.from('discipline').upsert(clean, { onConflict: 'team_code' });
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath('/bracket');
+  revalidatePath('/cards');
   return { ok: true };
 }
 
