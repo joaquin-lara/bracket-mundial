@@ -45,14 +45,17 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
   const started = ['IN_PLAY', 'PAUSED', 'FINISHED'].includes(match.status);
   const teamsTbd = match.home_team === 'TBD' || match.away_team === 'TBD';
   const kickoffMs = new Date(match.kickoff).getTime();
+  // Reveal everyone's picks a few minutes after kickoff, not right on the hour.
+  const REVEAL_AT = kickoffMs + 5 * 60 * 1000;
 
-  // Keep ticking until kickoff so the reveal can flip on the clock, not on the
+  // Keep ticking until the reveal moment so it can flip on the clock, not on the
   // API/sync status (which lags behind real kickoff because it rides the cron sync).
-  const now = useNow(!started && Date.now() < kickoffMs + 2000);
+  const now = useNow(Date.now() < REVEAL_AT + 2000);
   const locked = started || now >= lockAt;
-  // Everyone's picks unlock the moment kickoff time passes — independent of the
-  // live-data sync. (The server/RLS already gate the rows on kickoff <= now.)
-  const kickedOff = started || now >= kickoffMs;
+  // Everyone's picks unlock 5 minutes after kickoff time — independent of the
+  // live-data sync. (The server/RLS already gate the rows on kickoff <= now; the
+  // UI just holds the reveal those few extra minutes.)
+  const kickedOff = now >= REVEAL_AT;
 
   const [home, setHome] = useState(prediction ? String(prediction.pred_home) : '');
   const [away, setAway] = useState(prediction ? String(prediction.pred_away) : '');
