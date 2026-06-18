@@ -1,6 +1,5 @@
 // Group-stage table computation. Pure: in matches, out standings tables.
 
-import { fairPlayFor } from './fairPlay';
 import { lookup } from './ml/teams';
 import type { Match } from './types';
 
@@ -26,7 +25,7 @@ export interface GroupTable {
   rows: GroupRow[];
 }
 
-function emptyRow(team: string, code: string | null): GroupRow {
+function emptyRow(team: string, code: string | null, fairPlay: number): GroupRow {
   return {
     team,
     code,
@@ -38,7 +37,7 @@ function emptyRow(team: string, code: string | null): GroupRow {
     ga: 0,
     gd: 0,
     pts: 0,
-    fairPlay: fairPlayFor(code),
+    fairPlay,
     rank: lookup(code)?.globalRank ?? lookup(team)?.globalRank ?? null,
   };
 }
@@ -62,8 +61,14 @@ function isCounted(m: Match): boolean {
  *   4. Fair-play points.
  *   5. FIFA World Ranking.
  * A final alphabetical fallback keeps the order deterministic.
+ *
+ * `fairPlayByCode` maps a team's 3-letter code to its FIFA fair-play points
+ * (0 = cleanest, negative = more cards); teams not listed are treated as clean.
  */
-export function computeGroupTables(matches: Match[]): GroupTable[] {
+export function computeGroupTables(
+  matches: Match[],
+  fairPlayByCode: Record<string, number> = {}
+): GroupTable[] {
   const groups = new Map<string, Map<string, GroupRow>>();
   const groupMatches = new Map<string, Match[]>();
 
@@ -81,7 +86,10 @@ export function computeGroupTables(matches: Match[]): GroupTable[] {
       [m.away_team, m.away_code],
     ] as [string, string | null][]) {
       if (team === 'TBD') continue;
-      if (!rows.has(team)) rows.set(team, emptyRow(team, code));
+      if (!rows.has(team)) {
+        const fp = code ? fairPlayByCode[code.toUpperCase()] ?? 0 : 0;
+        rows.set(team, emptyRow(team, code, fp));
+      }
     }
 
     if (!isCounted(m)) continue;

@@ -2968,6 +2968,119 @@ table.standings tr.me td {
   flex-shrink: 0;
 }
 
+/* ---- card tracker ---- */
+
+.cards-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+}
+
+.cards-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.cards-table th {
+  font-family: var(--narrow);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--dim);
+  text-align: center;
+  padding: 8px 6px;
+  white-space: nowrap;
+}
+
+.cards-table th.ce-team {
+  text-align: left;
+  padding-left: 14px;
+}
+
+.cards-table td {
+  text-align: center;
+  padding: 5px 6px;
+  border-top: 1px solid rgba(244, 241, 232, 0.06);
+}
+
+.cards-table td.ce-team {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  color: var(--cream);
+  padding-left: 14px;
+  text-align: left;
+}
+
+.cards-table .ce-name {
+  white-space: nowrap;
+}
+
+.cards-table input {
+  width: 46px;
+  padding: 4px 0;
+  text-align: center;
+  background: rgba(244, 241, 232, 0.05);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--cream);
+  font-size: 13px;
+}
+
+.cards-table input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.cards-table td.ce-fp {
+  font-weight: 800;
+  color: var(--gold-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.cards-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.cards-actions button {
+  background: var(--gold);
+  color: #1a1a1a;
+  border: 0;
+  border-radius: 9px;
+  padding: 9px 18px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cards-actions button:hover {
+  background: var(--gold-hover);
+}
+
+.cards-actions button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.cards-msg {
+  font-size: 13px;
+}
+
+.cards-msg.ok {
+  color: var(--muted);
+}
+
+.cards-msg.err {
+  color: #e3a3a3;
+}
+
 
 
 /* ---- rules ---- */
