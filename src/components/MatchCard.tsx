@@ -187,18 +187,6 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
 
       <VenueInfo venue={match.venue} />
 
-      {match.lineups ? (
-        <ConfirmedLineups lineups={match.lineups} leftCode={match.home_code} />
-      ) : (
-        !teamsTbd &&
-        match.home_code &&
-        match.away_code &&
-        match.status !== 'FINISHED' &&
-        lockAt - now < 65 * 60 * 1000 && (
-          <div className="lineup-wait">Confirmed lineup loads once the match kicks off.</div>
-        )
-      )}
-
       {kickedOff && revealedPicks && revealedPicks.length > 0 && (
         <div className="picks">
           <div className="picks-title">Everyone&apos;s picks</div>
@@ -217,6 +205,18 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
             </div>
           ))}
         </div>
+      )}
+
+      {match.lineups ? (
+        <ConfirmedLineups lineups={match.lineups} leftCode={match.home_code} />
+      ) : (
+        !teamsTbd &&
+        match.home_code &&
+        match.away_code &&
+        match.status !== 'FINISHED' &&
+        lockAt - now < 65 * 60 * 1000 && (
+          <div className="lineup-wait">Confirmed lineup loads once the match kicks off.</div>
+        )
       )}
     </div>
   );
