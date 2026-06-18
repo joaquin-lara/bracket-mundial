@@ -128,12 +128,14 @@ export default function DuelArena({
   const ballImgRef = useRef<SVGGElement>(null);
   const keeperRef = useRef<SVGGElement>(null);
   const strikerRef = useRef<SVGGElement>(null);
-  const trailRef = useRef<SVGLineElement>(null);
+  const trailRef = useRef<SVGPathElement>(null);
   const confettiRef = useRef<SVGGElement>(null);
   const netRef = useRef<SVGGElement>(null);
   const sceneRef = useRef<SVGSVGElement>(null);
   const ambienceRef = useRef<HTMLAudioElement>(null);
   const drumsRef = useRef<HTMLAudioElement>(null);
+  const oleRef = useRef<HTMLAudioElement>(null);
+  const whistleRef = useRef<HTMLAudioElement>(null);
   const animatedKicks = useRef<Map<string, number>>(new Map());
   const sdArmed = useRef<Set<string>>(new Set());
   const [muted, setMutedState] = useState(false);
@@ -156,6 +158,7 @@ export default function DuelArena({
   const [cpuDuel, setCpuDuel] = useState<Duel | null>(null);
   const [cpuRecord, setCpuRecord] = useState({ w: 0, l: 0 });
   const [sdFlash, setSdFlash] = useState(false);
+  const [sdLit, setSdLit] = useState(false);
   const sdShown = useRef<Set<string>>(new Set());
   const prevAnimating = useRef(false);
 
@@ -220,23 +223,50 @@ export default function DuelArena({
 
   const duel = activeId === CPU_DUEL_ID ? cpuDuel : duels.find((d) => d.id === activeId) ?? null;
 
-  const isSuddenDeath = !!(duel && duel.kick > 10 && duel.status === 'active');
+  const sdDrumsOn = sdLit && (duel?.status !== 'finished' || animating) && !muted;
   useEffect(() => {
     const d = drumsRef.current;
     if (!d) return;
-    if (isSuddenDeath && !muted) {
-      d.volume = 0.5;
+    if (sdDrumsOn) {
+      d.volume = 0.25;
       d.play().catch(() => {});
     } else {
       d.pause();
       d.currentTime = 0;
     }
-  }, [isSuddenDeath, muted]);
+  }, [sdDrumsOn]);
+
+  const oleOn = duel?.status === 'finished' && !animating && duel?.winner === me && !muted;
+  const loseWhistleOn = duel?.status === 'finished' && !animating && duel?.winner !== me && !!duel?.winner && !muted;
+  useEffect(() => {
+    const a = oleRef.current;
+    if (!a) return;
+    if (oleOn) {
+      a.volume = 0.4;
+      a.play().catch(() => {});
+    } else {
+      a.pause();
+      a.currentTime = 0;
+    }
+  }, [oleOn]);
+
+  useEffect(() => {
+    const a = whistleRef.current;
+    if (!a) return;
+    if (loseWhistleOn) {
+      a.volume = 0.4;
+      a.play().catch(() => {});
+    } else {
+      a.pause();
+      a.currentTime = 0;
+    }
+  }, [loseWhistleOn]);
 
   function startCpu() {
     animatedKicks.current.set(CPU_DUEL_ID, 0);
     sdShown.current.delete(CPU_DUEL_ID);
     sdArmed.current.delete(CPU_DUEL_ID);
+    setSdLit(false);
     setCpuDuel(freshCpuDuel(me));
     setActiveId(CPU_DUEL_ID);
   }
@@ -256,10 +286,13 @@ export default function DuelArena({
     if (!justFinishedReveal) return;
     sdShown.current.add(duel.id);
     setSdFlash(true);
+    setSdLit(true);
     const t = setTimeout(() => setSdFlash(false), 2300);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duel?.id, duel?.kick, duel?.status, animating]);
+
+  useEffect(() => { setSdLit(false); }, [duel?.id]);
 
   function cpuPick(myPick: Pick) {
     setCpuDuel((d) => {
@@ -327,8 +360,6 @@ export default function DuelArena({
     const scene = sceneRef.current;
     const q = (sel: string) => striker.querySelector<SVGElement>(sel);
     const legL = q('.s-leg-l'), legR = q('.s-leg-r'), armL = q('.s-arm-l'), armR = q('.s-arm-r');
-    const kArmL = keeper.querySelector<SVGElement>('.keeper-arm-l');
-    const kArmR = keeper.querySelector<SVGElement>('.keeper-arm-r');
     const netLines = net ? Array.from(net.querySelectorAll('line')) : [];
     const crowd = scene ? Array.from(scene.querySelectorAll<SVGElement>('.duel-crowd-0, .duel-crowd-1, .duel-crowd-2')) : [];
     const limbs = [legL, legR, armL, armR].filter(Boolean) as SVGElement[];
@@ -353,36 +384,35 @@ export default function DuelArena({
       gsap.set(ballY, { y: 0 });
       gsap.set(ballImg, { rotation: 0, scale: 1 });
       gsap.set(keeper, { clearProps: 'transform,transformOrigin' });
-      gsap.set([kArmL, kArmR], { rotation: 0 });
-      gsap.set(trail, { opacity: 0 });
+      gsap.set(trail, { opacity: 0, attr: { d: 'M 200 228 Q 200 228 200 228' } });
     };
 
     // Pin the start pose synchronously (before paint) so the first frame of the
     // reveal shows the kicker, not a popped/recolored frame.
-    gsap.set(striker, { x: -34, rotation: 0 });
+    gsap.set(striker, { x: 0, rotation: 0 });
     gsap.set(limbs, { rotation: 0, transformOrigin: '50% 0%' });
     gsap.set(ball, { x: 0 });
     gsap.set(ballY, { y: 0 });
     gsap.set(ballImg, { rotation: 0, scale: 1, transformOrigin: '50% 50%' });
     gsap.set(keeper, { clearProps: 'transform,transformOrigin' });
-    gsap.set(trail, { opacity: 0, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } });
+    gsap.set(trail, { opacity: 0, attr: { d: 'M 200 228 Q 200 228 200 228' } });
 
     const tl = gsap.timeline({ onComplete: () => { setAnimating(false); setBanner(null); reset(); } });
     if (decisive) tl.timeScale(0.6); // slow-mo on the deciding kick
+    tl.delay(1);
 
-    // start pose: striker a few steps back, ball/keeper home
-    tl.set(striker, { x: -34, rotation: 0 })
+    // start pose: striker at idle position, ball/keeper home
+    tl.set(striker, { x: 0, rotation: 0 })
       .set(limbs, { rotation: 0, transformOrigin: '50% 0%' })
       .set(ball, { x: 0 })
       .set(ballY, { y: 0 })
       .set(ballImg, { rotation: 0, scale: 1 })
       .set(keeper, { clearProps: 'transform,transformOrigin' })
-      .set(trail, { opacity: 0, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } })
-      .add(() => sfx.whistle());
+      .set(trail, { opacity: 0, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } });
 
     // run-up: legs cross and alternate (a real stride), arms pump opposite,
     // while the body travels toward the ball.
-    tl.to(striker, { x: 8, duration: 0.72, ease: 'power1.in' }, 0)
+    tl.to(striker, { x: 42, duration: 0.72, ease: 'power1.in' }, 0)
       .fromTo(legL, { rotation: -26 }, { rotation: 26, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0)
       .fromTo(legR, { rotation: 26 }, { rotation: -26, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0)
       .fromTo(armL, { rotation: 22 }, { rotation: -22, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0)
@@ -402,8 +432,18 @@ export default function DuelArena({
     // ball: ONE clean parabola. x (horizontal) and y (vertical) live on SEPARATE
     // nested elements so their tweens can't fight over one transform matrix.
     // x is linear, y is quadratic -> y ∝ x². Spin + shrink ride on the inner group.
-    tl.fromTo(trail, { opacity: 0.9, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } },
-        { attr: { x2: shot.x, y2: shot.y }, duration: 0.4, ease: 'power2.in' }, 'launch')
+    // Trail traces the exact parabola: sub-bezier from t=0..τ has control (200+τ·Δx/2, 228).
+    const trailProxy = { t: 0 };
+    const dx = shot.x - 200, dy = shot.y - 228;
+    tl.set(trail, { opacity: 0.9, attr: { d: 'M 200 228 Q 200 228 200 228' } }, 'launch')
+      .fromTo(trailProxy, { t: 0 }, {
+        t: 1, duration: 0.4, ease: 'none',
+        onUpdate() {
+          const t = trailProxy.t;
+          trail.setAttribute('d',
+            `M 200 228 Q ${200 + t * dx / 2} 228 ${200 + dx * t} ${228 + dy * t * t}`);
+        },
+      }, 'launch')
       .to(ball, { x: shot.x - 200, duration: 0.4, ease: 'none' }, 'launch')
       .to(ballY, { y: shot.y - 228, duration: 0.4, ease: 'power2.in' }, 'launch')
       .to(ballImg, { rotation: goal ? 560 : 380, scale: 0.58, duration: 0.4, ease: 'power1.in', transformOrigin: '50% 50%' }, 'launch')
@@ -416,7 +456,7 @@ export default function DuelArena({
         x: diveX, y: round.dive === 'center' ? -6 : -16,
         rotation: round.dive === 'center' ? 0 : round.dive === 'left' ? -38 : 38,
         scaleX: 1,
-        scaleY: round.dive === 'center' ? 0.82 : 1, duration: 0.4, ease: 'power2.out',
+        scaleY: 1, duration: 0.4, ease: 'power2.out',
       }, 'launch');
 
     // impact
@@ -522,7 +562,6 @@ export default function DuelArena({
     const shownRounds = holdScore ? allRounds.slice(0, -1) : allRounds;
     const shownScore = (pid: string) =>
       shownRounds.filter((r) => r.shooter === pid && r.goal).length;
-    const suddenDeath = duel.kick > 10 && duel.status === 'active';
     const iPicked = iShoot ? duel.shooter_picked : duel.keeper_picked;
     const theyPicked = iShoot ? duel.keeper_picked : duel.shooter_picked;
 
@@ -579,7 +618,9 @@ export default function DuelArena({
           </button>
           <audio ref={ambienceRef} src="/minigame_sounds/stadium_noise.mp3" loop preload="auto" />
           <audio ref={drumsRef} src="/minigame_sounds/drums.mp3" loop preload="auto" />
-          <svg ref={sceneRef} viewBox="0 0 400 260" className={`duel-svg${suddenDeath ? ' sd' : ''}`}>
+          <audio ref={oleRef} src="/minigame_sounds/ole_chant.mp3" loop preload="auto" />
+          <audio ref={whistleRef} src="/minigame_sounds/fans_whistling.mp3" loop preload="auto" />
+          <svg ref={sceneRef} viewBox="0 0 400 260" className={`duel-svg${sdLit ? ' sd' : ''}`}>
             <defs>
               <linearGradient id="dSky" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#03150f" />
@@ -622,7 +663,7 @@ export default function DuelArena({
             <rect x="354" y="10" width="20" height="7" rx="2" fill="#f4f1e8" className="duel-lamp" />
 
             {/* sudden death: sweeping spots, red tint, smoke flares */}
-            {suddenDeath && (
+            {sdLit && (
               <g>
                 <rect x="0" y="0" width="400" height="260" fill="rgba(255,80,60,0.07)" className="duel-sd-tint" />
                 <polygon points="130,0 190,185 70,185" fill="url(#dBeam)" className="duel-sweep" />
@@ -683,13 +724,18 @@ export default function DuelArena({
                 <g className={`keeper-idle${animating ? ' hold' : ''}`}>
                   <circle cx="0" cy="-24" r="9" fill="#f4f1e8" />
                   <rect x="-7" y="-15" width="14" height="26" rx="5" fill={keeperColor} />
-                  <line x1="-7" y1="-10" x2="-22" y2="-22" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" className="keeper-arm-l" />
-                  <line x1="7" y1="-10" x2="22" y2="-22" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" className="keeper-arm-r" />
-                  <g transform="translate(-24 -26) scale(-1,1) rotate(51) scale(-1,1)">
-                    <image href="/goalie_gloves.png" x="-10" y="-13" width="20" height="26" preserveAspectRatio="xMidYMid meet" />
+                  {/* Each arm group: local origin = shoulder. Glove lives inside so idle wiggle carries both. */}
+                  <g className="keeper-arm-l" transform="translate(-7 -10)">
+                    <line x1="0" y1="0" x2="-15" y2="-12" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" />
+                    <g transform="translate(-25 -20) scale(-1,1) rotate(51) scale(-1,1)">
+                      <image href="/goalie_gloves.png" x="-10" y="-13" width="20" height="26" preserveAspectRatio="xMidYMid meet" />
+                    </g>
                   </g>
-                  <g transform="translate(24 -26) rotate(51) scale(-1,1)">
-                    <image href="/goalie_gloves.png" x="-10" y="-13" width="20" height="26" preserveAspectRatio="xMidYMid meet" />
+                  <g className="keeper-arm-r" transform="translate(7 -10)">
+                    <line x1="0" y1="0" x2="15" y2="-12" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" />
+                    <g transform="translate(25 -20) rotate(51) scale(-1,1)">
+                      <image href="/goalie_gloves.png" x="-10" y="-13" width="20" height="26" preserveAspectRatio="xMidYMid meet" />
+                    </g>
                   </g>
                   <line x1="-4" y1="11" x2="-7" y2="30" stroke="#f4f1e8" strokeWidth="5" strokeLinecap="round" />
                   <line x1="4" y1="11" x2="7" y2="30" stroke="#f4f1e8" strokeWidth="5" strokeLinecap="round" />
@@ -699,7 +745,7 @@ export default function DuelArena({
 
             {/* striker */}
             <g ref={strikerRef}>
-              <g transform="translate(156 222)">
+              <g transform="translate(122 222)">
                 <circle cx="0" cy="-26" r="8" fill="#f4f1e8" />
                 <rect x="-6" y="-18" width="12" height="22" rx="4" fill={shooterColor} />
                 <line className="s-arm-l" x1="-6" y1="-12" x2="-15" y2="-3" stroke={shooterColor} strokeWidth="4" strokeLinecap="round" />
@@ -711,7 +757,7 @@ export default function DuelArena({
 
             {/* YOU marker */}
             {duel.status === 'active' && !animating && iAmIn && (
-              <g transform={iShoot ? 'translate(156 180)' : 'translate(200 96)'}>
+              <g transform={iShoot ? 'translate(122 180)' : 'translate(200 96)'}>
                 <g className="duel-you-bob">
                   <rect x="-21" y="-15" width="42" height="16" rx="5" fill="#e6b337" />
                   <text x="0" y="-3" textAnchor="middle" className="duel-you-text">
@@ -723,7 +769,7 @@ export default function DuelArena({
             )}
 
             {/* shot trail + ball */}
-            <line ref={trailRef} x1="200" y1="224" x2="200" y2="224" stroke="url(#dTrail)" strokeWidth="4" strokeLinecap="round" opacity="0" />
+            <path ref={trailRef} d="M 200 228 Q 200 228 200 228" stroke="url(#dTrail)" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0" />
             <g ref={ballRef}>
               <g ref={ballYRef}>
                 <g transform="translate(200 228)">
@@ -872,11 +918,12 @@ export default function DuelArena({
                   key={p}
                   className={`duel-target${iShoot ? '' : ' keep'}`}
                   disabled={busy}
-                  onClick={() =>
+                  onClick={() => {
+                    sfx.whistle();
                     duel.id === CPU_DUEL_ID
                       ? cpuPick(p)
-                      : rpc('duel_submit_pick', { p_duel: duel.id, p_pick: p })
-                  }
+                      : rpc('duel_submit_pick', { p_duel: duel.id, p_pick: p });
+                  }}
                 >
                   {iShoot
                     ? p === 'left'
@@ -1069,14 +1116,24 @@ export default function DuelArena({
             <span className="groups-title">History</span>
             <div className="contenders-line" />
           </div>
-          {finished.slice(0, 10).map((d) => (
-            <div className="duel-row done" key={d.id}>
-              <span>
-                {nameOf(d.challenger)} {d.challenger_score} – {d.opponent_score} {nameOf(d.opponent)}
-              </span>
-              <span className="duel-winner-tag">{nameOf(d.winner ?? '')} 🏆</span>
-            </div>
-          ))}
+          <div style={{ maxHeight: 420, overflowY: 'auto' }}>
+            {finished.map((d) => {
+              const cMeta = metaOf(d.challenger);
+              const oMeta = metaOf(d.opponent);
+              return (
+                <div className="duel-row done" key={d.id}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    {cMeta && <img src={flagUrl(cMeta.flagCode)!} alt="" className="heat-flag" />}
+                    {nameOf(d.challenger)}
+                    <span style={{ margin: '0 4px' }}>{d.challenger_score} – {d.opponent_score}</span>
+                    {oMeta && <img src={flagUrl(oMeta.flagCode)!} alt="" className="heat-flag" />}
+                    {nameOf(d.opponent)}
+                  </span>
+                  <span className="duel-winner-tag">{nameOf(d.winner ?? '')} 🏆</span>
+                </div>
+              );
+            })}
+          </div>
         </>
       )}
 

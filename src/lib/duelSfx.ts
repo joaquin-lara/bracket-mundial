@@ -68,18 +68,13 @@ function noise(t0: number, dur: number, gain: number, type: BiquadFilterType, fr
 
 const now = () => ac()?.currentTime ?? 0;
 
-// Play a random clip from a list of public audio files (equal probability).
-const GOAL_FILES = ['/minigame_sounds/goal.mp3', '/minigame_sounds/goal2.mp3', '/minigame_sounds/goal3.mp3'];
-function playRandomFile(files: string[], volume = 0.2) {
-  if (isMuted() || typeof Audio === 'undefined' || files.length === 0) return;
-  const src = files[Math.floor(Math.random() * files.length)];
+function playFile(src: string, volume = 0.2) {
+  if (isMuted() || typeof Audio === 'undefined') return;
   try {
     const a = new Audio(src);
     a.volume = volume;
     a.play().catch(() => {});
-  } catch {
-    /* ignore */
-  }
+  } catch { /* ignore */ }
 }
 
 export const sfx = {
@@ -87,7 +82,7 @@ export const sfx = {
     if (isMuted() || typeof Audio === 'undefined') return;
     try {
       const a = new Audio('/minigame_sounds/whistle.mp3');
-      a.volume = 0.8;
+      a.volume = 0.4;
       a.play().catch(() => {});
     } catch { /* ignore */ }
   },
@@ -103,13 +98,10 @@ export const sfx = {
   },
   goal() {
     // One of the three real goal clips, chosen at random with equal odds.
-    playRandomFile(GOAL_FILES, 0.58);
+    playFile('/minigame_sounds/goal.mp3', 0.58);
   },
   save() {
-    if (isMuted()) return;
-    const t = now();
-    tone(120, t, 0.12, 'sine', 0.4, 70); // glove thud
-    noise(t + 0.04, 0.7, 0.28, 'lowpass', 380); // crowd "ooh"
+    playFile('/minigame_sounds/missed.mp3', 0.7);
   },
   win() {
     if (isMuted()) return;
