@@ -2888,11 +2888,30 @@ table.standings tr.me td {
   line-height: 1.35;
 }
 
-.ais-thirds {
-  max-width: 460px;
+.ais-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
 }
 
-.ais-thirds .gt-team {
+@media (max-width: 720px) {
+  .ais-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ais-table-label {
+  font-family: var(--narrow);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold-soft);
+  margin: 0 0 8px;
+}
+
+.ais-summary .gt-team {
   padding-left: 8px;
 }
 
