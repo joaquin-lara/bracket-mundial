@@ -79,15 +79,6 @@ export default async function BracketPage() {
         showToggle={!hasRealKnockout && anyGroupPlayed}
       />
 
-      <div className="groups-head">
-        <span className="groups-title">Card Tracker</span>
-        <div className="contenders-line" />
-      </div>
-      <p className="subtitle">
-        Enter each team&apos;s group-stage cards. Fair-play points (FP) are worked out automatically
-        — yellow −1, second yellow −3, direct red −4, yellow + red −5 — and break ties in the group
-        tables above. Closer to zero is better.
-      </p>
       <CardsEditor initial={cardsRows} />
     </div>
   );

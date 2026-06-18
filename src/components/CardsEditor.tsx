@@ -32,6 +32,7 @@ function points(r: CardsRow): number {
 }
 
 export default function CardsEditor({ initial }: { initial: CardsRow[] }) {
+  const [open, setOpen] = useState(false);
   const [rows, setRows] = useState<CardsRow[]>(initial);
   const [pending, startTransition] = useTransition();
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -59,50 +60,68 @@ export default function CardsEditor({ initial }: { initial: CardsRow[] }) {
 
   return (
     <div className="cards-editor">
-      <div className="cards-table-wrap">
-        <table className="cards-table">
-          <thead>
-            <tr>
-              <th className="ce-team">Team</th>
-              {FIELDS.map((f) => (
-                <th key={f.key}>{f.label}</th>
-              ))}
-              <th title="FIFA fair-play points">FP</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.code}>
-                <td className="ce-team">
-                  <Flag code={r.code} name={r.name} />
-                  <span className="ce-name">{r.name}</span>
-                </td>
-                {FIELDS.map((f) => (
-                  <td key={f.key}>
-                    <input
-                      type="number"
-                      min={0}
-                      max={99}
-                      inputMode="numeric"
-                      value={r[f.key]}
-                      onChange={(e) => update(r.code, f.key, e.target.value)}
-                      aria-label={`${r.name} ${f.label}`}
-                    />
-                  </td>
-                ))}
-                <td className="ce-fp">{points(r)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="cards-actions">
-        <button type="button" onClick={save} disabled={pending}>
-          {pending ? 'Saving…' : 'Save card counts'}
+      <div className="groups-head">
+        <span className="groups-title">Card Tracker</span>
+        <div className="contenders-line" />
+        <button
+          className={`projected-toggle${open ? ' active' : ''}`}
+          onClick={() => setOpen((v) => !v)}
+        >
+          {open ? 'Hide tracker' : 'Open tracker'}
         </button>
-        {msg && <span className={`cards-msg${msg.ok ? ' ok' : ' err'}`}>{msg.text}</span>}
       </div>
+      {!open && (
+        <p className="subtitle">
+          Enter each team&apos;s group-stage cards to factor fair-play into the group tables.
+        </p>
+      )}
+      {open && (
+        <>
+          <div className="cards-table-wrap">
+            <table className="cards-table">
+              <thead>
+                <tr>
+                  <th className="ce-team">Team</th>
+                  {FIELDS.map((f) => (
+                    <th key={f.key}>{f.label}</th>
+                  ))}
+                  <th title="FIFA fair-play points">FP</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r) => (
+                  <tr key={r.code}>
+                    <td className="ce-team">
+                      <Flag code={r.code} name={r.name} />
+                      <span className="ce-name">{r.name}</span>
+                    </td>
+                    {FIELDS.map((f) => (
+                      <td key={f.key}>
+                        <input
+                          type="number"
+                          min={0}
+                          max={99}
+                          inputMode="numeric"
+                          value={r[f.key]}
+                          onChange={(e) => update(r.code, f.key, e.target.value)}
+                          aria-label={`${r.name} ${f.label}`}
+                        />
+                      </td>
+                    ))}
+                    <td className="ce-fp">{points(r)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="cards-actions">
+            <button type="button" onClick={save} disabled={pending}>
+              {pending ? 'Saving…' : 'Save card counts'}
+            </button>
+            {msg && <span className={`cards-msg${msg.ok ? ' ok' : ' err'}`}>{msg.text}</span>}
+          </div>
+        </>
+      )}
     </div>
   );
 }
