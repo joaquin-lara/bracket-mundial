@@ -25,6 +25,33 @@ const THROTTLE_MS = 60_000; // re-evaluate at most once a minute
 let lastRun = 0;
 let inFlight: Promise<void> | null = null;
 
+// Badges are permanent once earned: a legitimately-earned achievement is never
+// deleted (and so never re-awarded or re-notified), even if a single sync run
+// sees incomplete data. Only ids listed here are ever pruned — use it to retire
+// a badge whose rule changed. Empty by default.
+const DEPRECATED_ACHIEVEMENT_IDS = new Set<string>([]);
+
+const PAGE = 1000; // PostgREST returns at most ~1000 rows per request
+
+/**
+ * Read every row of a query, paging past the per-request row cap. Without this
+ * a large table (e.g. predictions) silently truncates, which makes evaluation
+ * non-deterministic across runs. Ordering must be stable for paging to be sound.
+ */
+export async function fetchAll<T>(
+  page: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: unknown }>
+): Promise<T[]> {
+  const out: T[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await page(from, from + PAGE - 1);
+    if (error) throw error;
+    const rows = data ?? [];
+    out.push(...rows);
+    if (rows.length < PAGE) break;
+  }
+  return out;
+}
+
 /** Single-flight + throttled. Never throws: a failure must not break a page. */
 export function ensureAchievements(): Promise<void> {
   if (inFlight) return inFlight;
@@ -59,34 +86,38 @@ async function runAchievements(): Promise<void> {
   }
 
   // What's already recorded (and which of those still lack match context).
-  const { data: existingRows } = await admin
-    .from('user_achievements')
-    .select('user_id, achievement_id, match_id');
-  const have = new Set((existingRows ?? []).map((r) => `${r.user_id}|${r.achievement_id}`));
+  const existingRows = await fetchAll<{
+    user_id: string;
+    achievement_id: string;
+    match_id: number | null;
+  }>((from, to) =>
+    admin
+      .from('user_achievements')
+      .select('user_id, achievement_id, match_id')
+      .order('user_id')
+      .order('achievement_id')
+      .range(from, to)
+  );
+  const have = new Set(existingRows.map((r) => `${r.user_id}|${r.achievement_id}`));
   const needsContext = new Set(
-    (existingRows ?? [])
+    existingRows
       .filter((r) => r.match_id == null)
       .map((r) => `${r.user_id}|${r.achievement_id}`)
   );
   const fresh = earned.filter((e) => !have.has(`${e.userId}|${e.achievementId}`));
 
-  // Reconcile: drop any recorded badge the evaluator no longer reports. Earned
-  // is otherwise monotonic (finished-match data only grows), so this only
-  // removes rows mistakenly written before a rule fix — e.g. participation
-  // badges awarded off pre-filled future picks. Self-healing.
-  // Guard: only prune when fixtures actually loaded, so a transient empty
-  // read can never wipe legitimately-earned badges.
-  if (ctx.matches.length > 0) {
-    const earnedKeys = new Set(earned.map((e) => `${e.userId}|${e.achievementId}`));
-    const stale = (existingRows ?? []).filter(
-      (r) => !earnedKeys.has(`${r.user_id}|${r.achievement_id}`)
-    );
+  // Prune only explicitly-deprecated badges. Earned badges are otherwise
+  // permanent — deleting a badge that a single (possibly incomplete) run failed
+  // to re-report would let the next run re-award and re-notify it, spamming the
+  // owner. Retiring a badge is a deliberate act via DEPRECATED_ACHIEVEMENT_IDS.
+  if (DEPRECATED_ACHIEVEMENT_IDS.size > 0) {
+    const stale = existingRows.filter((r) => DEPRECATED_ACHIEVEMENT_IDS.has(r.achievement_id));
     for (const r of stale) {
       await admin
         .from('user_achievements')
         .delete()
-        .eq('user_id', r.user_id as string)
-        .eq('achievement_id', r.achievement_id as string);
+        .eq('user_id', r.user_id)
+        .eq('achievement_id', r.achievement_id);
     }
   }
 
@@ -169,12 +200,28 @@ async function runAchievements(): Promise<void> {
 }
 
 async function loadContext(admin: SupabaseClient): Promise<EvalContext> {
-  const [profilesRes, matchesRes, predsRes, duelsRes, standingsRes] = await Promise.all([
+  const [profilesRes, matchesRes, predsData, duelsRes, standingsRes] = await Promise.all([
     admin.from('profiles').select('id, display_name'),
     admin
       .from('matches')
       .select('id, stage, group_name, venue, kickoff, status, home_score, away_score, home_code, away_code'),
-    admin.from('predictions').select('user_id, match_id, pred_home, pred_away, points, updated_at'),
+    // Paginated: predictions is the table that grows past the per-request cap,
+    // and a truncated read would make evaluation flap between runs.
+    fetchAll<{
+      user_id: string;
+      match_id: number;
+      pred_home: number;
+      pred_away: number;
+      points: number | null;
+      updated_at: string;
+    }>((from, to) =>
+      admin
+        .from('predictions')
+        .select('user_id, match_id, pred_home, pred_away, points, updated_at')
+        .order('match_id')
+        .order('user_id')
+        .range(from, to)
+    ),
     admin
       .from('duels')
       .select('id, challenger, opponent, status, winner, challenger_score, opponent_score, rounds, updated_at')
@@ -199,13 +246,13 @@ async function loadContext(admin: SupabaseClient): Promise<EvalContext> {
     awayCode: (m.away_code as string | null) ?? null,
   }));
 
-  const predictions: PredInfo[] = (predsRes.data ?? []).map((p) => ({
-    userId: p.user_id as string,
-    matchId: p.match_id as number,
-    predHome: p.pred_home as number,
-    predAway: p.pred_away as number,
-    points: (p.points as number | null) ?? null,
-    updatedAt: p.updated_at as string,
+  const predictions: PredInfo[] = predsData.map((p) => ({
+    userId: p.user_id,
+    matchId: p.match_id,
+    predHome: p.pred_home,
+    predAway: p.pred_away,
+    points: p.points ?? null,
+    updatedAt: p.updated_at,
   }));
 
   const duels: DuelInfo[] = (duelsRes.data ?? []).map((d) => ({
