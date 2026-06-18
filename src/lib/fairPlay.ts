@@ -41,7 +41,54 @@ const WEIGHTS = {
  *   GER: { yellow: 3, secondYellow: 1 }
  */
 export const DISCIPLINE: Record<string, Discipline> = {
-  // CODE: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 },
+  ALG: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Algeria
+  ARG: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Argentina
+  AUS: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Australia
+  AUT: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Austria
+  BEL: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Belgium
+  BIH: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Bosnia and Herzegovina
+  BRA: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Brazil
+  CAN: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Canada
+  CIV: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Ivory Coast
+  COD: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // DR Congo
+  COL: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Colombia
+  CPV: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Cape Verde
+  CRO: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Croatia
+  CUR: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Curaçao
+  CZE: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Czech Republic
+  ECU: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Ecuador
+  EGY: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Egypt
+  ENG: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // England
+  ESP: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Spain
+  FRA: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // France
+  GER: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Germany
+  GHA: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Ghana
+  HAI: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Haiti
+  IRN: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Iran
+  IRQ: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Iraq
+  JOR: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Jordan
+  JPN: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Japan
+  KOR: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // South Korea
+  KSA: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Saudi Arabia
+  MAR: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Morocco
+  MEX: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Mexico
+  NED: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Netherlands
+  NOR: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Norway
+  NZL: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // New Zealand
+  PAN: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Panama
+  PAR: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Paraguay
+  POR: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Portugal
+  QAT: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Qatar
+  RSA: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // South Africa
+  SCO: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Scotland
+  SEN: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Senegal
+  SUI: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Switzerland
+  SWE: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Sweden
+  TUN: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Tunisia
+  TUR: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Turkey
+  URY: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Uruguay
+  USA: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // United States
+  UZB: { yellow: 0, secondYellow: 0, directRed: 0, yellowAndDirectRed: 0 }, // Uzbekistan
 };
 
 /** FIFA fair-play points for one team: 0 (cleanest) down to negative. */
