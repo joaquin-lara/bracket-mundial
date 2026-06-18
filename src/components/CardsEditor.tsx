@@ -102,7 +102,7 @@ export default function CardsEditor({ initial }: { initial: CardsRow[] }) {
                           min={0}
                           max={99}
                           inputMode="numeric"
-                          value={r[f.key]}
+                          value={r[f.key] || ''}
                           onChange={(e) => update(r.code, f.key, e.target.value)}
                           aria-label={`${r.name} ${f.label}`}
                         />
