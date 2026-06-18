@@ -2700,7 +2700,12 @@ table.standings tr.me td {
 
 @media (max-width: 560px) {
   .groups-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(4, 82vw);
+    grid-template-rows: repeat(3, auto);
+    grid-auto-flow: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
   }
 }
 
@@ -2897,7 +2902,14 @@ table.standings tr.me td {
 
 @media (max-width: 720px) {
   .ais-summary {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 78vw);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+  }
+  .ais-table-scroll {
+    max-height: 350px;
+    overflow-y: auto;
   }
 }
 

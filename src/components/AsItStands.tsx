@@ -160,8 +160,10 @@ export default function AsItStands({
       </p>
       <div className="ais-summary">
         <div className="ais-summary-table">
-          <p className="ais-table-label">Group winners &amp; runners-up</p>
-          <SummaryTable rows={qualifiers} colHeader="Pos" />
+          <p className="ais-table-label">Group 1st and 2nd places</p>
+          <div className="ais-table-scroll">
+            <SummaryTable rows={qualifiers} colHeader="Pos" />
+          </div>
         </div>
         <div className="ais-summary-table">
           <p className="ais-table-label">Best third-placed teams</p>
