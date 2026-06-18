@@ -68,23 +68,21 @@ function noise(t0: number, dur: number, gain: number, type: BiquadFilterType, fr
 
 const now = () => ac()?.currentTime ?? 0;
 
+const audioCache: Record<string, HTMLAudioElement> = {};
 function playFile(src: string, volume = 0.2) {
   if (isMuted() || typeof Audio === 'undefined') return;
   try {
-    const a = new Audio(src);
+    if (!audioCache[src]) audioCache[src] = new Audio(src);
+    const a = audioCache[src];
     a.volume = volume;
+    a.currentTime = 0;
     a.play().catch(() => {});
   } catch { /* ignore */ }
 }
 
 export const sfx = {
   whistle() {
-    if (isMuted() || typeof Audio === 'undefined') return;
-    try {
-      const a = new Audio('/minigame_sounds/whistle.mp3');
-      a.volume = 0.4;
-      a.play().catch(() => {});
-    } catch { /* ignore */ }
+    playFile('/minigame_sounds/whistle.mp3', 0.4);
   },
   kick() {
     if (isMuted()) return;
