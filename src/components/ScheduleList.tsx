@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Flag from './Flag';
 import { stageLabel, type Match } from '@/lib/types';
+import { venueLabel } from '@/lib/venues';
 
 type View = 'upcoming' | 'past';
 
@@ -56,7 +57,7 @@ function Row({ m }: { m: Match }) {
           </span>
         </div>
       </div>
-      {m.venue && <div className="sched-venue">{m.venue}</div>}
+      {venueLabel(m.venue) && <div className="sched-venue">{venueLabel(m.venue)}</div>}
     </div>
   );
 }

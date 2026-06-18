@@ -37,6 +37,7 @@ export interface PredictResult {
   probAway: number;
   mostLikelyScore: { home: number; away: number; prob: number };
   topScores: ScoreCell[]; // top scorelines by probability, descending
+  scoreGrid: number[][]; // [homeGoals][awayGoals] probability, 0..5 each
 }
 
 const MAX_GOALS = 8;
@@ -146,6 +147,12 @@ export function predict(input: PredictInput): PredictResult | null {
   const sorted = [...grid.cells].sort((a, b) => b.prob - a.prob);
   const top = sorted[0];
 
+  // Compact 6x6 scoreline matrix (0..5 goals each side) for the heatmap UI.
+  const scoreGridMatrix = Array.from({ length: 6 }, () => Array<number>(6).fill(0));
+  for (const c of grid.cells) {
+    if (c.home <= 5 && c.away <= 5) scoreGridMatrix[c.home][c.away] = c.prob;
+  }
+
   const eloGap = home.elo - away.elo + (neutral ? 0 : MODEL.homeAdvantageElo);
 
   // Blend DC's W/D/L with the Elo+Poisson model's (robust win, see above). The
@@ -181,6 +188,7 @@ export function predict(input: PredictInput): PredictResult | null {
     probAway,
     mostLikelyScore: { home: top.home, away: top.away, prob: top.prob },
     topScores: sorted.slice(0, 6),
+    scoreGrid: scoreGridMatrix,
   };
 }
 

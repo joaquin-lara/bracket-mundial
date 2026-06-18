@@ -135,6 +135,14 @@ body:has(.home-intro) .pitch-stripes {
   align-items: center;
   justify-content: center;
   font-size: 18px;
+  overflow: hidden;
+}
+
+.brand-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .brand-name {
@@ -180,7 +188,8 @@ body:has(.home-intro) .pitch-stripes {
 
 .topnav button {
   background: none;
-  border: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
   color: var(--dim);
   cursor: pointer;
   font-family: var(--narrow);
@@ -188,7 +197,7 @@ body:has(.home-intro) .pitch-stripes {
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  padding: 0;
+  padding: 6px 10px;
 }
 
 .topnav button:hover {
@@ -815,6 +824,59 @@ h1 {
   white-space: nowrap;
 }
 
+.venue-info {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.venue-info-plain {
+  font-family: var(--narrow);
+  font-size: 12px;
+  color: var(--dim);
+}
+.venue-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.venue-stadium {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--cream);
+}
+.venue-city {
+  font-size: 12.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.venue-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.venue-note {
+  font-size: 12px;
+  color: var(--dim);
+  line-height: 1.35;
+}
+
+.lineup-wait {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--dim);
+  font-style: italic;
+}
+
 .match-footer {
   position: relative;
   display: flex;
@@ -1283,6 +1345,28 @@ h1 {
   border-radius: var(--panel-radius);
   overflow: hidden;
   margin-bottom: 14px;
+}
+
+.duel-mute {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  width: 40px;
+  height: 40px;
+  font-size: 22px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(4, 21, 15, 0.6);
+  cursor: pointer;
+  padding: 0;
+}
+.duel-mute:hover {
+  background: rgba(4, 21, 15, 0.85);
 }
 
 .duel-overlay {

@@ -3,10 +3,18 @@
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Flag from './Flag';
+import TeamCombobox from './TeamCombobox';
+import ScoreGrid from './ScoreGrid';
+import TeamRadar from './TeamRadar';
+import H2HHistory from './H2HHistory';
+import ConfirmedLineups from './ConfirmedLineups';
+import TeamPitch from './TeamPitch';
+import ChartTag from './ChartTag';
 import { TEAMS, byCode } from '@/lib/ml/teams';
 import { predict, pct } from '@/lib/ml/model';
+import type { MatchLineups, TeamLineup } from '@/lib/types';
 
-const OPTIONS = TEAMS.map((t) => ({ code: t.code, name: t.name }));
+export interface LastLineup { team: TeamLineup; caption: string }
 
 /** Validate a ?home= / ?away= code from the URL, or null if not one of the 48. */
 function validCode(raw: string | null): string | null {
@@ -24,10 +32,23 @@ function ProbBar({ home, draw, away }: { home: number; draw: number; away: numbe
   );
 }
 
-export default function MatchupPicker() {
+export default function MatchupPicker({
+  confirmedByPair = {},
+  lastLineupByTeam = {},
+  defaultHome,
+  defaultAway,
+}: {
+  confirmedByPair?: Record<string, MatchLineups>;
+  lastLineupByTeam?: Record<string, LastLineup>;
+  /** Teams of the current/most-recent WC match, used when no ?home=/?away= is set. */
+  defaultHome?: string;
+  defaultAway?: string;
+}) {
   const params = useSearchParams();
-  const presetHome = validCode(params.get('home')) ?? 'ARG';
-  let presetAway = validCode(params.get('away')) ?? (presetHome === 'BRA' ? 'ARG' : 'BRA');
+  const presetHome = validCode(params.get('home')) ?? (defaultHome && byCode(defaultHome) ? defaultHome : 'ARG');
+  let presetAway =
+    validCode(params.get('away')) ??
+    (defaultAway && byCode(defaultAway) && defaultAway !== presetHome ? defaultAway : presetHome === 'BRA' ? 'ARG' : 'BRA');
   if (presetAway === presetHome) {
     presetAway = TEAMS.find((t) => t.code !== presetHome)!.code;
   }
@@ -48,22 +69,15 @@ export default function MatchupPicker() {
 
   if (!result) return null;
   const { home: H, away: A } = result;
+  // Real confirmed XIs when these two teams are an actual fixture that has them.
+  const confirmed = confirmedByPair[[home, away].slice().sort().join('|')];
 
   return (
     <div className="ml-picker">
       <div className="ml-pick-row">
         <label className="ml-pick">
           <span className="ml-pick-label">Team A</span>
-          <div className="ml-select-wrap">
-            <Flag code={H.code} name={H.name} />
-            <select value={home} onChange={(e) => setHome(e.target.value)} aria-label="Team A">
-              {OPTIONS.map((o) => (
-                <option key={o.code} value={o.code} disabled={o.code === away}>
-                  {o.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <TeamCombobox value={home} onChange={setHome} exclude={away} label="Team A" />
         </label>
 
         <button className="ml-swap" onClick={swap} aria-label="Swap teams" type="button">
@@ -72,16 +86,7 @@ export default function MatchupPicker() {
 
         <label className="ml-pick">
           <span className="ml-pick-label">Team B</span>
-          <div className="ml-select-wrap">
-            <Flag code={A.code} name={A.name} />
-            <select value={away} onChange={(e) => setAway(e.target.value)} aria-label="Team B">
-              {OPTIONS.map((o) => (
-                <option key={o.code} value={o.code} disabled={o.code === home}>
-                  {o.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <TeamCombobox value={away} onChange={setAway} exclude={home} label="Team B" />
         </label>
       </div>
 
@@ -95,6 +100,12 @@ export default function MatchupPicker() {
       </label>
 
       <div className="ml-result">
+        <div style={{ fontWeight: 800, color: 'var(--cream)', marginBottom: 2 }}>
+          Match prediction<ChartTag kind="prediction" />
+        </div>
+        <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 12 }}>
+          Win / draw / win odds from the model — a blend of Dixon-Coles form, Elo strength and FIFA squad talent.
+        </div>
         <div className="ml-prob-head">
           <span className="ml-prob-team">
             {H.name} win
@@ -134,9 +145,9 @@ export default function MatchupPicker() {
         </div>
 
         <div className="ml-scorelines">
-          <span className="ml-scorelines-label">Most likely scorelines</span>
+          <span className="ml-scorelines-label">Most likely scorelines<ChartTag kind="prediction" /></span>
           <span className="ml-scorelines-hint">
-            Chance of each exact final score. {H.name} listed first.
+            Predicted by the model. Chance of each exact final score, {H.name} listed first.
           </span>
           <div className="ml-score-grid">
             {result.topScores.map((s, i) => (
@@ -151,6 +162,27 @@ export default function MatchupPicker() {
             ))}
           </div>
         </div>
+
+        <ScoreGrid grid={result.scoreGrid} home={H} away={A} />
+        <TeamRadar home={H} away={A} />
+        <H2HHistory home={H} away={A} />
+
+        {confirmed ? (
+          <ConfirmedLineups lineups={confirmed} leftCode={H.code} />
+        ) : (
+          <div style={{ marginTop: 22 }}>
+            <div style={{ fontWeight: 800, marginBottom: 2, color: 'var(--cream)', textAlign: 'center' }}>Latest World Cup lineups<ChartTag kind="history" /></div>
+            <div style={{ fontSize: 12.5, color: 'var(--muted)', marginBottom: 10, textAlign: 'center' }}>
+              Each team&apos;s starting XI from their most recent 2026 World Cup match.
+            </div>
+            <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <TeamPitch teamName={H.name} lineup={lastLineupByTeam[H.code]?.team ?? null} caption={lastLineupByTeam[H.code]?.caption}
+                accent="rgb(52,211,153)" emptyNote="No 2026 World Cup match on record yet." />
+              <TeamPitch teamName={A.name} lineup={lastLineupByTeam[A.code]?.team ?? null} caption={lastLineupByTeam[A.code]?.caption}
+                accent="rgb(230,179,55)" emptyNote="No 2026 World Cup match on record yet." />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

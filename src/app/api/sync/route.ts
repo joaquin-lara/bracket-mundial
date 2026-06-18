@@ -4,6 +4,7 @@ import { fetchFixtures } from '@/lib/footballData';
 import { runSync } from '@/lib/sync';
 import { makeSupabaseSyncDb } from '@/lib/syncDb';
 import { runMatchNotifications } from '@/lib/push/notify';
+import { runLineupSync } from '@/lib/lineupSync';
 import { ensureAchievements } from '@/lib/achievementsSync';
 
 export const dynamic = 'force-dynamic';
@@ -31,6 +32,7 @@ export async function GET(request: NextRequest) {
   }
 
   const notified = await runMatchNotifications(admin);
+  const lineups = await runLineupSync(admin);
   await ensureAchievements().catch(() => {});
-  return NextResponse.json({ ok: true, ...result, notified });
+  return NextResponse.json({ ok: true, ...result, notified, lineups });
 }

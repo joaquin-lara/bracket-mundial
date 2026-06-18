@@ -3,6 +3,8 @@ import { ensureAchievements } from './achievementsSync';
 import { fetchFixtures } from './footballData';
 import { runSync } from './sync';
 import { makeSupabaseSyncDb } from './syncDb';
+import { runMatchNotifications } from './push/notify';
+import { runLineupSync } from './lineupSync';
 
 const STALE_MS = 5 * 60_000; // sync at most every 5 minutes
 
@@ -43,11 +45,15 @@ async function doSync(): Promise<void> {
       // Matches are fresh, but duels/standings may have moved: still let the
       // (throttled) achievement pass run so badges keep up.
       await ensureAchievements();
-      return;
+    } else {
+      await runSync(makeSupabaseSyncDb(admin), fetchFixtures);
+      await ensureAchievements();
     }
 
-    await runSync(makeSupabaseSyncDb(admin), fetchFixtures);
-    await ensureAchievements();
+    // Fire any due push notifications (kickoff/goal/reminder) on app activity too,
+    // not just the 5-min cron -- so goals notify the moment the app sees the score.
+    await runMatchNotifications(admin);
+    await runLineupSync(admin);
   } catch (err) {
     console.error('auto-sync failed:', err instanceof Error ? err.message : err);
   }

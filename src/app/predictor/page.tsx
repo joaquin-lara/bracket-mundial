@@ -2,10 +2,11 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import './predictor.css';
 import Flag from '@/components/Flag';
-import MatchupPicker from '@/components/MatchupPicker';
+import ChartTag from '@/components/ChartTag';
+import MatchupPicker, { type LastLineup } from '@/components/MatchupPicker';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { createClient } from '@/lib/supabase/server';
-import type { Match } from '@/lib/types';
+import type { Match, MatchLineups } from '@/lib/types';
 import { stageLabel } from '@/lib/types';
 import { predict, pct } from '@/lib/ml/model';
 import { DATASET, MODEL, lookup, TEAMS } from '@/lib/ml/teams';
@@ -36,6 +37,43 @@ export default async function PredictorPage() {
     .select('*')
     .order('kickoff', { ascending: true });
   const matches = (data ?? []) as Match[];
+
+  // Real confirmed XIs keyed by sorted team-code pair, for the matchup picker.
+  const confirmedByPair: Record<string, MatchLineups> = {};
+  // Each team's XI from their most recent World Cup match we have on record.
+  const lastRaw: Record<string, { team: MatchLineups['home']; kickoff: string; opp: string }> = {};
+  const fmtDate = (iso: string) =>
+    new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  const consider = (code: string, team: MatchLineups['home'], kickoff: string, opp: string) => {
+    const prev = lastRaw[code];
+    if (!prev || kickoff > prev.kickoff) lastRaw[code] = { team, kickoff, opp };
+  };
+  for (const m of matches) {
+    if (!m.lineups) continue;
+    if (m.home_code && m.away_code) {
+      confirmedByPair[[m.home_code, m.away_code].slice().sort().join('|')] = m.lineups;
+    }
+    if (m.home_code) consider(m.home_code, m.lineups.home, m.kickoff, m.away_team);
+    if (m.away_code) consider(m.away_code, m.lineups.away, m.kickoff, m.home_team);
+  }
+  const lastLineupByTeam: Record<string, LastLineup> = {};
+  for (const [code, r] of Object.entries(lastRaw)) {
+    lastLineupByTeam[code] = { team: r.team, caption: `vs ${r.opp} · ${fmtDate(r.kickoff)}` };
+  }
+
+  // Default the picker to the current/most-recent match: a live game if any, else
+  // the latest one already kicked off, else the soonest upcoming. Fast to read
+  // your ML mid-match without scrolling.
+  const now = Date.now();
+  const rateable = matches.filter((m) => m.home_code && m.away_code && lookup(m.home_code) && lookup(m.away_code));
+  const live = rateable.filter((m) => m.status === 'IN_PLAY' || m.status === 'PAUSED');
+  const started = rateable.filter((m) => Date.parse(m.kickoff) <= now);
+  const future = rateable.filter((m) => Date.parse(m.kickoff) > now);
+  const defaultMatch =
+    live.sort((a, b) => Date.parse(b.kickoff) - Date.parse(a.kickoff))[0] ??
+    started.sort((a, b) => Date.parse(b.kickoff) - Date.parse(a.kickoff))[0] ??
+    future.sort((a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff))[0] ??
+    null;
 
   // Upcoming fixtures we can rate (both teams known).
   const upcoming = matches
@@ -77,7 +115,12 @@ export default async function PredictorPage() {
           Choose two of the 48 qualified teams. Everything updates live in your browser.
         </p>
         <Suspense fallback={null}>
-          <MatchupPicker />
+          <MatchupPicker
+            confirmedByPair={confirmedByPair}
+            lastLineupByTeam={lastLineupByTeam}
+            defaultHome={defaultMatch?.home_code ?? undefined}
+            defaultAway={defaultMatch?.away_code ?? undefined}
+          />
         </Suspense>
       </section>
 
@@ -204,8 +247,10 @@ export default async function PredictorPage() {
       {/* ---- real fixtures ---- */}
       {upcoming.length > 0 && (
         <section className="ml-section">
-          <h2 className="ml-h2">Upcoming fixtures, rated</h2>
-          <p className="ml-lead">The model&apos;s read on the next World Cup 2026 matches.</p>
+          <h2 className="ml-h2">Upcoming fixtures, rated<ChartTag kind="prediction" /></h2>
+          <p className="ml-lead">
+            Model predictions for the next World Cup 2026 matches — win/draw/win odds and the single likeliest score.
+          </p>
           <div className="ml-fixtures">
             {upcoming.map((m) => {
               const r = predict({ home: m.home_code!, away: m.away_code!, neutral: true })!;

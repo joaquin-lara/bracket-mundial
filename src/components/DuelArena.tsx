@@ -1,9 +1,14 @@
 'use client';
 
 import gsap from 'gsap';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+
+// Run the reveal trigger before paint so the "who's shown" swap can't flash a frame.
+const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 import PresenceDot from '@/components/PresenceDot';
+import DuelEdge from '@/components/DuelEdge';
 import { flagUrl } from '@/lib/flags';
+import { sfx, isMuted, setMuted } from '@/lib/duelSfx';
 import { PLAYER_META, type Player } from '@/lib/players';
 import { createClient } from '@/lib/supabase/client';
 
@@ -91,6 +96,13 @@ const CROWD = Array.from({ length: 160 }, (_, i) => ({
 }));
 const CROWD_FILLS = ['#1d5a47', '#16493a', '#27654f'];
 const CONFETTI_COLORS = ['#e6b337', '#7fc8a9', '#c9a0dc', '#e89a7c', '#f4f1e8'];
+// Confetti in each player's national flag colors (the scorer's burst).
+const FLAG_CONFETTI: Record<string, string[]> = {
+  Carlos: ['#0067C6', '#FFFFFF', '#C8A95B'], // Nicaragua
+  Sebas: ['#4997D0', '#FFFFFF'], // Guatemala
+  Mauri: ['#0073CF', '#FFFFFF'], // Honduras
+  Joaquin: ['#D52B1E', '#FFFFFF', '#0039A6'], // Chile
+};
 
 export default function DuelArena({
   me,
@@ -112,16 +124,41 @@ export default function DuelArena({
   const [animating, setAnimating] = useState(false);
 
   const ballRef = useRef<SVGGElement>(null);
+  const ballYRef = useRef<SVGGElement>(null);
+  const ballImgRef = useRef<SVGGElement>(null);
   const keeperRef = useRef<SVGGElement>(null);
   const strikerRef = useRef<SVGGElement>(null);
-  const trailRef = useRef<SVGLineElement>(null);
+  const trailRef = useRef<SVGPathElement>(null);
   const confettiRef = useRef<SVGGElement>(null);
   const netRef = useRef<SVGGElement>(null);
+  const sceneRef = useRef<SVGSVGElement>(null);
+  const ambienceRef = useRef<HTMLAudioElement>(null);
+  const drumsRef = useRef<HTMLAudioElement>(null);
+  const oleRef = useRef<HTMLAudioElement>(null);
+  const whistleRef = useRef<HTMLAudioElement>(null);
   const animatedKicks = useRef<Map<string, number>>(new Map());
+  const sdArmed = useRef<Set<string>>(new Set());
+  const [muted, setMutedState] = useState(false);
+  useEffect(() => { setMutedState(isMuted()); }, []);
+
+  // Loop background stadium ambience (public/minigame_sounds/stadium_noise.mp3)
+  // while a game is open, unless muted. Silent no-op if the file isn't present.
+  const inGame = !!duels.find((d) => d.id === activeId) || activeId === CPU_DUEL_ID;
+  useEffect(() => {
+    const a = ambienceRef.current;
+    if (!a) return;
+    if (inGame && !muted) {
+      a.volume = 1;
+      a.play().catch(() => {});
+    } else {
+      a.pause();
+    }
+  }, [inGame, muted]);
 
   const [cpuDuel, setCpuDuel] = useState<Duel | null>(null);
   const [cpuRecord, setCpuRecord] = useState({ w: 0, l: 0 });
   const [sdFlash, setSdFlash] = useState(false);
+  const [sdLit, setSdLit] = useState(false);
   const sdShown = useRef<Set<string>>(new Set());
   const prevAnimating = useRef(false);
 
@@ -186,30 +223,76 @@ export default function DuelArena({
 
   const duel = activeId === CPU_DUEL_ID ? cpuDuel : duels.find((d) => d.id === activeId) ?? null;
 
+  const sdDrumsOn = sdLit && (duel?.status !== 'finished' || animating) && !muted;
+  useEffect(() => {
+    const d = drumsRef.current;
+    if (!d) return;
+    if (sdDrumsOn) {
+      d.volume = 0.2;
+      d.play().catch(() => {});
+    } else {
+      d.pause();
+      d.currentTime = 0;
+    }
+  }, [sdDrumsOn]);
+
+  const oleOn = duel?.status === 'finished' && !animating && duel?.winner === me && !muted;
+  const loseWhistleOn = duel?.status === 'finished' && !animating && duel?.winner !== me && !!duel?.winner && !muted;
+  useEffect(() => {
+    const a = oleRef.current;
+    if (!a) return;
+    if (oleOn) {
+      a.volume = 0.4;
+      a.play().catch(() => {});
+    } else {
+      a.pause();
+      a.currentTime = 0;
+    }
+  }, [oleOn]);
+
+  useEffect(() => {
+    const a = whistleRef.current;
+    if (!a) return;
+    if (loseWhistleOn) {
+      a.volume = 0.3;
+      a.play().catch(() => {});
+    } else {
+      a.pause();
+      a.currentTime = 0;
+    }
+  }, [loseWhistleOn]);
+
   function startCpu() {
     animatedKicks.current.set(CPU_DUEL_ID, 0);
     sdShown.current.delete(CPU_DUEL_ID);
+    sdArmed.current.delete(CPU_DUEL_ID);
+    setSdLit(false);
     setCpuDuel(freshCpuDuel(me));
     setActiveId(CPU_DUEL_ID);
   }
 
-  // one-time MUERTE SÚBITA flash when a duel reaches sudden death. It must land
-  // on the beat the turn actually flips, i.e. the instant the equalizer's
-  // reveal animation finishes — so fire only on the animating true→false edge.
-  // (Firing whenever `animating` is merely false lit it up a beat early, the
-  // moment the new kick arrived, before its reveal even played.)
+  // one-time MUERTE SÚBITA flash, only at the REAL crossing into sudden death:
+  // we must have witnessed this duel at kick <= 10 (armed) first, so opening a
+  // game already in sudden death never flashes. Fires the instant the equalizing
+  // kick's reveal finishes (the animating true->false edge).
   useEffect(() => {
     const justFinishedReveal = prevAnimating.current && !animating;
     prevAnimating.current = animating;
-    if (!duel || duel.status !== 'active' || duel.kick <= 10) return;
+    if (!duel) return;
+    if (duel.status === 'active' && duel.kick <= 10) sdArmed.current.add(duel.id);
+    if (duel.status !== 'active' || duel.kick <= 10) return;
     if (sdShown.current.has(duel.id)) return;
+    if (!sdArmed.current.has(duel.id)) return; // opened mid-sudden-death -> don't flash
     if (!justFinishedReveal) return;
     sdShown.current.add(duel.id);
     setSdFlash(true);
+    setSdLit(true);
     const t = setTimeout(() => setSdFlash(false), 2300);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duel?.id, duel?.kick, duel?.status, animating]);
+
+  useEffect(() => { setSdLit(false); }, [duel?.id]);
 
   function cpuPick(myPick: Pick) {
     setCpuDuel((d) => {
@@ -238,7 +321,7 @@ export default function DuelArena({
   }
 
   // ── reveal animation when a new resolved kick arrives ──────────────────────
-  useEffect(() => {
+  useIsoLayoutEffect(() => {
     if (!duel) return;
     const seen = animatedKicks.current.get(duel.id);
     const rounds = duel.rounds ?? [];
@@ -270,88 +353,145 @@ export default function DuelArena({
     const shot = TARGETS[round.shot];
     const diveX = TARGETS[round.dive].x - 200;
 
+    const goal = round.goal;
+    const decisive = duel.status === 'finished';
+    const ballImg = ballImgRef.current;
+    const ballY = ballYRef.current; // vertical axis (kept separate so x/y never fight)
+    const scene = sceneRef.current;
+    const q = (sel: string) => striker.querySelector<SVGElement>(sel);
+    const legL = q('.s-leg-l'), legR = q('.s-leg-r'), armL = q('.s-arm-l'), armR = q('.s-arm-r');
+    const netLines = net ? Array.from(net.querySelectorAll('line')) : [];
+    const crowd = scene ? Array.from(scene.querySelectorAll<SVGElement>('.duel-crowd-0, .duel-crowd-1, .duel-crowd-2')) : [];
+    const limbs = [legL, legR, armL, armR].filter(Boolean) as SVGElement[];
+
+    const pal = FLAG_CONFETTI[nameOf(round.shooter)] ?? CONFETTI_COLORS;
     const confettiBurst = () => {
       const bits = confettiRef.current?.children;
       if (!bits) return;
       Array.from(bits).forEach((bit, i) => {
-        gsap.fromTo(
-          bit,
-          { x: 0, y: 0, rotation: 0, opacity: 1 },
-          {
-            x: -100 + Math.random() * 200,
-            y: -30 + Math.random() * 110,
-            rotation: Math.random() * 540,
-            opacity: 0,
-            duration: 0.9 + Math.random() * 0.5,
-            delay: (i % 6) * 0.02,
-            ease: 'power2.out',
-          }
-        );
+        gsap.set(bit, { attr: { fill: pal[i % pal.length] } });
+        gsap.fromTo(bit, { x: 0, y: 0, rotation: 0, opacity: 1 }, {
+          x: -110 + Math.random() * 220, y: -40 + Math.random() * 130, rotation: Math.random() * 720,
+          opacity: 0, duration: 0.9 + Math.random() * 0.6, delay: (i % 6) * 0.02, ease: 'power2.out',
+        });
       });
     };
 
-    const tl = gsap.timeline({
-      onComplete: () => {
-        setAnimating(false);
-        setBanner(null);
-        gsap.set(ball, { x: 0, y: 0, scale: 1 });
-        gsap.set(keeper, { x: 0, y: 0, rotation: 0, scaleY: 1 });
-        gsap.set(striker, { x: 0, rotation: 0 });
-        gsap.set(trail, { opacity: 0 });
-      },
-    });
+    const reset = () => {
+      gsap.set(striker, { x: 0, rotation: 0 });
+      gsap.set(limbs, { rotation: 0 });
+      gsap.set(ball, { x: 0 });
+      gsap.set(ballY, { y: 0 });
+      gsap.set(ballImg, { rotation: 0, scale: 1 });
+      gsap.set(keeper, { clearProps: 'transform,transformOrigin' });
+      gsap.set(trail, { opacity: 0, attr: { d: 'M 200 228 Q 200 228 200 228' } });
+    };
 
-    tl.set(ball, { x: 0, y: 0, scale: 1 })
-      .set(keeper, { x: 0, y: 0, rotation: 0, scaleY: 1 })
-      .set(striker, { x: 0, rotation: 0 })
-      .set(trail, { opacity: 0, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } })
-      // run-up + keeper anticipation crouch
-      .to(striker, { x: -16, duration: 0.34, ease: 'power1.out' })
-      .to(keeper, { scaleY: 0.9, y: 4, duration: 0.34, transformOrigin: '50% 100%' }, '<')
-      // the strike
-      .to(striker, { x: 12, rotation: 10, transformOrigin: '50% 85%', duration: 0.14, ease: 'power3.in' })
-      .add('launch', '>-0.02')
-      .to(
-        keeper,
-        {
-          x: diveX,
-          y: round.dive === 'center' ? -6 : -14,
-          rotation: round.dive === 'center' ? 0 : round.dive === 'left' ? -32 : 32,
-          scaleY: round.dive === 'center' ? 0.82 : 1,
-          duration: 0.42,
-          ease: 'power2.out',
+    // Pin the start pose synchronously (before paint) so the first frame of the
+    // reveal shows the kicker, not a popped/recolored frame.
+    gsap.set(striker, { x: 0, rotation: 0 });
+    gsap.set(limbs, { rotation: 0, transformOrigin: '50% 0%' });
+    gsap.set(ball, { x: 0 });
+    gsap.set(ballY, { y: 0 });
+    gsap.set(ballImg, { rotation: 0, scale: 1, transformOrigin: '50% 50%' });
+    gsap.set(keeper, { clearProps: 'transform,transformOrigin' });
+    gsap.set(trail, { opacity: 0, attr: { d: 'M 200 228 Q 200 228 200 228' } });
+
+    const tl = gsap.timeline({ onComplete: () => { setAnimating(false); setBanner(null); reset(); } });
+    if (decisive) tl.timeScale(0.6); // slow-mo on the deciding kick
+    tl.delay(1);
+
+    // start pose: striker at idle position, ball/keeper home
+    tl.set(striker, { x: 0, rotation: 0 })
+      .set(limbs, { rotation: 0, transformOrigin: '50% 0%' })
+      .set(ball, { x: 0 })
+      .set(ballY, { y: 0 })
+      .set(ballImg, { rotation: 0, scale: 1 })
+      .set(keeper, { clearProps: 'transform,transformOrigin' })
+      .set(trail, { opacity: 0, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } });
+
+    // run-up: legs cross and alternate (a real stride), arms pump opposite,
+    // while the body travels toward the ball.
+    tl.to(striker, { x: 42, duration: 0.72, ease: 'power1.in' }, 0)
+      .fromTo(legL, { rotation: -26 }, { rotation: 26, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0)
+      .fromTo(legR, { rotation: 26 }, { rotation: -26, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0)
+      .fromTo(armL, { rotation: 22 }, { rotation: -22, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0)
+      .fromTo(armR, { rotation: -22 }, { rotation: 22, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0)
+      .to(keeper, { y: -3, duration: 0.18, repeat: 3, yoyo: true, ease: 'sine.inOut' }, 0);
+
+    // plant, wind the kicking leg back, then swing it through and HOLD it
+    // extended forward for the rest of the shot (no reset until idle).
+    tl.set(limbs, { rotation: 0 }, 0.7)
+      .to(legR, { rotation: 45, duration: 0.12, ease: 'power1.out' }, 0.72)
+      .to(striker, { rotation: -6, duration: 0.12 }, 0.72)
+      .to(legR, { rotation: -62, duration: 0.1, ease: 'power3.in' }, 0.86)
+      .to(striker, { rotation: 8, duration: 0.14 }, 0.86)
+      .add('launch', 0.94)
+      .add(() => { sfx.kick(); sfx.whoosh(); }, 'launch');
+
+    // ball: ONE clean parabola. x (horizontal) and y (vertical) live on SEPARATE
+    // nested elements so their tweens can't fight over one transform matrix.
+    // x is linear, y is quadratic -> y ∝ x². Spin + shrink ride on the inner group.
+    // Trail traces the exact parabola: sub-bezier from t=0..τ has control (200+τ·Δx/2, 228).
+    const trailProxy = { t: 0 };
+    const dx = shot.x - 200, dy = shot.y - 228;
+    tl.set(trail, { opacity: 0.9, attr: { d: 'M 200 228 Q 200 228 200 228' } }, 'launch')
+      .fromTo(trailProxy, { t: 0 }, {
+        t: 1, duration: 0.4, ease: 'none',
+        onUpdate() {
+          const t = trailProxy.t;
+          trail.setAttribute('d',
+            `M 200 228 Q ${200 + t * dx / 2} 228 ${200 + dx * t} ${228 + dy * t * t}`);
         },
-        'launch'
-      )
-      .fromTo(
-        trail,
-        { opacity: 0.9, attr: { x1: 200, y1: 224, x2: 200, y2: 224 } },
-        { attr: { x2: shot.x, y2: shot.y }, duration: 0.42, ease: 'power2.in' },
-        'launch'
-      )
-      .to(ball, { x: shot.x - 200, y: shot.y - 228, scale: 0.62, duration: 0.42, ease: 'power2.in' }, 'launch')
-      .to(trail, { opacity: 0, duration: 0.22 }, 'launch+=0.42')
-      .add(() => {
-        setBanner(round.goal ? '¡GOOOOL!' : '¡ATAJADO!');
-        if (round.goal) {
-          confettiBurst();
-          if (net) {
-            gsap.fromTo(
-              net,
-              { scale: 1, transformOrigin: '50% 30%' },
-              { scale: 1.035, duration: 0.1, yoyo: true, repeat: 3 }
-            );
-          }
-        }
-      }, 'launch+=0.43')
-      .to(
-        ball,
-        round.goal
-          ? { y: shot.y - 216, duration: 0.26, ease: 'bounce.out' }
-          : { x: diveX, y: -58, scale: 0.55, duration: 0.3, ease: 'power1.out' },
-        'launch+=0.45'
-      )
-      .to({}, { duration: 1.35 });
+      }, 'launch')
+      .to(ball, { x: shot.x - 200, duration: 0.4, ease: 'none' }, 'launch')
+      .to(ballY, { y: shot.y - 228, duration: 0.4, ease: 'power2.in' }, 'launch')
+      .to(ballImg, { rotation: goal ? 560 : 380, scale: 0.58, duration: 0.4, ease: 'power1.in', transformOrigin: '50% 50%' }, 'launch')
+      .to(trail, { opacity: 0, duration: 0.2 }, 'launch+=0.4');
+
+    // keeper: explosive dive to the chosen side. The left dive is an exact mirror
+    // of the right (same rotation magnitude, flipped via scaleX) so it never leans
+    tl.to(keeper, {
+        svgOrigin: '200 150',
+        x: diveX, y: round.dive === 'center' ? -6 : -16,
+        rotation: round.dive === 'center' ? 0 : round.dive === 'left' ? -38 : 38,
+        scaleX: 1,
+        scaleY: 1, duration: 0.4, ease: 'power2.out',
+      }, 'launch');
+
+    // impact
+    tl.add(() => {
+      setBanner(goal ? '¡GOOOOL!' : '¡ATAJADO!');
+      if (goal) {
+        sfx.goal();
+        confettiBurst();
+        if (netLines.length) gsap.fromTo(netLines, { strokeWidth: 1 },
+          { strokeWidth: 2.4, duration: 0.12, yoyo: true, repeat: 1, ease: 'sine.out', stagger: { each: 0.012, from: 'center' } });
+        if (net) gsap.fromTo(net, { scale: 1, transformOrigin: '50% 30%' }, { scale: 1.04, duration: 0.1, yoyo: true, repeat: 3 });
+        if (crowd.length) gsap.fromTo(crowd, { y: 0 }, { y: -6, duration: 0.16, yoyo: true, repeat: 1, ease: 'power1.out', stagger: { each: 0.004, from: 'random' } });
+        if (scene) gsap.fromTo(scene, { x: 0, y: 0 }, { x: 'random(-4,4)', y: 'random(-3,3)', duration: 0.05, repeat: 6, yoyo: true, clearProps: 'x,y' });
+      } else {
+        sfx.save();
+        if (scene) gsap.fromTo(scene, { x: 0, y: 0 }, { x: 'random(-2,2)', duration: 0.05, repeat: 4, yoyo: true, clearProps: 'x,y' });
+      }
+    }, 'launch+=0.4');
+
+    // ball settles in the net (goal) — or is parried wide and bounces on the grass (save)
+    if (goal) {
+      tl.to(ballY, { y: shot.y - 214, duration: 0.26, ease: 'bounce.out' }, 'launch+=0.42');
+    } else {
+      const deflectX = round.dive === 'left' ? -135 : round.dive === 'right' ? 135 : (round.shot === 'left' ? -120 : 120);
+      tl.to(ball, { x: deflectX, duration: 0.55, ease: 'power2.out' }, 'launch+=0.42')
+        .to(ballY, { y: 8, duration: 0.55, ease: 'bounce.out' }, 'launch+=0.42')
+        .to(ballImg, { scale: 0.9, duration: 0.55, ease: 'power1.out' }, 'launch+=0.42');
+    }
+
+    if (decisive) tl.add(() => {
+      sfx.win();
+      if (scene) gsap.fromTo(scene, { x: 0, y: 0 }, { x: 'random(-5,5)', y: 'random(-4,4)', duration: 0.06, repeat: 8, yoyo: true, clearProps: 'x,y' });
+    }, 'launch+=0.62');
+
+    tl.to({}, { duration: decisive ? 1.8 : 1.3 });
   }, [duel]);
 
   // ── actions ────────────────────────────────────────────────────────────────
@@ -382,9 +522,11 @@ export default function DuelArena({
   }
 
   const others = profiles.filter((p) => p.id !== me);
-  const pending = duels.filter((d) => d.status === 'pending');
-  const active = duels.filter((d) => d.status === 'active');
-  const finished = duels.filter((d) => d.status === 'finished');
+  const isMine = (d: Duel) => d.challenger === me || d.opponent === me;
+  const pending = duels.filter((d) => d.status === 'pending' && isMine(d));
+  const active = duels.filter((d) => d.status === 'active' && isMine(d));
+  const othersActive = duels.filter((d) => d.status === 'active' && !isMine(d));
+  const finished = duels.filter((d) => d.status === 'finished' && isMine(d));
 
   const record = (other: string) => {
     let w = 0;
@@ -403,6 +545,7 @@ export default function DuelArena({
     const shooterId = duel.kick % 2 === 1 ? duel.challenger : duel.opponent;
     const keeperId = shooterId === duel.challenger ? duel.opponent : duel.challenger;
     const iShoot = shooterId === me;
+    const iAmIn = me === duel.challenger || me === duel.opponent; // false = spectator
 
     // Two reveal timings: scores/dots update with the GOL/ATAJADO banner;
     // shirts, role tags, and sudden-death effects wait for the figures to
@@ -419,7 +562,6 @@ export default function DuelArena({
     const shownRounds = holdScore ? allRounds.slice(0, -1) : allRounds;
     const shownScore = (pid: string) =>
       shownRounds.filter((r) => r.shooter === pid && r.goal).length;
-    const suddenDeath = duel.kick > 10 && duel.status === 'active';
     const iPicked = iShoot ? duel.shooter_picked : duel.keeper_picked;
     const theyPicked = iShoot ? duel.keeper_picked : duel.shooter_picked;
 
@@ -466,7 +608,19 @@ export default function DuelArena({
         </div>
 
         <div className="duel-scene">
-          <svg viewBox="0 0 400 260" className={`duel-svg${suddenDeath ? ' sd' : ''}`}>
+          <button
+            type="button"
+            className="duel-mute"
+            aria-label={muted ? 'Unmute' : 'Mute'}
+            onClick={() => { const n = !muted; setMuted(n); setMutedState(n); }}
+          >
+            {muted ? '🔇' : '🔊'}
+          </button>
+          <audio ref={ambienceRef} src="/minigame_sounds/stadium_noise.mp3" loop preload="auto" />
+          <audio ref={drumsRef} src="/minigame_sounds/drums.mp3" loop preload="auto" />
+          <audio ref={oleRef} src="/minigame_sounds/ole_chant.mp3" loop preload="auto" />
+          <audio ref={whistleRef} src="/minigame_sounds/fans_whistling.mp3" loop preload="auto" />
+          <svg ref={sceneRef} viewBox="0 0 400 260" className={`duel-svg${sdLit ? ' sd' : ''}`}>
             <defs>
               <linearGradient id="dSky" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#03150f" />
@@ -509,7 +663,7 @@ export default function DuelArena({
             <rect x="354" y="10" width="20" height="7" rx="2" fill="#f4f1e8" className="duel-lamp" />
 
             {/* sudden death: sweeping spots, red tint, smoke flares */}
-            {suddenDeath && (
+            {sdLit && (
               <g>
                 <rect x="0" y="0" width="400" height="260" fill="rgba(255,80,60,0.07)" className="duel-sd-tint" />
                 <polygon points="130,0 190,185 70,185" fill="url(#dBeam)" className="duel-sweep" />
@@ -570,8 +724,19 @@ export default function DuelArena({
                 <g className={`keeper-idle${animating ? ' hold' : ''}`}>
                   <circle cx="0" cy="-24" r="9" fill="#f4f1e8" />
                   <rect x="-7" y="-15" width="14" height="26" rx="5" fill={keeperColor} />
-                  <line x1="-7" y1="-10" x2="-22" y2="-22" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" className="keeper-arm-l" />
-                  <line x1="7" y1="-10" x2="22" y2="-22" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" className="keeper-arm-r" />
+                  {/* Each arm group: local origin = shoulder. Glove lives inside so idle wiggle carries both. */}
+                  <g className="keeper-arm-l" transform="translate(-7 -10)">
+                    <line x1="0" y1="0" x2="-15" y2="-12" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" />
+                    <g transform="translate(-25 -20) scale(-1,1) rotate(51) scale(-1,1)">
+                      <image href="/goalie_gloves.png" x="-10" y="-13" width="20" height="26" preserveAspectRatio="xMidYMid meet" />
+                    </g>
+                  </g>
+                  <g className="keeper-arm-r" transform="translate(7 -10)">
+                    <line x1="0" y1="0" x2="15" y2="-12" stroke={keeperColor} strokeWidth="5" strokeLinecap="round" />
+                    <g transform="translate(25 -20) rotate(51) scale(-1,1)">
+                      <image href="/goalie_gloves.png" x="-10" y="-13" width="20" height="26" preserveAspectRatio="xMidYMid meet" />
+                    </g>
+                  </g>
                   <line x1="-4" y1="11" x2="-7" y2="30" stroke="#f4f1e8" strokeWidth="5" strokeLinecap="round" />
                   <line x1="4" y1="11" x2="7" y2="30" stroke="#f4f1e8" strokeWidth="5" strokeLinecap="round" />
                 </g>
@@ -580,19 +745,19 @@ export default function DuelArena({
 
             {/* striker */}
             <g ref={strikerRef}>
-              <g transform="translate(156 222)">
+              <g transform="translate(122 222)">
                 <circle cx="0" cy="-26" r="8" fill="#f4f1e8" />
                 <rect x="-6" y="-18" width="12" height="22" rx="4" fill={shooterColor} />
-                <line x1="-6" y1="-12" x2="-15" y2="-3" stroke={shooterColor} strokeWidth="4" strokeLinecap="round" />
-                <line x1="6" y1="-12" x2="14" y2="-5" stroke={shooterColor} strokeWidth="4" strokeLinecap="round" />
-                <line x1="-3" y1="4" x2="-7" y2="20" stroke="#f4f1e8" strokeWidth="4" strokeLinecap="round" />
-                <line x1="3" y1="4" x2="11" y2="17" stroke="#f4f1e8" strokeWidth="4" strokeLinecap="round" />
+                <line className="s-arm-l" x1="-6" y1="-12" x2="-15" y2="-3" stroke={shooterColor} strokeWidth="4" strokeLinecap="round" />
+                <line className="s-arm-r" x1="6" y1="-12" x2="14" y2="-5" stroke={shooterColor} strokeWidth="4" strokeLinecap="round" />
+                <line className="s-leg-l" x1="-3" y1="4" x2="-7" y2="20" stroke="#f4f1e8" strokeWidth="4" strokeLinecap="round" />
+                <line className="s-leg-r" x1="3" y1="4" x2="11" y2="17" stroke="#f4f1e8" strokeWidth="4" strokeLinecap="round" />
               </g>
             </g>
 
             {/* YOU marker */}
-            {duel.status === 'active' && !animating && (
-              <g transform={iShoot ? 'translate(156 180)' : 'translate(200 96)'}>
+            {duel.status === 'active' && !animating && iAmIn && (
+              <g transform={iShoot ? 'translate(122 180)' : 'translate(200 96)'}>
                 <g className="duel-you-bob">
                   <rect x="-21" y="-15" width="42" height="16" rx="5" fill="#e6b337" />
                   <text x="0" y="-3" textAnchor="middle" className="duel-you-text">
@@ -604,16 +769,16 @@ export default function DuelArena({
             )}
 
             {/* shot trail + ball */}
-            <line ref={trailRef} x1="200" y1="224" x2="200" y2="224" stroke="url(#dTrail)" strokeWidth="4" strokeLinecap="round" opacity="0" />
+            <path ref={trailRef} d="M 200 228 Q 200 228 200 228" stroke="url(#dTrail)" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0" />
             <g ref={ballRef}>
-              <g transform="translate(200 228)">
-                <ellipse cx="2" cy="9" rx="10" ry="3" fill="rgba(0,0,0,0.3)" />
-                <g>
-                  <circle r="11" fill="#f4f1e8" />
-                  <circle r="3" fill="#0b3d2c" />
-                  <circle cx="-6" cy="-5" r="2" fill="#0b3d2c" />
-                  <circle cx="6" cy="-5" r="2" fill="#0b3d2c" />
-                  <circle cx="0" cy="7" r="2" fill="#0b3d2c" />
+              <g ref={ballYRef}>
+                <g transform="translate(200 228)">
+                  <ellipse cx="2" cy="9" rx="10" ry="3" fill="rgba(0,0,0,0.3)" />
+                  <g ref={ballImgRef}>
+                    {/* fallback ball shows if the PNG is missing */}
+                    <circle r="11" fill="#f4f1e8" stroke="#0b3d2c" strokeWidth="0.5" />
+                    <image href="/minigame_ball.png" x="-12" y="-12" width="24" height="24" preserveAspectRatio="xMidYMid meet" />
+                  </g>
                 </g>
               </g>
             </g>
@@ -699,6 +864,7 @@ export default function DuelArena({
                 {(() => {
                   const winnerKicks = (duel.rounds ?? []).filter((r) => r.shooter === duel.winner);
                   const perfect = winnerKicks.length >= 5 && winnerKicks.every((r) => r.goal);
+                  if (!iAmIn) return `${nameOf(duel.winner ?? '')} wins 🏆`;
                   if (duel.winner === me) {
                     return perfect ? 'You win! Como un animal! 🏆' : 'You win! Que crack. 🏆';
                   }
@@ -709,17 +875,19 @@ export default function DuelArena({
                 })()}
               </div>
               <div className="duel-overlay-actions">
-                <button
-                  className="save-btn"
-                  disabled={busy}
-                  onClick={() =>
-                    duel.id === CPU_DUEL_ID
-                      ? startCpu()
-                      : challenge(duel.challenger === me ? duel.opponent : duel.challenger)
-                  }
-                >
-                  Rematch
-                </button>
+                {iAmIn && (
+                  <button
+                    className="save-btn"
+                    disabled={busy}
+                    onClick={() =>
+                      duel.id === CPU_DUEL_ID
+                        ? startCpu()
+                        : challenge(duel.challenger === me ? duel.opponent : duel.challenger)
+                    }
+                  >
+                    Rematch
+                  </button>
+                )}
                 <button className="link-btn" onClick={() => setActiveId(null)}>
                   Back to lobby
                 </button>
@@ -730,6 +898,8 @@ export default function DuelArena({
 
         {duel.status === 'finished' ? null : animating ? (
           <p className="duel-status">…</p>
+        ) : !iAmIn ? (
+          <p className="duel-status">👀 Spectating · {nameOf(shooterId)} to shoot, kick {duel.kick}</p>
         ) : !iPicked ? (
           <div>
             <div className={`duel-role ${iShoot ? 'shoot' : 'keep'}`}>
@@ -748,11 +918,12 @@ export default function DuelArena({
                   key={p}
                   className={`duel-target${iShoot ? '' : ' keep'}`}
                   disabled={busy}
-                  onClick={() =>
+                  onClick={() => {
+                    sfx.whistle();
                     duel.id === CPU_DUEL_ID
                       ? cpuPick(p)
-                      : rpc('duel_submit_pick', { p_duel: duel.id, p_pick: p })
-                  }
+                      : rpc('duel_submit_pick', { p_duel: duel.id, p_pick: p });
+                  }}
                 >
                   {iShoot
                     ? p === 'left'
@@ -775,7 +946,19 @@ export default function DuelArena({
           </p>
         )}
 
-        {duel.status === 'active' && (
+        {/* Private edge readout — Joaquin only, his own games, real opponents only. */}
+        {duel.status === 'active' && !animating && iAmIn && nameOf(me) === 'Joaquin' && keeperId !== CPU_ID && shooterId !== CPU_ID && (
+          <DuelEdge
+            duels={duels}
+            me={me}
+            oppId={duel.challenger === me ? duel.opponent : duel.challenger}
+            oppName={nameOf(duel.challenger === me ? duel.opponent : duel.challenger)}
+            role={iShoot ? 'shoot' : 'keep'}
+            currentDuelId={duel.id}
+          />
+        )}
+
+        {duel.status === 'active' && iAmIn && (
           <div className="duel-endwrap">
             <button className="duel-end" disabled={busy} onClick={() => endGame(duel.id)}>
               End game
@@ -791,6 +974,11 @@ export default function DuelArena({
   // ── lobby ──────────────────────────────────────────────────────────────────
   return (
     <div>
+      <h1>Penalty Shootouts</h1>
+      <p className="subtitle">
+        Challenge a bro to a best-of-5 shootout. Pick in secret, reveal together. Bragging rights
+        only.
+      </p>
       <div className="groups-head">
         <span className="groups-title">{isGuest ? 'Practice' : 'Challenge'}</span>
         <div className="contenders-line" />
@@ -901,20 +1089,51 @@ export default function DuelArena({
         </>
       )}
 
+      {!isGuest && othersActive.length > 0 && (
+        <>
+          <div className="groups-head">
+            <span className="groups-title">Live now</span>
+            <div className="contenders-line" />
+          </div>
+          {othersActive.map((d) => (
+            <div className="duel-row" key={d.id}>
+              <span>
+                {nameOf(d.challenger)} {d.challenger_score} – {d.opponent_score} {nameOf(d.opponent)}
+              </span>
+              <span className="duel-row-actions">
+                <button className="save-btn" onClick={() => setActiveId(d.id)}>
+                  👀 Spectate
+                </button>
+              </span>
+            </div>
+          ))}
+        </>
+      )}
+
       {!isGuest && finished.length > 0 && (
         <>
           <div className="groups-head">
             <span className="groups-title">History</span>
             <div className="contenders-line" />
           </div>
-          {finished.slice(0, 10).map((d) => (
-            <div className="duel-row done" key={d.id}>
-              <span>
-                {nameOf(d.challenger)} {d.challenger_score} – {d.opponent_score} {nameOf(d.opponent)}
-              </span>
-              <span className="duel-winner-tag">{nameOf(d.winner ?? '')} 🏆</span>
-            </div>
-          ))}
+          <div style={{ maxHeight: 420, overflowY: 'auto' }}>
+            {finished.map((d) => {
+              const cMeta = metaOf(d.challenger);
+              const oMeta = metaOf(d.opponent);
+              return (
+                <div className="duel-row done" key={d.id}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    {cMeta && <img src={flagUrl(cMeta.flagCode)!} alt="" className="heat-flag" />}
+                    {nameOf(d.challenger)}
+                    <span style={{ margin: '0 4px' }}>{d.challenger_score} – {d.opponent_score}</span>
+                    {oMeta && <img src={flagUrl(oMeta.flagCode)!} alt="" className="heat-flag" />}
+                    {nameOf(d.opponent)}
+                  </span>
+                  <span className="duel-winner-tag">{nameOf(d.winner ?? '')} 🏆</span>
+                </div>
+              );
+            })}
+          </div>
         </>
       )}
 
