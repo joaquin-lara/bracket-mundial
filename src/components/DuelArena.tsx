@@ -254,7 +254,7 @@ export default function DuelArena({
     const a = whistleRef.current;
     if (!a) return;
     if (loseWhistleOn) {
-      a.volume = 0.3;
+      a.volume = 0.25;
       a.play().catch(() => {});
     } else {
       a.pause();
