@@ -44,9 +44,15 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
   const live = match.status === 'IN_PLAY' || match.status === 'PAUSED';
   const started = ['IN_PLAY', 'PAUSED', 'FINISHED'].includes(match.status);
   const teamsTbd = match.home_team === 'TBD' || match.away_team === 'TBD';
+  const kickoffMs = new Date(match.kickoff).getTime();
 
-  const now = useNow(!started && Date.now() < lockAt + 5000);
+  // Keep ticking until kickoff so the reveal can flip on the clock, not on the
+  // API/sync status (which lags behind real kickoff because it rides the cron sync).
+  const now = useNow(!started && Date.now() < kickoffMs + 2000);
   const locked = started || now >= lockAt;
+  // Everyone's picks unlock the moment kickoff time passes — independent of the
+  // live-data sync. (The server/RLS already gate the rows on kickoff <= now.)
+  const kickedOff = started || now >= kickoffMs;
 
   const [home, setHome] = useState(prediction ? String(prediction.pred_home) : '');
   const [away, setAway] = useState(prediction ? String(prediction.pred_away) : '');
@@ -193,7 +199,7 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
         )
       )}
 
-      {started && revealedPicks && revealedPicks.length > 0 && (
+      {kickedOff && revealedPicks && revealedPicks.length > 0 && (
         <div className="picks">
           <div className="picks-title">Everyone&apos;s picks</div>
           {revealedPicks.map((p) => (
