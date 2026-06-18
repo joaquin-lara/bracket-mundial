@@ -228,7 +228,7 @@ export default function DuelArena({
     const d = drumsRef.current;
     if (!d) return;
     if (sdDrumsOn) {
-      d.volume = 0.25;
+      d.volume = 0.2;
       d.play().catch(() => {});
     } else {
       d.pause();
@@ -254,7 +254,7 @@ export default function DuelArena({
     const a = whistleRef.current;
     if (!a) return;
     if (loseWhistleOn) {
-      a.volume = 0.4;
+      a.volume = 0.3;
       a.play().catch(() => {});
     } else {
       a.pause();
