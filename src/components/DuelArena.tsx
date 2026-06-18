@@ -423,7 +423,12 @@ export default function DuelArena({
     const shownRounds = holdScore ? allRounds.slice(0, -1) : allRounds;
     const shownScore = (pid: string) =>
       shownRounds.filter((r) => r.shooter === pid && r.goal).length;
-    const suddenDeath = duel.kick > 10 && duel.status === 'active';
+    // The deciding 10th kick pushes duel.kick to 11, but its goal/save reveal is
+    // still playing — keep the normal screen until that animation finishes, so the
+    // sudden-death tint lands on the same beat as the MUERTE SÚBITA flash (not the
+    // instant the player kicks).
+    const enteringSd = holdVisual && lastRound.kick === 10;
+    const suddenDeath = duel.kick > 10 && duel.status === 'active' && !enteringSd;
     const iPicked = iShoot ? duel.shooter_picked : duel.keeper_picked;
     const theyPicked = iShoot ? duel.keeper_picked : duel.shooter_picked;
 
