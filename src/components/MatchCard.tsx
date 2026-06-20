@@ -6,7 +6,7 @@ import Flag from './Flag';
 import VenueInfo from './VenueInfo';
 import ConfirmedLineups from './ConfirmedLineups';
 import TransitionLink from './TransitionLink';
-import { lockTime, stageLabel, type Match, type Prediction, type RevealedPick } from '@/lib/types';
+import { lockTime, REVEAL_MS, stageLabel, type Match, type Prediction, type RevealedPick } from '@/lib/types';
 
 interface Props {
   match: Match;
@@ -45,16 +45,15 @@ export default function MatchCard({ match, prediction, revealedPicks, readOnly }
   const started = ['IN_PLAY', 'PAUSED', 'FINISHED'].includes(match.status);
   const teamsTbd = match.home_team === 'TBD' || match.away_team === 'TBD';
   const kickoffMs = new Date(match.kickoff).getTime();
-  // Reveal everyone's picks a few minutes after kickoff, not right on the hour.
-  const REVEAL_AT = kickoffMs + 5 * 60 * 1000;
+  // Reveal everyone's picks 5 minutes before kickoff, on the clock.
+  const REVEAL_AT = kickoffMs - REVEAL_MS;
 
-  // Keep ticking until the reveal moment so it can flip on the clock, not on the
+  // Keep ticking until the reveal moment so it flips on the clock, not on the
   // API/sync status (which lags behind real kickoff because it rides the cron sync).
   const now = useNow(Date.now() < REVEAL_AT + 2000);
   const locked = started || now >= lockAt;
-  // Everyone's picks unlock 5 minutes after kickoff time — independent of the
-  // live-data sync. (The server/RLS already gate the rows on kickoff <= now; the
-  // UI just holds the reveal those few extra minutes.)
+  // Picks unlock 5 minutes before kickoff — independent of the live-data sync.
+  // (The server/RLS gates the rows on kickoff <= now + 5 min; the UI flips here.)
   const kickedOff = now >= REVEAL_AT;
   const showPicks = kickedOff && !!revealedPicks && revealedPicks.length > 0;
 

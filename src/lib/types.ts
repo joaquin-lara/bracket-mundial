@@ -53,6 +53,14 @@ export function lockTime(kickoff: string): number {
   return new Date(kickoff).getTime() - LOCK_MS;
 }
 
+// Everyone's picks become visible 5 minutes before kickoff. Picks lock 10
+// minutes out, so by the reveal they're already final — no cheating window.
+export const REVEAL_MS = 5 * 60 * 1000;
+
+export function revealTime(kickoff: string): number {
+  return new Date(kickoff).getTime() - REVEAL_MS;
+}
+
 export function stageLabel(stage: string, groupName: string | null): string {
   if (groupName) return groupName;
   const labels: Record<string, string> = {

@@ -3,7 +3,7 @@ import MatchList from '@/components/MatchList';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { createClient } from '@/lib/supabase/server';
 import { isGuestEmail } from '@/lib/players';
-import type { Match, Prediction, RevealedPick } from '@/lib/types';
+import { REVEAL_MS, type Match, type Prediction, type RevealedPick } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'Your bracket' };
 export const dynamic = 'force-dynamic';
@@ -27,7 +27,8 @@ export default async function EnterBracketPage() {
   const revealedPicks: Record<number, RevealedPick[]> = {};
 
   if (matchList.length > 0) {
-    // RLS filters automatically: own rows always; others' only after kickoff.
+    // RLS filters automatically: own rows always; others' only from 5 minutes
+    // before kickoff onward.
     const { data: preds } = await supabase
       .from('predictions')
       .select('id, match_id, pred_home, pred_away, points, user_id');
@@ -40,15 +41,17 @@ export default async function EnterBracketPage() {
       (profiles ?? []).map((p) => [p.id as string, p.display_name as string])
     );
 
-    const startedIds = new Set(
-      matchList.filter((m) => new Date(m.kickoff).getTime() <= Date.now()).map((m) => m.id)
+    const revealedIds = new Set(
+      matchList
+        .filter((m) => new Date(m.kickoff).getTime() <= Date.now() + REVEAL_MS)
+        .map((m) => m.id)
     );
 
     for (const p of preds ?? []) {
       if (p.user_id === user.id) {
         predictions[p.match_id as number] = p as unknown as Prediction;
       }
-      if (startedIds.has(p.match_id as number)) {
+      if (revealedIds.has(p.match_id as number)) {
         (revealedPicks[p.match_id as number] ??= []).push({
           match_id: p.match_id as number,
           display_name: nameById.get(p.user_id as string) ?? 'Unknown',
@@ -68,8 +71,8 @@ export default async function EnterBracketPage() {
       {guest ? (
         <p className="page-intro">
           You&apos;re browsing as a <strong>guest</strong>. Every fixture is here to look through,
-          and after kickoff you can see how each player&apos;s picks compared. To fill out your own
-          bracket, sign out and sign in as a player.
+          and from 5 minutes before kickoff you can see how each player&apos;s picks compared. To
+          fill out your own bracket, sign out and sign in as a player.
         </p>
       ) : (
         <p className="page-intro">

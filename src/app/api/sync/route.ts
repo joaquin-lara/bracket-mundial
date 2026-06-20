@@ -23,6 +23,15 @@ export async function GET(request: NextRequest) {
     { auth: { persistSession: false, autoRefreshToken: false } }
   );
 
+  // notifyOnly=1: fire any due push notifications and nothing else. This runs
+  // every minute (so the kickoff alert lands on the clock) and touches only the
+  // database — no football-data API calls — so it never hits the API quota. The
+  // full fixture/score sync stays on its slower schedule.
+  if (new URL(request.url).searchParams.get('notifyOnly') === '1') {
+    const notified = await runMatchNotifications(admin);
+    return NextResponse.json({ ok: true, notifyOnly: true, notified });
+  }
+
   // Update fixtures/scores; a sync failure must NOT stop notifications.
   let result: Record<string, unknown> = {};
   try {

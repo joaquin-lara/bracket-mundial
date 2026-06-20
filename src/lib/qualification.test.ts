@@ -146,6 +146,6 @@ describe('groupOutlooks', () => {
     const outlook = Object.fromEntries(groupOutlooks(table, matches).map((o) => [o.team, o]));
     expect(outlook['AAA'].status).toBe('through');
     expect(outlook['BBB'].status).toBe('in_contention');
-    expect(outlook['BBB'].note).toContain('Win to be sure');
+    expect(outlook['BBB'].note.toLowerCase()).toContain('win guarantees');
   });
 });

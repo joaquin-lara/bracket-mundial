@@ -127,8 +127,9 @@ create policy matches_select on public.matches
 -- No insert/update/delete policies on matches: only the sync job
 -- (service-role key, bypasses RLS) writes fixtures and results.
 
--- A user always sees their own predictions; others' predictions only
--- after kickoff has passed (prevents copying).
+-- A user always sees their own predictions; others' predictions only from
+-- 5 minutes before kickoff (picks lock 10 minutes out, so they're already
+-- final by then — no copying window).
 drop policy if exists predictions_select on public.predictions;
 create policy predictions_select on public.predictions
   for select to authenticated
@@ -136,7 +137,7 @@ create policy predictions_select on public.predictions
     user_id = auth.uid()
     or exists (
       select 1 from public.matches m
-      where m.id = match_id and m.kickoff <= now()
+      where m.id = match_id and m.kickoff <= now() + interval '5 minutes'
     )
   );
 

@@ -1,0 +1,19 @@
+# Fires due push notifications every minute so the kickoff alert lands on the
+# clock. Hits the notifyOnly path, which only reads/writes the database — it
+# makes NO football-data API calls, so it doesn't touch the API quota. The full
+# fixture/score sync stays in sync.yml on its slower (5-min) cadence.
+# Reuses the same repository secrets: SYNC_URL and CRON_SECRET.
+name: Kickoff notifications
+
+on:
+  schedule:
+    - cron: '* * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call notify-only endpoint
+        run: |
+          curl -fsS -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "${{ secrets.SYNC_URL }}?notifyOnly=1"
