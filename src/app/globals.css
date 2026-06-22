@@ -2642,21 +2642,7 @@ table.standings tr.me td {
   margin-top: 6px;
   padding-top: 5px;
   border-top: 1px solid rgba(244, 241, 232, 0.08);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
   text-align: center;
-}
-
-.b-venue-stadium {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--cream);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
 }
 
 .b-venue-city {

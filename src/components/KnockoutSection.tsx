@@ -86,7 +86,6 @@ function BracketMatch({ m, highlight }: { m: Match; highlight?: boolean }) {
 
       {venue && (
         <div className="b-venue">
-          <span className="b-venue-stadium">{venue.stadium}</span>
           <span className="b-venue-city">{venue.city}</span>
         </div>
       )}
