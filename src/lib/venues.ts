@@ -40,6 +40,29 @@ function norm(s: string): string {
   return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 }
 
+/**
+ * Fixed knockout-stage venues, in official (chronological) match order per
+ * round. The 2026 schedule pins every knockout slot to a stadium in advance,
+ * independent of which teams qualify, so the tracker can show the venue while
+ * the teams are still TBD. Names match VENUES[].stadium exactly.
+ */
+export const KNOCKOUT_VENUES: Record<string, string[]> = {
+  LAST_32: [
+    'SoFi Stadium', 'Gillette Stadium', 'Estadio BBVA', 'NRG Stadium',
+    'MetLife Stadium', 'AT&T Stadium', 'Estadio Azteca', 'Mercedes-Benz Stadium',
+    "Levi's Stadium", 'Lumen Field', 'BMO Field', 'SoFi Stadium',
+    'BC Place', 'Hard Rock Stadium', 'Arrowhead Stadium', 'AT&T Stadium',
+  ],
+  LAST_16: [
+    'Lincoln Financial Field', 'NRG Stadium', 'MetLife Stadium', 'Estadio Azteca',
+    'AT&T Stadium', 'Lumen Field', 'Mercedes-Benz Stadium', 'BC Place',
+  ],
+  QUARTER_FINALS: ['Gillette Stadium', 'SoFi Stadium', 'Hard Rock Stadium', 'Arrowhead Stadium'],
+  SEMI_FINALS: ['AT&T Stadium', 'Mercedes-Benz Stadium'],
+  THIRD_PLACE: ['Hard Rock Stadium'],
+  FINAL: ['MetLife Stadium'],
+};
+
 /** Resolve a fixture's free-text venue string to a known host venue, or null. */
 export function lookupVenue(raw: string | null | undefined): Venue | null {
   if (!raw) return null;

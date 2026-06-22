@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { flagUrl } from '@/lib/flags';
 import type { ProjectedMatch } from '@/lib/qualification';
 import type { Match } from '@/lib/types';
+import { lookupVenue } from '@/lib/venues';
 
 const ROUNDS: { stage: string; label: string }[] = [
   { stage: 'LAST_32', label: 'Round of 32' },
@@ -47,6 +48,7 @@ function BracketMatch({ m, highlight }: { m: Match; highlight?: boolean }) {
   const dateLabel = `${ko
     .toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
     .toUpperCase()} · ${ko.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}`;
+  const venue = lookupVenue(m.venue);
 
   return (
     <div className={`b-card${live ? ' live' : ''}${highlight ? ' final-match' : ''}`}>
@@ -81,6 +83,12 @@ function BracketMatch({ m, highlight }: { m: Match; highlight?: boolean }) {
         <span className={homeWin ? 'win' : awayWin ? 'dim' : ''}>{m.home_code ?? 'TBD'}</span>
         <span className={awayWin ? 'win' : homeWin ? 'dim' : ''}>{m.away_code ?? 'TBD'}</span>
       </div>
+
+      {venue && (
+        <div className="b-venue" title={venue.stadium}>
+          📍 {venue.city}
+        </div>
+      )}
     </div>
   );
 }

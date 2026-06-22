@@ -2638,6 +2638,20 @@ table.standings tr.me td {
   color: var(--dim);
 }
 
+.b-venue {
+  margin-top: 6px;
+  padding-top: 5px;
+  border-top: 1px solid rgba(244, 241, 232, 0.08);
+  font-family: var(--narrow);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--dim);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ---- group stage tables ---- */
 
 .groups-section {

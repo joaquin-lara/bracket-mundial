@@ -9,12 +9,24 @@ import { computeGroupTables } from '@/lib/groups';
 import { TEAMS } from '@/lib/ml/teams';
 import { projectBracket } from '@/lib/qualification';
 import { createClient } from '@/lib/supabase/server';
+import { KNOCKOUT_VENUES } from '@/lib/venues';
 import type { Match } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'Tournament Tracker' };
 export const revalidate = 120; // cache for 2 minutes
 
 const KNOCKOUT_STAGES = new Set(['LAST_32', 'LAST_16', 'QUARTER_FINALS', 'SEMI_FINALS', 'FINAL', 'THIRD_PLACE']);
+
+/**
+ * Stamp each knockout match with its fixed venue. The schedule pins venues to
+ * slots in advance, so we fill them by chronological position within the round
+ * (the matches arrive kickoff-ascending) regardless of whether teams are known.
+ * Only fills when the match has no venue of its own.
+ */
+function withKnockoutVenues(stage: string, matches: Match[]): Match[] {
+  const sched = KNOCKOUT_VENUES[stage] ?? [];
+  return matches.map((m, i) => (m.venue ? m : { ...m, venue: sched[i] ?? m.venue }));
+}
 
 export default async function BracketPage() {
   await ensureFreshScores();
@@ -51,8 +63,8 @@ export default async function BracketPage() {
   }
   const byStage = [...byStageMap.entries()]
     .filter(([s]) => s !== 'THIRD_PLACE')
-    .map(([stage, matches]) => ({ stage, matches }));
-  const thirdPlace = byStageMap.get('THIRD_PLACE') ?? [];
+    .map(([stage, matches]) => ({ stage, matches: withKnockoutVenues(stage, matches) }));
+  const thirdPlace = withKnockoutVenues('THIRD_PLACE', byStageMap.get('THIRD_PLACE') ?? []);
 
   const hasRealKnockout = knockoutMatches.some((m) => m.home_team !== 'TBD' && m.away_team !== 'TBD');
   const anyGroupPlayed = allMatches.some((m) => m.group_name && m.status === 'FINISHED');
