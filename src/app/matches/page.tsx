@@ -3,6 +3,7 @@ import MatchList from '@/components/MatchList';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { createClient } from '@/lib/supabase/server';
 import { isGuestEmail } from '@/lib/players';
+import { fillKnockoutVenues } from '@/lib/venues';
 import { REVEAL_MS, type Match, type Prediction, type RevealedPick } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'Your bracket' };
@@ -21,7 +22,7 @@ export default async function EnterBracketPage() {
     .select('*')
     .order('kickoff', { ascending: true });
 
-  const matchList = (matches ?? []) as Match[];
+  const matchList = fillKnockoutVenues((matches ?? []) as Match[]);
 
   const predictions: Record<number, Prediction> = {};
   const revealedPicks: Record<number, RevealedPick[]> = {};

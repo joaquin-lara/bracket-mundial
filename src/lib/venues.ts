@@ -4,6 +4,8 @@
 // the aliases we might see and we match on a normalised substring. Capacity,
 // roof and elevation drive the "crowd factor" note shown on a match card.
 
+import type { Match } from './types';
+
 export interface Venue {
   stadium: string; // tournament-friendly name
   city: string;
@@ -62,6 +64,38 @@ export const KNOCKOUT_VENUES: Record<string, string[]> = {
   THIRD_PLACE: ['Hard Rock Stadium'],
   FINAL: ['MetLife Stadium'],
 };
+
+/**
+ * Stamp knockout fixtures with their fixed venue. The schedule pins each
+ * knockout slot to a stadium in advance, so we assign by chronological
+ * position within the round — independent of which teams are known. Only fills
+ * matches that have no venue of their own; group-stage matches pass through
+ * untouched. Returns a new array; unchanged matches keep their identity.
+ */
+export function fillKnockoutVenues(matches: Match[]): Match[] {
+  const byStage = new Map<string, Match[]>();
+  for (const m of matches) {
+    if (!KNOCKOUT_VENUES[m.stage]) continue;
+    const arr = byStage.get(m.stage) ?? [];
+    arr.push(m);
+    byStage.set(m.stage, arr);
+  }
+
+  const venueById = new Map<number, string>();
+  for (const [stage, list] of byStage) {
+    const sched = KNOCKOUT_VENUES[stage];
+    list
+      .slice()
+      .sort((a, b) => new Date(a.kickoff).getTime() - new Date(b.kickoff).getTime())
+      .forEach((m, i) => {
+        if (sched[i]) venueById.set(m.id, sched[i]);
+      });
+  }
+
+  return matches.map((m) =>
+    m.venue || !venueById.has(m.id) ? m : { ...m, venue: venueById.get(m.id)! }
+  );
+}
 
 /** Resolve a fixture's free-text venue string to a known host venue, or null. */
 export function lookupVenue(raw: string | null | undefined): Venue | null {

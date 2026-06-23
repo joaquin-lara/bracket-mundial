@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import ScheduleList from '@/components/ScheduleList';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { createClient } from '@/lib/supabase/server';
+import { fillKnockoutVenues } from '@/lib/venues';
 import type { Match } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'Schedule' };
@@ -16,7 +17,7 @@ export default async function SchedulePage() {
     .select('*')
     .order('kickoff', { ascending: true });
 
-  const matches = (data ?? []) as Match[];
+  const matches = fillKnockoutVenues((data ?? []) as Match[]);
 
   return (
     <main>
