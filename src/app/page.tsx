@@ -124,7 +124,7 @@ export default async function HomePage() {
         <div className="contender-grid">
           {contenders.map((c) => (
             <div className="contender-card" key={c.name}>
-              <div className="contender-avatar" style={{ background: c.color ?? 'rgba(0,0,0,0.5)' }}>
+              <div className="contender-avatar" style={{ background: 'rgba(0, 0, 0, 0.6)' }}>
                 {c.flagCode && flagUrl(c.flagCode) ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={flagUrl(c.flagCode)!} alt={c.name} className="contender-flag" />

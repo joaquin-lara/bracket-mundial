@@ -239,10 +239,14 @@ export default function ChatBubble({ me }: { me: string }) {
     loadStatic();
     refresh();
 
-    const ch = supabase
-      .channel('chat-stream')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, (payload: { new: ChatMessage }) => {
-        const m = payload.new;
+    // Note: chaining two postgres_changes `.on()` calls trips a supabase-js
+    // typing overload, so register them as separate statements on the channel.
+    const ch = supabase.channel('chat-stream');
+    ch.on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'chat_messages' },
+      (payload) => {
+        const m = payload.new as ChatMessage;
         setMessages((prev) => {
           const next = new Map(prev);
           const arr = next.get(m.conversation_id) ?? [];
@@ -250,9 +254,13 @@ export default function ChatBubble({ me }: { me: string }) {
           next.set(m.conversation_id, [...arr, m]);
           return next;
         });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'chat_reads' }, (payload: { new: { conversation_id: string; user_id: string; last_read_at: string } }) => {
-        const r = payload.new;
+      },
+    );
+    ch.on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'chat_reads' },
+      (payload) => {
+        const r = payload.new as { conversation_id: string; user_id: string; last_read_at: string };
         if (!r?.conversation_id) return;
         setReads((prev) => {
           const next = new Map(prev);
@@ -261,8 +269,9 @@ export default function ChatBubble({ me }: { me: string }) {
           next.set(r.conversation_id, inner);
           return next;
         });
-      })
-      .subscribe();
+      },
+    );
+    ch.subscribe();
 
     const poll = setInterval(refresh, 7000);
     const onVisible = () => { if (!document.hidden) refresh(); };
