@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { TEAMS } from '@/lib/ml/teams';
-import { isGuestEmail } from '@/lib/players';
+import { isAdminEmail, isGuestEmail } from '@/lib/players';
 
 export interface PredictionResult {
   ok: boolean;
@@ -127,6 +127,36 @@ export async function saveDiscipline(rows: DisciplineInput[]): Promise<Predictio
   if (error) return { ok: false, error: error.message };
 
   revalidatePath('/bracket');
+  return { ok: true };
+}
+
+/**
+ * Approve or reject a pending sign-up. Only the four founding admins may call
+ * this; the database RPC re-checks the caller's email so it can't be spoofed.
+ */
+export async function decideSignup(
+  userId: string,
+  decision: 'approved' | 'rejected'
+): Promise<PredictionResult> {
+  if (decision !== 'approved' && decision !== 'rejected') {
+    return { ok: false, error: 'Invalid decision.' };
+  }
+
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: 'Not signed in.' };
+  if (!isAdminEmail(user.email)) {
+    return { ok: false, error: 'Only admins can approve sign-ups.' };
+  }
+
+  const { error } = await supabase.rpc('approve_signup', { target: userId, decision });
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath('/admin');
+  revalidatePath('/');
+  revalidatePath('/standings');
   return { ok: true };
 }
 

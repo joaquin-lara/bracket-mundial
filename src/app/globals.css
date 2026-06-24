@@ -3341,6 +3341,158 @@ table.standings tr.me td {
   padding: 40px 0;
 }
 
+/* ---- sign-up + approvals ---- */
+
+.signup-btn {
+  width: 100%;
+  margin-top: 14px;
+  background: rgba(11, 61, 44, 0.6);
+  color: var(--cream);
+  border: 1px dashed rgba(230, 179, 55, 0.55);
+  border-radius: 10px;
+  padding: 12px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.signup-btn:hover {
+  border-color: var(--gold);
+  border-style: solid;
+}
+
+.flag-select-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.flag-select {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: var(--sans);
+  color: var(--cream);
+  background: rgba(11, 61, 44, 0.6);
+  border: 1px solid rgba(244, 241, 232, 0.25);
+  border-radius: 8px;
+}
+
+.flag-select:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.flag-placeholder {
+  font-size: 20px;
+}
+
+.contender-initial {
+  font-weight: 900;
+  font-size: 18px;
+  color: var(--cream);
+}
+
+.admin-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px auto 0;
+  max-width: 640px;
+  padding: 12px 16px;
+  background: rgba(230, 179, 55, 0.12);
+  border: 1px solid rgba(230, 179, 55, 0.5);
+  border-radius: 12px;
+  color: var(--gold);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.admin-banner:hover {
+  background: rgba(230, 179, 55, 0.2);
+}
+
+.admin-banner-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex: none;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.admin-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.admin-name {
+  flex: 1;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-approve,
+.btn-reject {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.btn-approve {
+  background: var(--gold);
+  color: var(--bg-dark);
+}
+
+.btn-approve:hover:not(:disabled) {
+  background: var(--gold-hover);
+}
+
+.btn-reject {
+  background: transparent;
+  color: var(--dim);
+  border: 1px solid var(--line);
+}
+
+.btn-reject:hover:not(:disabled) {
+  color: var(--cream);
+  border-color: rgba(244, 241, 232, 0.4);
+}
+
+.btn-approve:disabled,
+.btn-reject:disabled {
+  opacity: 0.55;
+}
+
 /* ---- mobile ---- */
 
 .team > span {

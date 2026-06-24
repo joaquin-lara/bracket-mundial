@@ -5,6 +5,7 @@ import ChallengeWatcher from '@/components/ChallengeWatcher';
 import EnableNotifications from '@/components/EnableNotifications';
 import HomeOnRefresh from '@/components/HomeOnRefresh';
 import PageTransitionProvider from '@/components/PageTransition';
+import PendingApproval from '@/components/PendingApproval';
 import PullToRefresh from '@/components/PullToRefresh';
 import TopNav from '@/components/TopNav';
 import ViewportLock from '@/components/ViewportLock';
@@ -38,6 +39,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   } = await supabase.auth.getUser();
 
   let achievementsRevealed = false;
+  let signupStatus: string | null = null;
   if (user) {
     const { data: st } = await supabase
       .from('achievements_state')
@@ -45,21 +47,38 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       .eq('id', 1)
       .maybeSingle();
     achievementsRevealed = !!st?.revealed_at || isAchievementsPreviewUser(user.email);
+
+    const { data: prof } = await supabase
+      .from('profiles')
+      .select('status')
+      .eq('id', user.id)
+      .maybeSingle();
+    signupStatus = (prof?.status as string | undefined) ?? null;
   }
+
+  // A signed-in player whose sign-up isn't approved sees only the waiting
+  // screen. Unknown/missing status is treated as approved (founders, guest).
+  const blocked = !!user && (signupStatus === 'pending' || signupStatus === 'rejected');
 
   return (
     <html lang="en">
       <body>
         <PageTransitionProvider>
           <ViewportLock />
-          <PullToRefresh />
-          <HomeOnRefresh />
-          <AutoRefresh />
-          {user && <TopNav achievementsRevealed={achievementsRevealed} />}
-          {user && <ChallengeWatcher me={user.id} />}
-          {user && <AchievementWatcher me={user.id} />}
-          {user && <EnableNotifications />}
-          {children}
+          {blocked ? (
+            <PendingApproval rejected={signupStatus === 'rejected'} />
+          ) : (
+            <>
+              <PullToRefresh />
+              <HomeOnRefresh />
+              <AutoRefresh />
+              {user && <TopNav achievementsRevealed={achievementsRevealed} />}
+              {user && <ChallengeWatcher me={user.id} />}
+              {user && <AchievementWatcher me={user.id} />}
+              {user && <EnableNotifications />}
+              {children}
+            </>
+          )}
         </PageTransitionProvider>
       </body>
     </html>

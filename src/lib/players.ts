@@ -20,6 +20,39 @@ export function pinPassword(player: string, pin: string): string {
   return `bm-${pin}-${player.toLowerCase()}`;
 }
 
+// --- Admins ----------------------------------------------------------------
+// The four founders are the admins. New players sign up but stay 'pending'
+// until any one admin approves them. This list is the client-side mirror of
+// is_admin_email() in supabase/signups.sql; keep them in sync.
+export const ADMIN_EMAILS: string[] = PLAYERS.map((p) => playerEmail(p));
+
+/** True if this signed-in user is one of the four founding admins. */
+export function isAdminEmail(email: string | null | undefined): boolean {
+  return ADMIN_EMAILS.includes((email ?? '').toLowerCase());
+}
+
+// --- New-player sign-up -----------------------------------------------------
+// Accent colors a new player's avatar/name can use. Kept distinct from the
+// founders' colors. The sign-up form assigns one automatically.
+export const SIGNUP_COLORS = ['#5fa8e6', '#e67ea3', '#9ad17c', '#d9b35f', '#b07ce8', '#e88a5f'];
+
+/** Pick a stable accent color for a brand-new player from their name. */
+export function colorForName(name: string): string {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return SIGNUP_COLORS[h % SIGNUP_COLORS.length];
+}
+
+/** Validate a sign-up display name: 2–14 chars, letters/numbers/space only. */
+export function isValidSignupName(name: string): boolean {
+  const n = name.trim();
+  if (n.length < 2 || n.length > 14) return false;
+  if (!/^[A-Za-z0-9 ]+$/.test(n)) return false;
+  // Cannot collide with a founder, the guest, or an admin slot.
+  const taken = [...PLAYERS.map((p) => p.toLowerCase()), GUEST_NAME.toLowerCase()];
+  return !taken.includes(n.toLowerCase());
+}
+
 // --- TEMPORARY achievements preview ----------------------------------------
 // Lets one account see the achievements page / nav / badges BEFORE the public
 // reveal, for review. Set to null (or remove this + its usages in

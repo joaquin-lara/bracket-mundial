@@ -62,3 +62,23 @@ export function flagUrl(tla: string | null | undefined): string | null {
   const a2 = tla ? FLAG_CODES[tla] : undefined;
   return a2 ? `https://flagcdn.com/w40/${a2}.png` : null;
 }
+
+// Human-readable country names for the sign-up flag picker. Alternate code
+// variants (CUW, URY) are intentionally omitted to avoid duplicate entries.
+const COUNTRY_NAMES: Record<string, string> = {
+  ALG: 'Algeria', ARG: 'Argentina', AUS: 'Australia', AUT: 'Austria', BEL: 'Belgium',
+  BIH: 'Bosnia-Herzegovina', BRA: 'Brazil', CAN: 'Canada', CHI: 'Chile', CIV: 'Ivory Coast',
+  COD: 'Congo DR', COL: 'Colombia', CPV: 'Cape Verde', CRO: 'Croatia', CUR: 'Curaçao',
+  CZE: 'Czechia', ECU: 'Ecuador', EGY: 'Egypt', ENG: 'England', ESP: 'Spain', FRA: 'France',
+  GER: 'Germany', GHA: 'Ghana', GUA: 'Guatemala', HAI: 'Haiti', HON: 'Honduras', IRN: 'Iran',
+  IRQ: 'Iraq', JOR: 'Jordan', JPN: 'Japan', KOR: 'South Korea', KSA: 'Saudi Arabia',
+  MAR: 'Morocco', MEX: 'Mexico', NCA: 'Nicaragua', NED: 'Netherlands', NOR: 'Norway',
+  NZL: 'New Zealand', PAN: 'Panama', PAR: 'Paraguay', POR: 'Portugal', QAT: 'Qatar',
+  RSA: 'South Africa', SCO: 'Scotland', SEN: 'Senegal', SUI: 'Switzerland', SWE: 'Sweden',
+  TUN: 'Tunisia', TUR: 'Turkey', URU: 'Uruguay', USA: 'United States', UZB: 'Uzbekistan',
+};
+
+/** Sorted [code, name] pairs for the sign-up country dropdown. */
+export const COUNTRY_OPTIONS: { code: string; name: string }[] = Object.entries(COUNTRY_NAMES)
+  .map(([code, name]) => ({ code, name }))
+  .sort((a, b) => a.name.localeCompare(b.name));

@@ -5,7 +5,7 @@ import HomeIntro from '@/components/HomeIntro';
 import PitchStripes from '@/components/PitchStripes';
 import PresenceDot from '@/components/PresenceDot';
 import TodayGames from '@/components/TodayGames';
-import { PLAYER_META, PLAYERS } from '@/lib/players';
+import { GUEST_NAME, PLAYER_META, PLAYERS, isAdminEmail } from '@/lib/players';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { signOut } from '@/app/actions';
 import { createClient } from '@/lib/supabase/server';
@@ -23,10 +23,43 @@ export default async function HomePage() {
     (data ?? []).map((r) => [r.display_name as string, r.total as number])
   );
 
-  const { data: profiles } = await supabase.from('profiles').select('id, display_name');
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, display_name, flag_code, color, status')
+    .eq('status', 'approved');
+  const approved = profiles ?? [];
   const idByName = new Map(
-    (profiles ?? []).map((p) => [p.display_name as string, p.id as string])
+    approved.map((p) => [p.display_name as string, p.id as string])
   );
+
+  // The four founders, plus any approved new players, make up the contenders.
+  type Contender = { name: string; flagCode: string | null; color: string | null; userId?: string };
+  const contenders: Contender[] = PLAYERS.map((name) => ({
+    name,
+    flagCode: PLAYER_META[name].flagCode,
+    color: PLAYER_META[name].color,
+    userId: idByName.get(name),
+  }));
+  for (const p of approved) {
+    const name = p.display_name as string;
+    if (name === GUEST_NAME || PLAYERS.includes(name as (typeof PLAYERS)[number])) continue;
+    contenders.push({
+      name,
+      flagCode: (p.flag_code as string | null) ?? null,
+      color: (p.color as string | null) ?? null,
+      userId: p.id as string,
+    });
+  }
+
+  // Admins see a banner when sign-ups are waiting.
+  let pendingCount = 0;
+  if (isAdminEmail(user?.email)) {
+    const { count } = await supabase
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'pending');
+    pendingCount = count ?? 0;
+  }
 
   // Fetch 2 days around now; client filters to local today.
   const from = new Date(Date.now() - 48 * 3600_000).toISOString();
@@ -42,6 +75,12 @@ export default async function HomePage() {
     <div className="home-pitch">
       <HomeIntro />
       <PitchStripes />
+      {pendingCount > 0 && (
+        <Link href="/admin" className="admin-banner">
+          <span className="admin-banner-dot" />
+          {pendingCount} sign-up{pendingCount === 1 ? '' : 's'} waiting for approval - review →
+        </Link>
+      )}
       <section className="hero">
         <GlobeBackdrop matches={(todayMatches ?? []) as Match[]} />
 
@@ -79,17 +118,22 @@ export default async function HomePage() {
         </div>
 
         <div className="contender-grid">
-          {PLAYERS.map((name) => (
-            <div className="contender-card" key={name}>
-              <div className="contender-avatar" style={{ background: 'rgba(0,0,0,0.5)' }}>
-                <img src={flagUrl(PLAYER_META[name].flagCode)!} alt={name} className="contender-flag" />
+          {contenders.map((c) => (
+            <div className="contender-card" key={c.name}>
+              <div className="contender-avatar" style={{ background: c.color ?? 'rgba(0,0,0,0.5)' }}>
+                {c.flagCode && flagUrl(c.flagCode) ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={flagUrl(c.flagCode)!} alt={c.name} className="contender-flag" />
+                ) : (
+                  <span className="contender-initial">{c.name.slice(0, 1).toUpperCase()}</span>
+                )}
               </div>
               <div className="contender-name">
-                {name}
-                {idByName.has(name) && <PresenceDot userId={idByName.get(name)!} />}
+                {c.name}
+                {c.userId && <PresenceDot userId={c.userId} />}
               </div>
               <div className="contender-pts">
-                {totals.has(name) ? `${totals.get(name)} pts` : 'unclaimed'}
+                {totals.has(c.name) ? `${totals.get(c.name)} pts` : 'unclaimed'}
               </div>
             </div>
           ))}
