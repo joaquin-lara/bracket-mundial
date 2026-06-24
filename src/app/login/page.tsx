@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { COUNTRY_OPTIONS, flagUrl } from '@/lib/flags';
 import {
   GUEST_EMAIL,
@@ -13,20 +13,30 @@ import {
   isValidSignupName,
   pinPassword,
   playerEmail,
-  type Player,
 } from '@/lib/players';
 import { createClient } from '@/lib/supabase/client';
 
 type Mode = 'select' | 'pin' | 'signup';
+type NewPlayer = { display_name: string; flag_code: string | null };
 
 export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>('select');
-  const [player, setPlayer] = useState<Player | null>(null);
+  // The selected player's display name (founder or approved new player).
+  const [player, setPlayer] = useState<string | null>(null);
   const [pin, setPin] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [leaving, setLeaving] = useState(false);
+
+  // Approved new (non-founder) players who can also log in.
+  const [newPlayers, setNewPlayers] = useState<NewPlayer[]>([]);
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.rpc('login_players').then(({ data }) => {
+      if (Array.isArray(data)) setNewPlayers(data as NewPlayer[]);
+    });
+  }, []);
 
   // Sign-up form fields
   const [name, setName] = useState('');
@@ -181,6 +191,30 @@ export default function LoginPage() {
                   {p}
                 </button>
               ))}
+              {newPlayers.map((np) => {
+                const url = np.flag_code ? flagUrl(np.flag_code) : null;
+                return (
+                  <button
+                    key={np.display_name}
+                    className="player-btn"
+                    onClick={() => {
+                      setPlayer(np.display_name);
+                      setMode('pin');
+                      setError(null);
+                    }}
+                  >
+                    <span className="player-avatar" style={{ background: 'rgba(0,0,0,0.5)' }}>
+                      {url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={url} alt={np.display_name} className="contender-flag" />
+                      ) : (
+                        <span>{np.display_name.slice(0, 1).toUpperCase()}</span>
+                      )}
+                    </span>
+                    {np.display_name}
+                  </button>
+                );
+              })}
             </div>
 
             <button className="signup-btn" onClick={() => { setMode('signup'); setError(null); }}>
