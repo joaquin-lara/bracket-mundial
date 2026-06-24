@@ -18,9 +18,11 @@ export default function HomeIntro() {
       const contenders = document.querySelector<HTMLElement>('.contenders');
 
       // Revisiting the home tab: no show, just make everything visible.
+      const signoutFooter = document.querySelector<HTMLElement>('.signout-footer');
+
       if (!introDecision()) {
         if (topbar) gsap.set(topbar, { y: 0, opacity: 1 });
-        gsap.set([stripes, heroContent, todayGames, contenders].filter(Boolean), { opacity: 1 });
+        gsap.set([stripes, heroContent, todayGames, contenders, signoutFooter].filter(Boolean), { opacity: 1 });
         return;
       }
 
@@ -29,11 +31,12 @@ export default function HomeIntro() {
 
       const tl = gsap.timeline();
 
-      tl.to(stripes,     { opacity: 1, duration: 0.8, ease: 'power2.out' },  GLOBE_END - 0.2)
-        .to(topbar,      { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, '<+0.6')
-        .to(heroContent, { opacity: 1, duration: 0.5, ease: 'power2.out' },   '<+0.2')
-        .to(todayGames,  { opacity: 1, duration: 0.5, ease: 'power2.out' },   '<+0.2')
-        .to(contenders,  { opacity: 1, duration: 0.5, ease: 'power2.out' },   '<+0.2');
+      tl.to(stripes,        { opacity: 1, duration: 0.8, ease: 'power2.out' },  GLOBE_END - 0.2)
+        .to(topbar,         { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, '<+0.6')
+        .to(heroContent,    { opacity: 1, duration: 0.5, ease: 'power2.out' },   '<+0.2')
+        .to(todayGames,     { opacity: 1, duration: 0.5, ease: 'power2.out' },   '<+0.2')
+        .to(contenders,     { opacity: 1, duration: 0.5, ease: 'power2.out' },   '<+0.2')
+        .to(signoutFooter,  { opacity: 1, duration: 0.4, ease: 'power2.out' },   '<+0.3');
     }, 100);
 
     return () => clearTimeout(t);

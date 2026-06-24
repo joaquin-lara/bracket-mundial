@@ -100,6 +100,7 @@ body:has(.home-intro) .topbar,
 body:has(.home-intro) .hero-content,
 body:has(.home-intro) .today-games,
 body:has(.home-intro) .contenders,
+body:has(.home-intro) .signout-footer,
 body:has(.home-intro) .pitch-stripes {
   opacity: 0;
 }
