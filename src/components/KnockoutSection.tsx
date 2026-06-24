@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { flagUrl } from '@/lib/flags';
-import type { ProjectedMatch } from '@/lib/qualification';
+import type { ProjectedMatch, ProjectedSeed } from '@/lib/qualification';
 import type { Match } from '@/lib/types';
 import { lookupVenue } from '@/lib/venues';
 
@@ -113,15 +113,45 @@ export default function KnockoutSection({ byStage, thirdPlace, projected, showTo
   const r32Matches = stageMap.get('LAST_32') ?? [];
   const projectedR32 = useMemo(() => {
     if (!useProjected) return r32Matches;
+
+    const teamKey = (name: string | null, code: string | null) =>
+      (code || name || '').toUpperCase();
+
+    // Seed with every team already confirmed (real) anywhere in the R32, so the
+    // projection never re-introduces a team that's locked into another slot —
+    // and never places the same projected team in two slots. This is what stops
+    // e.g. a confirmed team also appearing in a still-TBD slot via the projection.
+    const used = new Set<string>();
+    for (const m of r32Matches) {
+      if (m.home_team !== 'TBD') used.add(teamKey(m.home_team, m.home_code));
+      if (m.away_team !== 'TBD') used.add(teamKey(m.away_team, m.away_code));
+    }
+
+    // Fill a TBD slot with its projected team, but only if that team isn't
+    // already placed; otherwise fall back to the slot label (e.g. "2A").
+    const resolve = (seed: ProjectedSeed): { team: string; code: string | null } => {
+      const t = seed.team;
+      if (t) {
+        const k = teamKey(t.team, t.code);
+        if (!used.has(k)) {
+          used.add(k);
+          return { team: t.team, code: t.code };
+        }
+      }
+      return { team: seed.label, code: null };
+    };
+
     return r32Matches.map((m, i) => {
       const proj = projected[i];
       if (!proj) return m;
+      const home = m.home_team === 'TBD' ? resolve(proj.home) : { team: m.home_team, code: m.home_code };
+      const away = m.away_team === 'TBD' ? resolve(proj.away) : { team: m.away_team, code: m.away_code };
       return {
         ...m,
-        home_team: m.home_team === 'TBD' ? (proj.home.team?.team ?? proj.home.label) : m.home_team,
-        home_code: m.home_team === 'TBD' ? (proj.home.team?.code ?? null) : m.home_code,
-        away_team: m.away_team === 'TBD' ? (proj.away.team?.team ?? proj.away.label) : m.away_team,
-        away_code: m.away_team === 'TBD' ? (proj.away.team?.code ?? null) : m.away_code,
+        home_team: home.team,
+        home_code: home.code,
+        away_team: away.team,
+        away_code: away.code,
       };
     });
   }, [useProjected, r32Matches, projected]);
