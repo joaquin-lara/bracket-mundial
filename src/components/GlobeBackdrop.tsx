@@ -139,7 +139,7 @@ export default function GlobeBackdrop({ matches }: { matches: Match[] }) {
       scene.add(model);
 
       // Match the globe's lat tilt so the ball and SVG globe are seamlessly aligned.
-      model.rotation.x = -centerLat * (Math.PI / 180);
+      model.rotation.x = centerLat * (Math.PI / 180);
 
       const rotProxy = { lon: centerLon };
 
