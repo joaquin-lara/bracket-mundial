@@ -1,5 +1,5 @@
 import { flagUrl } from '@/lib/flags';
-import { PLAYER_META, type Player } from '@/lib/players';
+import { PLAYER_META, type Player, type PlayerStyle } from '@/lib/players';
 
 export interface HeatColumn {
   id: number;
@@ -12,7 +12,15 @@ export interface HeatRow {
 }
 
 /** One square per finished game per player: the form wall. */
-export default function PickHeatmap({ columns, rows }: { columns: HeatColumn[]; rows: HeatRow[] }) {
+export default function PickHeatmap({
+  columns,
+  rows,
+  styles = {},
+}: {
+  columns: HeatColumn[];
+  rows: HeatRow[];
+  styles?: Record<string, PlayerStyle>;
+}) {
   if (columns.length === 0 || rows.length === 0) return null;
 
   return (
@@ -21,13 +29,14 @@ export default function PickHeatmap({ columns, rows }: { columns: HeatColumn[]; 
       <p className="heat-sub">One square per finished game, oldest first. Hover for the match.</p>
 
       {rows.map((r) => {
-        const meta = PLAYER_META[r.name as Player];
+        const flag = styles[r.name]?.flagCode ?? PLAYER_META[r.name as Player]?.flagCode ?? null;
+        const flagSrc = flag ? flagUrl(flag) : null;
         return (
           <div className="heat-row" key={r.name}>
             <span className="heat-name">
-              {meta && (
+              {flagSrc && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={flagUrl(meta.flagCode)!} alt="" className="heat-flag" />
+                <img src={flagSrc} alt="" className="heat-flag" />
               )}
               {r.name}
             </span>

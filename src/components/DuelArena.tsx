@@ -9,7 +9,7 @@ import PresenceDot from '@/components/PresenceDot';
 import DuelEdge from '@/components/DuelEdge';
 import { flagUrl } from '@/lib/flags';
 import { sfx, isMuted, setMuted } from '@/lib/duelSfx';
-import { PLAYER_META, type Player } from '@/lib/players';
+import { GUEST_NAME, PLAYER_META, type Player } from '@/lib/players';
 import { createClient } from '@/lib/supabase/client';
 
 type Pick = 'left' | 'center' | 'right';
@@ -37,9 +37,13 @@ interface Duel {
   created_at: string;
 }
 
-interface Profile {
+export interface Profile {
   id: string;
   display_name: string;
+  color?: string | null;
+  flag_code?: string | null;
+  founder_slot?: string | null;
+  status?: string | null;
 }
 
 const DUEL_COLS =
@@ -167,7 +171,18 @@ export default function DuelArena({
       id === CPU_ID ? 'CPU 🤖' : profiles.find((p) => p.id === id)?.display_name ?? '???',
     [profiles]
   );
-  const metaOf = (id: string) => PLAYER_META[nameOf(id) as Player];
+  // Color + flag for a player: their own profile values first, then the
+  // founder PLAYER_META, so newly approved players get their real identity.
+  const metaOf = (id: string): { color: string; flagCode: string | null } | undefined => {
+    if (id === CPU_ID) return undefined;
+    const prof = profiles.find((p) => p.id === id);
+    const fm = PLAYER_META[nameOf(id) as Player];
+    if (!prof && !fm) return undefined;
+    return {
+      color: prof?.color ?? fm?.color ?? '#8fb0a1',
+      flagCode: prof?.flag_code ?? fm?.flagCode ?? null,
+    };
+  };
 
   const refresh = useCallback(async () => {
     const { data } = await supabase
@@ -521,7 +536,9 @@ export default function DuelArena({
     }
   }
 
-  const others = profiles.filter((p) => p.id !== me);
+  const others = profiles.filter(
+    (p) => p.id !== me && p.status === 'approved' && p.display_name !== GUEST_NAME
+  );
   const isMine = (d: Duel) => d.challenger === me || d.opponent === me;
   const pending = duels.filter((d) => d.status === 'pending' && isMine(d));
   const active = duels.filter((d) => d.status === 'active' && isMine(d));
@@ -592,10 +609,12 @@ export default function DuelArena({
               key={pid}
             >
               <span className="duel-pname">
-                {metaOf(pid) && (
+                {(() => {
+                  const fc = metaOf(pid)?.flagCode;
+                  const url = fc ? flagUrl(fc) : null;
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={flagUrl(metaOf(pid).flagCode)!} alt="" className="heat-flag" />
-                )}
+                  return url ? <img src={url} alt="" className="heat-flag" /> : null;
+                })()}
                 {nameOf(pid)}
                 {duel.winner === pid && ' 🏆'}
                 {duel.status === 'active' && (
@@ -1121,13 +1140,15 @@ export default function DuelArena({
             {allFinished.map((d) => {
               const cMeta = metaOf(d.challenger);
               const oMeta = metaOf(d.opponent);
+              const cFlag = cMeta?.flagCode ? flagUrl(cMeta.flagCode) : null;
+              const oFlag = oMeta?.flagCode ? flagUrl(oMeta.flagCode) : null;
               return (
                 <div className="duel-row done" key={d.id}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    {cMeta && <img src={flagUrl(cMeta.flagCode)!} alt="" className="heat-flag" />}
+                    {cFlag && <img src={cFlag} alt="" className="heat-flag" />}
                     {nameOf(d.challenger)}
                     <span style={{ margin: '0 4px' }}>{d.challenger_score} – {d.opponent_score}</span>
-                    {oMeta && <img src={flagUrl(oMeta.flagCode)!} alt="" className="heat-flag" />}
+                    {oFlag && <img src={oFlag} alt="" className="heat-flag" />}
                     {nameOf(d.opponent)}
                   </span>
                   <span className="duel-winner-tag">{nameOf(d.winner ?? '')} 🏆</span>

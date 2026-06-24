@@ -80,3 +80,29 @@ export const GUEST_PASSWORD = 'bm-guest-viewer-account';
 export function isGuestEmail(email: string | null | undefined): boolean {
   return (email ?? '').toLowerCase() === GUEST_EMAIL;
 }
+
+// --- Per-player visual style (color + flag), live from profiles ------------
+// So newly approved players render with their own color/flag everywhere, not
+// just the four founders baked into PLAYER_META. Falls back to PLAYER_META for
+// a founder who hasn't customised, then to neutral defaults.
+export type PlayerStyle = { color: string; flagCode: string | null };
+
+export type ProfileLike = {
+  display_name: string;
+  color?: string | null;
+  flag_code?: string | null;
+  founder_slot?: string | null;
+};
+
+/** Build a display_name -> {color, flagCode} map from profile rows. */
+export function playerStyles(profiles: ProfileLike[]): Record<string, PlayerStyle> {
+  const out: Record<string, PlayerStyle> = {};
+  for (const p of profiles) {
+    const fm = p.founder_slot ? PLAYER_META[p.founder_slot as Player] : undefined;
+    out[p.display_name] = {
+      color: p.color ?? fm?.color ?? '#8fb0a1',
+      flagCode: p.flag_code ?? fm?.flagCode ?? null,
+    };
+  }
+  return out;
+}

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import DuelArena from '@/components/DuelArena';
+import DuelArena, { type Profile as DuelProfile } from '@/components/DuelArena';
 import { createClient } from '@/lib/supabase/server';
 import { isGuestEmail } from '@/lib/players';
 
@@ -17,13 +17,15 @@ export default async function DuelsPage({
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: profiles } = await supabase.from('profiles').select('id, display_name');
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, display_name, color, flag_code, founder_slot, status');
 
   return (
     <main>
       <DuelArena
         me={user.id}
-        profiles={(profiles ?? []) as { id: string; display_name: string }[]}
+        profiles={(profiles ?? []) as DuelProfile[]}
         initialDuelId={searchParams.duel ?? null}
         isGuest={isGuestEmail(user.email)}
       />

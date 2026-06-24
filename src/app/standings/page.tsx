@@ -7,7 +7,7 @@ import { buildRecap, type RecapInput, type RecapAchievement, type RecapDuel } fr
 import { createClient } from '@/lib/supabase/server';
 import { predict } from '@/lib/ml/model';
 import { ACHIEVEMENTS_BY_ID } from '@/lib/achievementsList';
-import { GUEST_NAME } from '@/lib/players';
+import { GUEST_NAME, playerStyles } from '@/lib/players';
 
 export const metadata: Metadata = { title: 'Player Standings' };
 export const dynamic = 'force-dynamic';
@@ -54,8 +54,12 @@ export default async function StandingsPage() {
       'points, user_id, match_id, pred_home, pred_away, matches(kickoff, home_code, away_code, home_score, away_score)'
     )
     .not('points', 'is', null);
-  const { data: profiles } = await supabase.from('profiles').select('id, display_name');
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, display_name, color, flag_code, founder_slot');
   const nameById = new Map((profiles ?? []).map((p) => [p.id as string, p.display_name as string]));
+  // Live color/flag per player so new players render with their own identity.
+  const styles = playerStyles((profiles ?? []) as Parameters<typeof playerStyles>[0]);
 
   type ScoredMatch = {
     kickoff: string;
@@ -204,9 +208,9 @@ export default async function StandingsPage() {
 
       <RecapCard recap={recap} />
 
-      <RaceChart entries={raceEntries} />
+      <RaceChart entries={raceEntries} styles={styles} />
 
-      <PickHeatmap columns={heatColumns} rows={heatRows} />
+      <PickHeatmap columns={heatColumns} rows={heatRows} styles={styles} />
     </main>
   );
 }

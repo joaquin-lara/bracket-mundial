@@ -1,6 +1,6 @@
 'use client';
 
-import { PLAYER_META, type Player } from '@/lib/players';
+import { PLAYER_META, type Player, type PlayerStyle } from '@/lib/players';
 
 export interface RacePoint {
   name: string;
@@ -12,12 +12,16 @@ const W = 680;
 const H = 300;
 const PAD = { l: 36, r: 92, t: 16, b: 34 };
 
-function playerColor(name: string): string {
-  return PLAYER_META[name as Player]?.color ?? '#e6b337';
-}
-
 /** Cumulative points per player, by match day. The season story arc. */
-export default function RaceChart({ entries }: { entries: RacePoint[] }) {
+export default function RaceChart({
+  entries,
+  styles = {},
+}: {
+  entries: RacePoint[];
+  styles?: Record<string, PlayerStyle>;
+}) {
+  const playerColor = (name: string): string =>
+    styles[name]?.color ?? PLAYER_META[name as Player]?.color ?? '#e6b337';
   if (entries.length === 0) {
     return (
       <div className="race-card">
