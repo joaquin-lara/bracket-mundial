@@ -281,10 +281,13 @@ export default function ChatBubble({ me }: { me: string }) {
       next.set(convId, inner);
       return next;
     });
-    await supabase.from('chat_reads').upsert(
-      { conversation_id: convId, user_id: me, last_read_at: iso },
-      { onConflict: 'conversation_id,user_id' },
-    );
+    // Persist via a security-definer RPC: a direct PostgREST upsert writes every
+    // payload column (incl. the PK) in its ON CONFLICT UPDATE, which the
+    // column-level grant on chat_reads rejects on the 2nd+ read — so the
+    // watermark would silently freeze at the first read and old messages keep
+    // re-appearing as unread on every reload. The RPC also clamps with
+    // greatest() so the watermark can never move backwards.
+    await supabase.rpc('chat_mark_read', { p_conv: convId, p_at: iso });
   }, [supabase, me]);
 
   // ---- Initial load + realtime + polling ---------------------------------

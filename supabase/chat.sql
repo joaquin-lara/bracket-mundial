@@ -194,6 +194,33 @@ revoke execute on function public.chat_open_dm(uuid) from public;
 grant execute on function public.chat_open_dm(uuid) to authenticated;
 
 -- ---------------------------------------------------------------------------
+-- Mark a conversation read up to a timestamp. Done in a security-definer
+-- function so the upsert isn't tripped up by the column-level grants on
+-- chat_reads: a PostgREST upsert writes every column in the payload (including
+-- the primary-key columns) in its ON CONFLICT DO UPDATE, which the
+-- update(last_read_at)-only grant rejects — so direct upserts silently fail on
+-- the second and later reads and the watermark never advances. greatest() also
+-- guarantees the watermark only ever moves forward (clock skew / stale events).
+-- ---------------------------------------------------------------------------
+create or replace function public.chat_mark_read(p_conv uuid, p_at timestamptz default now())
+returns void
+language plpgsql security definer set search_path = public as $$
+declare
+  uid uuid := auth.uid();
+begin
+  if uid is null then raise exception 'not signed in'; end if;
+  if not public.chat_is_member(p_conv, uid) then raise exception 'not a member'; end if;
+  insert into public.chat_reads (conversation_id, user_id, last_read_at)
+  values (p_conv, uid, p_at)
+  on conflict (conversation_id, user_id)
+  do update set last_read_at = greatest(public.chat_reads.last_read_at, excluded.last_read_at);
+end;
+$$;
+
+revoke execute on function public.chat_mark_read(uuid, timestamptz) from public;
+grant execute on function public.chat_mark_read(uuid, timestamptz) to authenticated;
+
+-- ---------------------------------------------------------------------------
 -- Realtime (postgres_changes respects RLS, so each client only receives the
 -- messages and read-receipts it is allowed to see).
 -- ---------------------------------------------------------------------------
