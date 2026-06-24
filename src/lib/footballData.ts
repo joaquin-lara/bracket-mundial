@@ -174,23 +174,33 @@ export async function fetchFixtures(): Promise<FixtureRow[]> {
   const key = process.env.FOOTBALL_DATA_API_KEY;
   if (!key) throw new Error('FOOTBALL_DATA_API_KEY is not set');
   const rows = await fetchFootballDataFixtures(key);
-  await mergeVenues(rows);
+
+  // openfootball is the enrichment source: host cities (all matches) and the
+  // confirmed knockout teams that football-data tends to seed late. Best-effort:
+  // if it's unreachable the football-data rows are used as-is.
+  let ofRows: FixtureRow[] | null = null;
+  try {
+    ofRows = await fetchOpenfootballFixtures();
+  } catch {
+    ofRows = null;
+  }
+  if (ofRows) {
+    mergeVenues(rows, ofRows);
+    mergeKnockoutTeams(rows, ofRows);
+  }
   return rows;
 }
+
+const KNOCKOUT_STAGES = new Set([
+  'LAST_32', 'LAST_16', 'QUARTER_FINALS', 'SEMI_FINALS', 'THIRD_PLACE', 'FINAL',
+]);
 
 /**
  * football-data omits the venue; openfootball carries the host city. Each team
  * pairing is unique across the tournament, so we key on the canonical team pair
- * and copy the city across. Best-effort: if openfootball is unreachable the
- * rows simply keep null venues. Mutates `rows` in place.
+ * and copy the city across. Mutates `rows` in place.
  */
-async function mergeVenues(rows: FixtureRow[]): Promise<void> {
-  let ofRows: FixtureRow[];
-  try {
-    ofRows = await fetchOpenfootballFixtures();
-  } catch {
-    return;
-  }
+function mergeVenues(rows: FixtureRow[], ofRows: FixtureRow[]): void {
   const cityByPair = new Map<string, string>();
   for (const r of ofRows) {
     const k = pairKey(r);
@@ -201,6 +211,47 @@ async function mergeVenues(rows: FixtureRow[]): Promise<void> {
     const k = pairKey(r);
     if (k) r.venue = cityByPair.get(k) ?? null;
   }
+}
+
+/**
+ * Backfill confirmed knockout teams from openfootball. football-data often
+ * leaves a knockout slot empty (TBD) for a while after a group is decided,
+ * whereas openfootball fills the group winner straight away. Knockout fixtures
+ * line up one-to-one across both feeds in kickoff order, so we zip them and,
+ * only where football-data still has TBD and openfootball names a real team,
+ * copy the team across (football-data always wins when it has the slot).
+ * Mutates `rows` in place.
+ */
+export function mergeKnockoutTeams(rows: FixtureRow[], ofRows: FixtureRow[]): void {
+  const byKickoff = (a: FixtureRow, b: FixtureRow) =>
+    Date.parse(a.kickoff) - Date.parse(b.kickoff);
+  const fdKO = rows.filter((r) => KNOCKOUT_STAGES.has(r.stage)).sort(byKickoff);
+  const ofKO = ofRows.filter((r) => r.group_name == null && r.stage !== 'GROUP_STAGE').sort(byKickoff);
+
+  const n = Math.min(fdKO.length, ofKO.length);
+  for (let i = 0; i < n; i++) {
+    const fd = fdKO[i];
+    const of = ofKO[i];
+    // Safety: only trust the pairing if both feeds agree on the calendar day.
+    if (fd.kickoff.slice(0, 10) !== of.kickoff.slice(0, 10)) continue;
+    fillKnockoutSide(fd, 'home', of.home_code, of.home_team);
+    fillKnockoutSide(fd, 'away', of.away_code, of.away_team);
+  }
+}
+
+function fillKnockoutSide(
+  fd: FixtureRow,
+  side: 'home' | 'away',
+  ofCode: string | null,
+  ofName: string,
+): void {
+  const nameKey = `${side}_team` as const;
+  const codeKey = `${side}_code` as const;
+  if (fd[nameKey] !== 'TBD') return; // football-data already has this slot
+  const team = lookup(ofCode) ?? lookup(ofName); // null when openfootball is still a placeholder
+  if (!team) return;
+  fd[nameKey] = team.name;
+  fd[codeKey] = team.code;
 }
 
 /** Canonical, order-independent key for a fixture: the sorted TLA codes of its

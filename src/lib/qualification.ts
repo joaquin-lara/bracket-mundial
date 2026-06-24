@@ -23,28 +23,33 @@ type Seed =
 
 interface Pairing {
   match: number;
+  venue: string; // host stadium (matches VENUES[].stadium) — single source of truth
   home: Seed;
   away: Seed;
 }
 
-/** The 16 fixed Round-of-32 pairings, with the third-place candidate sets. */
+/**
+ * The 16 Round-of-32 pairings in official match order (FIFA 73→88), each with
+ * its host stadium. This order matches the fixtures' kickoff order and is the
+ * single source the venue list derives from, so teams and venues can't drift.
+ */
 export const R32_PAIRINGS: Pairing[] = [
-  { match: 1, home: pos(1, 'E'), away: third('ABCDF') },
-  { match: 2, home: pos(1, 'I'), away: third('CDFGH') },
-  { match: 3, home: pos(2, 'A'), away: pos(2, 'B') },
-  { match: 4, home: pos(1, 'F'), away: pos(2, 'C') },
-  { match: 5, home: pos(2, 'K'), away: pos(2, 'L') },
-  { match: 6, home: pos(1, 'H'), away: pos(2, 'J') },
-  { match: 7, home: pos(1, 'D'), away: third('BEFIJ') },
-  { match: 8, home: pos(1, 'G'), away: third('AEHIJ') },
-  { match: 9, home: pos(1, 'C'), away: pos(2, 'F') },
-  { match: 10, home: pos(2, 'E'), away: pos(2, 'I') },
-  { match: 11, home: pos(1, 'A'), away: third('CEFHI') },
-  { match: 12, home: pos(1, 'L'), away: third('EHIJK') },
-  { match: 13, home: pos(1, 'J'), away: pos(2, 'H') },
-  { match: 14, home: pos(2, 'D'), away: pos(2, 'G') },
-  { match: 15, home: pos(1, 'B'), away: third('EFGIJ') },
-  { match: 16, home: pos(1, 'K'), away: third('DEIJL') },
+  { match: 1, venue: 'SoFi Stadium', home: pos(2, 'A'), away: pos(2, 'B') },
+  { match: 2, venue: 'Gillette Stadium', home: pos(1, 'E'), away: third('ABCDF') },
+  { match: 3, venue: 'Estadio BBVA', home: pos(1, 'F'), away: pos(2, 'C') },
+  { match: 4, venue: 'NRG Stadium', home: pos(1, 'C'), away: pos(2, 'F') },
+  { match: 5, venue: 'MetLife Stadium', home: pos(1, 'I'), away: third('CDFGH') },
+  { match: 6, venue: 'AT&T Stadium', home: pos(2, 'E'), away: pos(2, 'I') },
+  { match: 7, venue: 'Estadio Azteca', home: pos(1, 'A'), away: third('CEFHI') },
+  { match: 8, venue: 'Mercedes-Benz Stadium', home: pos(1, 'L'), away: third('EHIJK') },
+  { match: 9, venue: "Levi's Stadium", home: pos(1, 'D'), away: third('BEFIJ') },
+  { match: 10, venue: 'Lumen Field', home: pos(1, 'G'), away: third('AEHIJ') },
+  { match: 11, venue: 'BMO Field', home: pos(2, 'K'), away: pos(2, 'L') },
+  { match: 12, venue: 'SoFi Stadium', home: pos(1, 'H'), away: pos(2, 'J') },
+  { match: 13, venue: 'BC Place', home: pos(1, 'B'), away: third('EFGIJ') },
+  { match: 14, venue: 'Hard Rock Stadium', home: pos(1, 'J'), away: pos(2, 'H') },
+  { match: 15, venue: 'Arrowhead Stadium', home: pos(1, 'K'), away: third('DEIJL') },
+  { match: 16, venue: 'AT&T Stadium', home: pos(2, 'D'), away: pos(2, 'G') },
 ];
 
 function pos(p: 1 | 2, group: string): Seed {

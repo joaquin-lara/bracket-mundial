@@ -4,6 +4,7 @@
 // the aliases we might see and we match on a normalised substring. Capacity,
 // roof and elevation drive the "crowd factor" note shown on a match card.
 
+import { R32_PAIRINGS } from './qualification';
 import type { Match } from './types';
 
 export interface Venue {
@@ -47,14 +48,12 @@ function norm(s: string): string {
  * round. The 2026 schedule pins every knockout slot to a stadium in advance,
  * independent of which teams qualify, so the tracker can show the venue while
  * the teams are still TBD. Names match VENUES[].stadium exactly.
+ *
+ * LAST_32 is derived from R32_PAIRINGS so the pairings and their venues are a
+ * single source of truth and can never fall out of sync.
  */
 export const KNOCKOUT_VENUES: Record<string, string[]> = {
-  LAST_32: [
-    'SoFi Stadium', 'Gillette Stadium', 'Estadio BBVA', 'NRG Stadium',
-    'MetLife Stadium', 'AT&T Stadium', 'Estadio Azteca', 'Mercedes-Benz Stadium',
-    "Levi's Stadium", 'Lumen Field', 'BMO Field', 'SoFi Stadium',
-    'BC Place', 'Hard Rock Stadium', 'Arrowhead Stadium', 'AT&T Stadium',
-  ],
+  LAST_32: R32_PAIRINGS.map((p) => p.venue),
   LAST_16: [
     'Lincoln Financial Field', 'NRG Stadium', 'MetLife Stadium', 'Estadio Azteca',
     'AT&T Stadium', 'Lumen Field', 'Mercedes-Benz Stadium', 'BC Place',

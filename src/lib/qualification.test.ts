@@ -79,11 +79,10 @@ describe('rankThirds', () => {
 describe('projectBracket', () => {
   it('fills group-position slots from the tables', () => {
     const matches = projectBracket(tablesWith({}));
-    const m3 = matches.find((m) => m.match === 3)!; // 2A vs 2B
-    expect(m3.home.label).toBe('2A');
-    expect(m3.away.label).toBe('2B');
-    expect(m3.home.team?.code).toBe('A2'); // runner-up of group A
-    expect(m3.away.team?.code).toBe('B2');
+    const m = matches.find((x) => x.home.label === '2A')!; // 2A vs 2B
+    expect(m.away.label).toBe('2B');
+    expect(m.home.team?.code).toBe('A2'); // runner-up of group A
+    expect(m.away.team?.code).toBe('B2');
   });
 
   it('assigns each qualifying third to a slot within its candidate set, all distinct', () => {
@@ -107,10 +106,16 @@ describe('projectBracket', () => {
     expect(used.size).toBe(8); // every qualifying group placed exactly once
   });
 
-  it('keeps the sixteen fixed pairings', () => {
+  it('keeps the sixteen fixed pairings, in official venue order', () => {
     expect(R32_PAIRINGS).toHaveLength(16);
-    expect(seedLabel(R32_PAIRINGS[0].home)).toBe('1E');
-    expect(seedLabel(R32_PAIRINGS[0].away)).toBe('3ABCDF');
+    // First match is at SoFi (LA): 2A vs 2B.
+    expect(R32_PAIRINGS[0].venue).toBe('SoFi Stadium');
+    expect(seedLabel(R32_PAIRINGS[0].home)).toBe('2A');
+    expect(seedLabel(R32_PAIRINGS[0].away)).toBe('2B');
+    // 1E (e.g. Germany) is the Boston/Gillette match vs 3ABCDF.
+    const gillette = R32_PAIRINGS.find((p) => seedLabel(p.home) === '1E')!;
+    expect(gillette.venue).toBe('Gillette Stadium');
+    expect(seedLabel(gillette.away)).toBe('3ABCDF');
   });
 });
 
