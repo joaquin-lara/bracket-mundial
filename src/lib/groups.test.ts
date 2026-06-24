@@ -105,6 +105,47 @@ describe('computeGroupTables', () => {
     expect(row).toHaveProperty('rank');
   });
 
+  it('uses fair play to break a tie only after points, head-to-head, GD and goals are level', () => {
+    // XXX and YYY are identical: they draw head-to-head, and both beat ZZZ 2-0
+    // and draw WWW 1-1 — so equal on points (5), head-to-head, overall GD (+2)
+    // and goals (4). The only thing left to separate them is fair play.
+    const matches = [
+      match('Group F', 'XXX', 'YYY', 1, 1),
+      match('Group F', 'XXX', 'ZZZ', 2, 0),
+      match('Group F', 'YYY', 'ZZZ', 2, 0),
+      match('Group F', 'XXX', 'WWW', 1, 1),
+      match('Group F', 'YYY', 'WWW', 1, 1),
+      match('Group F', 'ZZZ', 'WWW', 0, 0),
+    ];
+
+    const rows = computeGroupTables(matches, { XXX: 0, YYY: -3 })[0].rows;
+    const x = rows.findIndex((r) => r.team === 'XXX');
+    const y = rows.findIndex((r) => r.team === 'YYY');
+    // Confirm the tie is genuine through GD and goals...
+    expect([rows[x].pts, rows[x].gd, rows[x].gf]).toEqual([rows[y].pts, rows[y].gd, rows[y].gf]);
+    // ...then the cleaner record (XXX, 0) ranks above the dirtier one (YYY, -3).
+    expect(x).toBeLessThan(y);
+
+    // Flip the cards and the order flips too — proving fair play is the decider.
+    const flipped = computeGroupTables(matches, { XXX: -3, YYY: 0 })[0].rows;
+    expect(flipped.findIndex((r) => r.team === 'YYY')).toBeLessThan(
+      flipped.findIndex((r) => r.team === 'XXX')
+    );
+  });
+
+  it('does NOT let fair play override a better goal difference', () => {
+    // AAA has the worse fair-play record but a better overall GD; GD wins.
+    const matches = [
+      match('Group G', 'AAA', 'CCC', 5, 0), // AAA +5
+      match('Group G', 'BBB', 'CCC', 1, 0), // BBB +1
+      match('Group G', 'AAA', 'BBB', 0, 0), // head-to-head level
+    ];
+    const rows = computeGroupTables(matches, { AAA: -10, BBB: 0 })[0].rows;
+    expect(rows.findIndex((r) => r.team === 'AAA')).toBeLessThan(
+      rows.findIndex((r) => r.team === 'BBB')
+    );
+  });
+
   it('ignores knockout matches and TBD placeholders', () => {
     const ko = match('', 'Mexico', 'Brazil', 1, 0);
     ko.group_name = null;
