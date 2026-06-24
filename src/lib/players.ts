@@ -43,14 +43,19 @@ export function colorForName(name: string): string {
   return SIGNUP_COLORS[h % SIGNUP_COLORS.length];
 }
 
-/** Validate a sign-up display name: 2–14 chars, letters/numbers/space only. */
-export function isValidSignupName(name: string): boolean {
+/** Display name format only: 2 to 14 chars, letters/numbers/space, not "Guest". */
+export function isValidNameFormat(name: string): boolean {
   const n = name.trim();
   if (n.length < 2 || n.length > 14) return false;
   if (!/^[A-Za-z0-9 ]+$/.test(n)) return false;
-  // Cannot collide with a founder, the guest, or an admin slot.
-  const taken = [...PLAYERS.map((p) => p.toLowerCase()), GUEST_NAME.toLowerCase()];
-  return !taken.includes(n.toLowerCase());
+  return n.toLowerCase() !== GUEST_NAME.toLowerCase();
+}
+
+/** Validate a brand-new sign-up name: valid format and not a reserved slot. */
+export function isValidSignupName(name: string): boolean {
+  if (!isValidNameFormat(name)) return false;
+  // A new sign-up cannot claim a founder's reserved name.
+  return !PLAYERS.map((p) => p.toLowerCase()).includes(name.trim().toLowerCase());
 }
 
 // --- TEMPORARY achievements preview ----------------------------------------

@@ -3523,6 +3523,113 @@ table.standings tr.me td {
   opacity: 0.55;
 }
 
+/* ---- profile editor ---- */
+
+.profile-editor {
+  max-width: 460px;
+  margin-top: 18px;
+}
+
+.profile-editor label {
+  display: block;
+  font-family: var(--narrow);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  margin: 14px 0 6px;
+}
+
+.profile-editor input.text-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: var(--sans);
+  color: var(--cream);
+  background: rgba(11, 61, 44, 0.6);
+  border: 1px solid rgba(244, 241, 232, 0.25);
+  border-radius: 8px;
+}
+
+.profile-editor input.text-input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.profile-editor button[type='submit'] {
+  width: 100%;
+  margin-top: 18px;
+  background: var(--gold);
+  color: var(--bg-dark);
+  border: none;
+  border-radius: 10px;
+  padding: 13px;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.profile-editor button[type='submit']:hover:not(:disabled) {
+  background: var(--gold-hover);
+}
+
+.profile-editor button[type='submit']:disabled {
+  opacity: 0.5;
+}
+
+.msg-ok {
+  color: #7fc8a9;
+  font-size: 13px;
+  margin: 10px 0 0;
+}
+
+.danger-zone {
+  margin-top: 34px;
+  padding: 18px;
+  border: 1px solid rgba(214, 92, 92, 0.5);
+  border-radius: 12px;
+  background: rgba(214, 92, 92, 0.06);
+}
+
+.danger-zone h2 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  color: #e88a8a;
+}
+
+.danger-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.btn-danger {
+  background: #c0392b;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 16px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #d64a3b;
+}
+
+.btn-danger:disabled {
+  opacity: 0.5;
+}
+
+.danger-actions .btn-danger {
+  margin-top: 0;
+}
+
 /* ---- mobile ---- */
 
 .team > span {

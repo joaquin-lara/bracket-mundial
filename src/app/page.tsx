@@ -25,26 +25,30 @@ export default async function HomePage() {
 
   const { data: profiles } = await supabase
     .from('profiles')
-    .select('id, display_name, flag_code, color, status')
+    .select('id, display_name, flag_code, color, status, founder_slot')
     .eq('status', 'approved');
   const approved = profiles ?? [];
-  const idByName = new Map(
-    approved.map((p) => [p.display_name as string, p.id as string])
+
+  // Founders are matched by their stable slot (so a renamed founder still maps
+  // to their roster card); everyone else is matched by their profile row.
+  const bySlot = new Map(
+    approved.filter((p) => p.founder_slot).map((p) => [p.founder_slot as string, p])
   );
 
-  // The four founders, plus any approved new players, make up the contenders.
   type Contender = { name: string; flagCode: string | null; color: string | null; userId?: string };
-  const contenders: Contender[] = PLAYERS.map((name) => ({
-    name,
-    flagCode: PLAYER_META[name].flagCode,
-    color: PLAYER_META[name].color,
-    userId: idByName.get(name),
-  }));
+  const contenders: Contender[] = PLAYERS.map((slot) => {
+    const prof = bySlot.get(slot);
+    return {
+      name: (prof?.display_name as string) ?? slot,
+      flagCode: (prof?.flag_code as string | null) ?? PLAYER_META[slot].flagCode,
+      color: (prof?.color as string | null) ?? PLAYER_META[slot].color,
+      userId: prof?.id as string | undefined,
+    };
+  });
   for (const p of approved) {
-    const name = p.display_name as string;
-    if (name === GUEST_NAME || PLAYERS.includes(name as (typeof PLAYERS)[number])) continue;
+    if (p.founder_slot || p.display_name === GUEST_NAME) continue;
     contenders.push({
-      name,
+      name: p.display_name as string,
       flagCode: (p.flag_code as string | null) ?? null,
       color: (p.color as string | null) ?? null,
       userId: p.id as string,

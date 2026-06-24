@@ -15,14 +15,24 @@ const BASE_LINKS: readonly (readonly [string, string])[] = [
   ['/duels', 'Penalty Shootouts'],
 ];
 
-export default function TopNav({ achievementsRevealed = false }: { achievementsRevealed?: boolean }) {
-  const LINKS: readonly (readonly [string, string])[] = achievementsRevealed
+export default function TopNav({
+  achievementsRevealed = false,
+  isGuest = false,
+}: {
+  achievementsRevealed?: boolean;
+  isGuest?: boolean;
+}) {
+  const withAchievements: readonly (readonly [string, string])[] = achievementsRevealed
     ? [
         ...BASE_LINKS.slice(0, 5),
         ['/achievements', 'Achievements'],
         ...BASE_LINKS.slice(5),
       ]
     : BASE_LINKS;
+  // Guests have no editable profile, so they don't see the Profile tab.
+  const LINKS: readonly (readonly [string, string])[] = isGuest
+    ? withAchievements
+    : [...withAchievements, ['/profile', 'Profile']];
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const touchStart = useRef<{ x: number; y: number; inScrollable: boolean } | null>(null);

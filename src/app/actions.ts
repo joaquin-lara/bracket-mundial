@@ -4,7 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { TEAMS } from '@/lib/ml/teams';
-import { isAdminEmail, isGuestEmail } from '@/lib/players';
+import { isAdminEmail, isGuestEmail, isValidNameFormat } from '@/lib/players';
+import { FLAG_CODES } from '@/lib/flags';
 
 export interface PredictionResult {
   ok: boolean;
@@ -158,6 +159,67 @@ export async function decideSignup(
   revalidatePath('/');
   revalidatePath('/standings');
   return { ok: true };
+}
+
+/** Update the signed-in player's display name and flag. Guests can't. */
+export async function updateProfile(
+  displayName: string,
+  flagCode: string
+): Promise<PredictionResult> {
+  const name = displayName.trim();
+  if (!isValidNameFormat(name)) {
+    return { ok: false, error: 'Name must be 2 to 14 letters or numbers.' };
+  }
+  if (!FLAG_CODES[flagCode]) {
+    return { ok: false, error: 'Pick a valid country flag.' };
+  }
+
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: 'Not signed in.' };
+  if (isGuestEmail(user.email)) {
+    return { ok: false, error: 'The guest account has no profile to edit.' };
+  }
+
+  // Reject a name already used by another player (case-insensitive).
+  const { data: clash } = await supabase
+    .from('profiles')
+    .select('id')
+    .ilike('display_name', name)
+    .neq('id', user.id)
+    .maybeSingle();
+  if (clash) return { ok: false, error: 'That name is already taken.' };
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ display_name: name, flag_code: flagCode })
+    .eq('id', user.id);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath('/');
+  revalidatePath('/profile');
+  revalidatePath('/standings');
+  return { ok: true };
+}
+
+/** Permanently delete the signed-in player's account, then sign them out. */
+export async function deleteMyAccount(): Promise<PredictionResult> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: 'Not signed in.' };
+  if (isGuestEmail(user.email)) {
+    return { ok: false, error: 'The shared guest account can’t be deleted.' };
+  }
+
+  const { error } = await supabase.rpc('delete_my_account');
+  if (error) return { ok: false, error: error.message };
+
+  await supabase.auth.signOut();
+  redirect('/login');
 }
 
 export async function signOut() {

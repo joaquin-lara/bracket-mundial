@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import AchievementWatcher from '@/components/AchievementWatcher';
 import AutoRefresh from '@/components/AutoRefresh';
 import ChallengeWatcher from '@/components/ChallengeWatcher';
+import ChatBubble from '@/components/ChatBubble';
 import EnableNotifications from '@/components/EnableNotifications';
 import HomeOnRefresh from '@/components/HomeOnRefresh';
 import PageTransitionProvider from '@/components/PageTransition';
@@ -10,7 +11,7 @@ import PullToRefresh from '@/components/PullToRefresh';
 import TopNav from '@/components/TopNav';
 import ViewportLock from '@/components/ViewportLock';
 import { createClient } from '@/lib/supabase/server';
-import { isAchievementsPreviewUser } from '@/lib/players';
+import { isAchievementsPreviewUser, isGuestEmail } from '@/lib/players';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -72,10 +73,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <PullToRefresh />
               <HomeOnRefresh />
               <AutoRefresh />
-              {user && <TopNav achievementsRevealed={achievementsRevealed} />}
+              {user && <TopNav achievementsRevealed={achievementsRevealed} isGuest={isGuestEmail(user.email)} />}
               {user && <ChallengeWatcher me={user.id} />}
               {user && <AchievementWatcher me={user.id} />}
               {user && <EnableNotifications />}
+              {user && !isGuestEmail(user.email) && <ChatBubble me={user.id} />}
               {children}
             </>
           )}

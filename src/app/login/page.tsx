@@ -78,7 +78,7 @@ export default function LoginPage() {
     e.preventDefault();
     const cleanName = name.trim();
     if (!isValidSignupName(cleanName)) {
-      setError('Pick a name (2–14 letters/numbers) that isn’t already taken.');
+      setError('Pick a name (2 to 14 letters/numbers) that isn’t already taken.');
       return;
     }
     if (!/^\d{4}$/.test(signupPin)) {
