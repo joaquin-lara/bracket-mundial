@@ -671,9 +671,6 @@ h1 {
   text-align: center;
 }
 
-.contender-card:hover {
-  border-color: rgba(230, 179, 55, 0.5);
-}
 
 .contender-avatar {
   width: 56px;
