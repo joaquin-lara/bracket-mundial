@@ -50,6 +50,7 @@ export default function ChatBubble({ me }: { me: string }) {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // ---- View: conversation list, or one open thread ------------------------
   // activeOther = null  -> the group room is open
@@ -67,6 +68,10 @@ export default function ChatBubble({ me }: { me: string }) {
   const convInfo = useRef<Map<string, { kind: 'group' | 'dm'; other: string | null }>>(new Map());
   // conversationId -> messages (ascending)
   const [messages, setMessages] = useState<Map<string, ChatMessage[]>>(new Map());
+  // Mirror of messages for read-marking, so markRead can read the latest
+  // message time without depending on (and churning with) messages state.
+  const messagesRef = useRef(messages);
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
   // conversationId -> (userId -> last_read_at)
   const [reads, setReads] = useState<Map<string, Map<string, string>>>(new Map());
 
@@ -233,28 +238,51 @@ export default function ChatBubble({ me }: { me: string }) {
       .from('chat_reads')
       .select('conversation_id, user_id, last_read_at');
     if (rds) {
-      const map = new Map<string, Map<string, string>>();
-      for (const r of rds as Array<{ conversation_id: string; user_id: string; last_read_at: string }>) {
-        const inner = map.get(r.conversation_id) ?? new Map<string, string>();
-        inner.set(r.user_id, r.last_read_at);
-        map.set(r.conversation_id, inner);
-      }
-      setReads(map);
+      setReads((prev) => {
+        const map = new Map<string, Map<string, string>>();
+        for (const r of rds as Array<{ conversation_id: string; user_id: string; last_read_at: string }>) {
+          const inner = map.get(r.conversation_id) ?? new Map<string, string>();
+          inner.set(r.user_id, r.last_read_at);
+          map.set(r.conversation_id, inner);
+        }
+        // Never move a read marker backwards: a fresh local read (optimistic, or
+        // from realtime) must not be clobbered by a slightly stale DB row.
+        for (const [conv, inner] of prev) {
+          const m = map.get(conv) ?? new Map<string, string>();
+          for (const [uid, t] of inner) {
+            const cur = m.get(uid);
+            if (!cur || new Date(t).getTime() > new Date(cur).getTime()) m.set(uid, t);
+          }
+          map.set(conv, m);
+        }
+        return map;
+      });
     }
   }, [supabase, me]);
 
   // ---- Mark a conversation read ------------------------------------------
   const markRead = useCallback(async (convId: string) => {
-    const nowIso = new Date().toISOString();
+    // The watermark must cover every message currently loaded, regardless of any
+    // skew between this device's clock and the server's. Messages are stamped
+    // with server time, so if the phone clock is behind, a plain Date.now() can
+    // land before a just-read message and make it pop back as unread. Use the
+    // newest loaded message time when it's ahead of the local clock.
+    const arr = messagesRef.current.get(convId) ?? [];
+    let latest = 0;
+    for (const m of arr) {
+      const t = new Date(m.created_at).getTime();
+      if (t > latest) latest = t;
+    }
+    const iso = new Date(Math.max(Date.now(), latest)).toISOString();
     setReads((prev) => {
       const next = new Map(prev);
       const inner = new Map(next.get(convId) ?? new Map<string, string>());
-      inner.set(me, nowIso);
+      inner.set(me, iso);
       next.set(convId, inner);
       return next;
     });
     await supabase.from('chat_reads').upsert(
-      { conversation_id: convId, user_id: me, last_read_at: nowIso },
+      { conversation_id: convId, user_id: me, last_read_at: iso },
       { onConflict: 'conversation_id,user_id' },
     );
   }, [supabase, me]);
@@ -666,14 +694,18 @@ export default function ChatBubble({ me }: { me: string }) {
                 if (!q || sending) return;
                 setInput('');
                 send(q);
+                // Keep focus on the input so the mobile keyboard stays open.
+                inputRef.current?.focus();
               }}
               style={{ display: 'flex', gap: 8, padding: 10, borderTop: '1px solid var(--line)' }}
             >
               <input
+                ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Type a message…"
                 maxLength={2000}
+                enterKeyHint="send"
                 style={{
                   flex: 1, padding: '9px 12px', fontSize: 14, borderRadius: 8,
                   border: '1px solid var(--line)', background: 'var(--bg-light)', color: 'var(--cream)', outline: 'none',
@@ -681,6 +713,9 @@ export default function ChatBubble({ me }: { me: string }) {
               />
               <button
                 type="submit"
+                // Don't let tapping Send pull focus off the input (which would
+                // dismiss the mobile keyboard).
+                onMouseDown={(e) => e.preventDefault()}
                 disabled={sending || !input.trim()}
                 style={{
                   padding: '9px 14px', fontSize: 13, fontWeight: 800, borderRadius: 8, border: 'none',
