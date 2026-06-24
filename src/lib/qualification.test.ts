@@ -106,16 +106,31 @@ describe('projectBracket', () => {
     expect(used.size).toBe(8); // every qualifying group placed exactly once
   });
 
-  it('keeps the sixteen fixed pairings, in official venue order', () => {
+  it('matches the official R32 schedule exactly: venue + pairing per slot, in order', () => {
+    // Ground truth from the official 2026 schedule (FIFA matches 73-88), used to
+    // lock venue<->pairing alignment so a team can never land at the wrong stadium.
+    const OFFICIAL: [string, string, string][] = [
+      ['SoFi Stadium', '2A', '2B'],
+      ['Gillette Stadium', '1E', '3ABCDF'],
+      ['Estadio BBVA', '1F', '2C'],
+      ['NRG Stadium', '1C', '2F'],
+      ['MetLife Stadium', '1I', '3CDFGH'],
+      ['AT&T Stadium', '2E', '2I'],
+      ['Estadio Azteca', '1A', '3CEFHI'],
+      ['Mercedes-Benz Stadium', '1L', '3EHIJK'],
+      ["Levi's Stadium", '1D', '3BEFIJ'],
+      ['Lumen Field', '1G', '3AEHIJ'],
+      ['BMO Field', '2K', '2L'],
+      ['SoFi Stadium', '1H', '2J'],
+      ['BC Place', '1B', '3EFGIJ'],
+      ['Hard Rock Stadium', '1J', '2H'],
+      ['Arrowhead Stadium', '1K', '3DEIJL'],
+      ['AT&T Stadium', '2D', '2G'],
+    ];
     expect(R32_PAIRINGS).toHaveLength(16);
-    // First match is at SoFi (LA): 2A vs 2B.
-    expect(R32_PAIRINGS[0].venue).toBe('SoFi Stadium');
-    expect(seedLabel(R32_PAIRINGS[0].home)).toBe('2A');
-    expect(seedLabel(R32_PAIRINGS[0].away)).toBe('2B');
-    // 1E (e.g. Germany) is the Boston/Gillette match vs 3ABCDF.
-    const gillette = R32_PAIRINGS.find((p) => seedLabel(p.home) === '1E')!;
-    expect(gillette.venue).toBe('Gillette Stadium');
-    expect(seedLabel(gillette.away)).toBe('3ABCDF');
+    expect(
+      R32_PAIRINGS.map((p) => [p.venue, seedLabel(p.home), seedLabel(p.away)])
+    ).toEqual(OFFICIAL);
   });
 });
 

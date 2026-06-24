@@ -216,24 +216,31 @@ function mergeVenues(rows: FixtureRow[], ofRows: FixtureRow[]): void {
 /**
  * Backfill confirmed knockout teams from openfootball. football-data often
  * leaves a knockout slot empty (TBD) for a while after a group is decided,
- * whereas openfootball fills the group winner straight away. Knockout fixtures
- * line up one-to-one across both feeds in kickoff order, so we zip them and,
- * only where football-data still has TBD and openfootball names a real team,
- * copy the team across (football-data always wins when it has the slot).
+ * whereas openfootball fills the group winner straight away.
+ *
+ * Matches are paired by EXACT kickoff time, not by list position: a day can hold
+ * several knockout games, and the two feeds don't necessarily order them the
+ * same way, so an index zip can drop a team into the wrong fixture (e.g. putting
+ * Germany at Monterrey instead of Boston). Kickoff is unique per knockout match,
+ * so it pins each team to the correct fixture. We only fill where football-data
+ * still has TBD and openfootball names a real team; football-data always wins.
  * Mutates `rows` in place.
  */
 export function mergeKnockoutTeams(rows: FixtureRow[], ofRows: FixtureRow[]): void {
-  const byKickoff = (a: FixtureRow, b: FixtureRow) =>
-    Date.parse(a.kickoff) - Date.parse(b.kickoff);
-  const fdKO = rows.filter((r) => KNOCKOUT_STAGES.has(r.stage)).sort(byKickoff);
-  const ofKO = ofRows.filter((r) => r.group_name == null && r.stage !== 'GROUP_STAGE').sort(byKickoff);
+  const minute = (iso: string) => Math.floor(Date.parse(iso) / 60000);
 
-  const n = Math.min(fdKO.length, ofKO.length);
-  for (let i = 0; i < n; i++) {
-    const fd = fdKO[i];
-    const of = ofKO[i];
-    // Safety: only trust the pairing if both feeds agree on the calendar day.
-    if (fd.kickoff.slice(0, 10) !== of.kickoff.slice(0, 10)) continue;
+  // Index openfootball knockout fixtures by kickoff minute (unique per match).
+  const ofByKickoff = new Map<number, FixtureRow>();
+  for (const r of ofRows) {
+    if (r.group_name != null || r.stage === 'GROUP_STAGE') continue; // knockout only
+    const k = minute(r.kickoff);
+    if (!Number.isNaN(k) && !ofByKickoff.has(k)) ofByKickoff.set(k, r);
+  }
+
+  for (const fd of rows) {
+    if (!KNOCKOUT_STAGES.has(fd.stage)) continue;
+    const of = ofByKickoff.get(minute(fd.kickoff));
+    if (!of) continue; // no exact-time match -> leave TBD rather than risk misplacing
     fillKnockoutSide(fd, 'home', of.home_code, of.home_team);
     fillKnockoutSide(fd, 'away', of.away_code, of.away_team);
   }
