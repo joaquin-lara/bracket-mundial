@@ -100,11 +100,18 @@ export default function AsItStands({
     if (t.rows[1]) out.push({ label: `2${g}`, row: t.rows[1], className: 'qualify' });
     return out;
   });
-  const thirdRows: SummaryRow[] = thirds.map((t, i) => ({
+  const thirdRows: SummaryRow[] = thirds.map((t) => ({
     label: `3${t.group}`,
     row: t.row,
-    className: t.qualifies ? 'qualify' : i === 8 ? 'maybe' : '',
+    className: t.qualifies ? 'qualify' : 'third-out',
   }));
+
+  const fourthRows: SummaryRow[] = tables
+    .filter((t) => t.rows[3])
+    .sort((a, b) => groupLetter(a.name).localeCompare(groupLetter(b.name)))
+    .map((t) => ({ label: `4${groupLetter(t.name)}`, row: t.rows[3], className: 'third-out' }));
+
+  const nonQualRows = [...thirdRows, ...fourthRows];
 
   return (
     <section className="ais-section">
@@ -140,8 +147,10 @@ export default function AsItStands({
           </div>
         </div>
         <div className="ais-summary-table">
-          <p className="ais-table-label">Best third-placed teams</p>
-          <SummaryTable rows={thirdRows} colHeader="Pos" />
+          <p className="ais-table-label">3rd and 4th place teams</p>
+          <div className="ais-table-scroll">
+            <SummaryTable rows={nonQualRows} colHeader="Pos" />
+          </div>
         </div>
       </div>
 

@@ -21,6 +21,26 @@
 
 * {
   box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244, 241, 232, 0.2) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(244, 241, 232, 0.18);
+  border-radius: 99px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(240, 211, 138, 0.45);
 }
 
 body {
@@ -2842,6 +2862,14 @@ table.standings tr.me td {
   background: rgba(244, 241, 232, 0.09);
 }
 
+.group-table tr.third-out td {
+  background: rgba(255, 138, 115, 0.12);
+}
+
+.group-table tr.third-out td.gt-pts {
+  color: var(--danger);
+}
+
 /* ---- as it stands ---- */
 
 .ais-section {
@@ -2938,16 +2966,17 @@ table.standings tr.me td {
   align-items: start;
 }
 
+.ais-table-scroll {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
 @media (max-width: 720px) {
   .ais-summary {
     grid-template-columns: repeat(2, 78vw);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 8px;
-  }
-  .ais-table-scroll {
-    max-height: 350px;
-    overflow-y: auto;
   }
 }
 
