@@ -7,7 +7,7 @@ import { ensureFreshScores } from '@/lib/autoSync';
 import { fairPlayByCode, type DisciplineRow } from '@/lib/fairPlay';
 import { computeGroupTables } from '@/lib/groups';
 import { TEAMS } from '@/lib/ml/teams';
-import { projectBracket } from '@/lib/qualification';
+import { lockedSeeds, projectBracket } from '@/lib/qualification';
 import { createClient } from '@/lib/supabase/server';
 import { fillKnockoutVenues } from '@/lib/venues';
 import type { Match } from '@/lib/types';
@@ -58,6 +58,7 @@ export default async function BracketPage() {
   const hasRealKnockout = knockoutMatches.some((m) => m.home_team !== 'TBD' && m.away_team !== 'TBD');
   const anyGroupPlayed = allMatches.some((m) => m.group_name && m.status === 'FINISHED');
   const projected = projectBracket(groupTables);
+  const locked = lockedSeeds(groupTables, allMatches);
 
   return (
     <div className="bracket-page">
@@ -77,6 +78,7 @@ export default async function BracketPage() {
         byStage={byStage}
         thirdPlace={thirdPlace}
         projected={projected}
+        locked={locked}
         showToggle={!hasRealKnockout && anyGroupPlayed}
       />
 

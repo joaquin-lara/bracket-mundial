@@ -215,8 +215,17 @@ interface Eval {
   canTop3: boolean;
 }
 
-/** Outlook for every team in a group, given the full fixture list. */
-export function groupOutlooks(table: GroupTable, allMatches: Match[]): TeamOutlook[] {
+type Combo = { pts: Map<string, number>; own: Map<string, 'W' | 'D' | 'L'> };
+
+/**
+ * Expand a group's remaining fixtures into every win/draw/loss combination,
+ * recording the final points each team would hold and each side's own result
+ * per combo. Shared by the outlook notes and the locked-position placement.
+ */
+function buildCombos(
+  table: GroupTable,
+  allMatches: Match[]
+): { teams: string[]; remaining: Match[]; combos: Combo[] } {
   const teams = table.rows.map((r) => r.team);
   const base = new Map(table.rows.map((r) => [r.team, r.pts]));
 
@@ -228,9 +237,7 @@ export function groupOutlooks(table: GroupTable, allMatches: Match[]): TeamOutlo
       base.has(m.away_team)
   );
 
-  // Expand remaining games into every win/draw/loss combination, recording the
-  // final points each team would hold and each side's own result per combo.
-  const combos: { pts: Map<string, number>; own: Map<string, 'W' | 'D' | 'L'> }[] = [];
+  const combos: Combo[] = [];
   const build = (i: number, pts: Map<string, number>, own: Map<string, 'W' | 'D' | 'L'>) => {
     if (i === remaining.length) {
       combos.push({ pts: new Map(pts), own: new Map(own) });
@@ -259,6 +266,13 @@ export function groupOutlooks(table: GroupTable, allMatches: Match[]): TeamOutlo
   };
   build(0, base, new Map());
 
+  return { teams, remaining, combos };
+}
+
+/** Outlook for every team in a group, given the full fixture list. */
+export function groupOutlooks(table: GroupTable, allMatches: Match[]): TeamOutlook[] {
+  const { teams, remaining, combos } = buildCombos(table, allMatches);
+
   return teams.map((team) => {
     const code = table.rows.find((r) => r.team === team)!.code;
     const ev = evaluate(team, teams, combos);
@@ -266,6 +280,40 @@ export function groupOutlooks(table: GroupTable, allMatches: Match[]): TeamOutlo
     const note = noteFor(team, ev, status, remaining, combos);
     return { team, code, status, note };
   });
+}
+
+/**
+ * Teams whose exact group finish is mathematically locked, keyed by seed label
+ * ("1A" for the locked winner, "2C" for the locked runner-up). This lets the
+ * real bracket surface a team the moment its position is certain — ahead of the
+ * data feed, which only publishes a knockout slot once it has the official team.
+ *
+ * - 1st is locked when the team has clinched the group win.
+ * - 2nd is locked when the team has clinched a top-two spot but can no longer
+ *   win the group (so it can only be the runner-up).
+ *
+ * A team that has clinched top two but whose 1st/2nd is still in play is NOT
+ * included: it can't occupy a single bracket box yet. Third-place qualifiers
+ * are never locked here — that depends on the cross-group best-thirds race.
+ */
+export function lockedSeeds(
+  tables: GroupTable[],
+  allMatches: Match[]
+): Record<string, { team: string; code: string | null }> {
+  const out: Record<string, { team: string; code: string | null }> = {};
+  for (const table of tables) {
+    const letter = groupLetter(table.name);
+    const { teams, combos } = buildCombos(table, allMatches);
+    for (const row of table.rows) {
+      const ev = evaluate(row.team, teams, combos);
+      if (ev.clinchedWin) {
+        out[`1${letter}`] = { team: row.team, code: row.code };
+      } else if (ev.clinchedTop2 && !ev.canWin) {
+        out[`2${letter}`] = { team: row.team, code: row.code };
+      }
+    }
+  }
+  return out;
 }
 
 /** How many other teams sit above `team` on points: strict, and tie-inclusive. */

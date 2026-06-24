@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { computeGroupTables, type GroupRow, type GroupTable } from './groups';
 import {
   groupOutlooks,
+  lockedSeeds,
   projectBracket,
   rankThirds,
   R32_PAIRINGS,
@@ -159,6 +160,65 @@ describe('groupOutlooks', () => {
     expect(outlook['DDD']).toBe('eliminated');
   });
 
+});
+
+describe('lockedSeeds', () => {
+  it('locks 1st and 2nd once the group is fully decided', () => {
+    // AAA 9, BBB 6, CCC 3, DDD 0 — all games played, every position settled.
+    const matches = [
+      match('Group A', 'AAA', 'BBB', 1, 0),
+      match('Group A', 'AAA', 'CCC', 1, 0),
+      match('Group A', 'AAA', 'DDD', 1, 0),
+      match('Group A', 'BBB', 'CCC', 1, 0),
+      match('Group A', 'BBB', 'DDD', 1, 0),
+      match('Group A', 'CCC', 'DDD', 1, 0),
+    ];
+    const tables = computeGroupTables(matches);
+    const locked = lockedSeeds(tables, matches);
+    expect(locked['1A']?.team).toBe('AAA');
+    expect(locked['2A']?.team).toBe('BBB');
+    // Third place is never locked here (it depends on the cross-group race).
+    expect(locked['3A']).toBeUndefined();
+  });
+
+  it('does not lock a position while 1st vs 2nd is still in play', () => {
+    // After two rounds AAA and BBB are both on 6, CCC and DDD on 0. Final round:
+    // AAA-BBB and CCC-DDD. Both AAA and BBB have clinched top two, but the head
+    // game decides which is 1st — so neither can be placed in a single box yet.
+    const matches = [
+      match('Group B', 'AAA', 'CCC', 1, 0),
+      match('Group B', 'AAA', 'DDD', 1, 0),
+      match('Group B', 'BBB', 'CCC', 1, 0),
+      match('Group B', 'BBB', 'DDD', 1, 0),
+      match('Group B', 'AAA', 'BBB', null, null), // decides 1st vs 2nd
+      match('Group B', 'CCC', 'DDD', null, null),
+    ];
+    const tables = computeGroupTables(matches);
+    const locked = lockedSeeds(tables, matches);
+    expect(locked['1B']).toBeUndefined();
+    expect(locked['2B']).toBeUndefined();
+  });
+
+  it('locks 1st and 2nd while the group still has a game left to play', () => {
+    // AAA and BBB are both done: AAA won all three (9), BBB won the two it could
+    // (6). The only game left is CCC-DDD between the bottom two (max 3 each), so
+    // it can't disturb the top two — AAA is locked 1st, BBB locked 2nd already.
+    const matches = [
+      match('Group C', 'AAA', 'BBB', 1, 0),
+      match('Group C', 'AAA', 'CCC', 1, 0),
+      match('Group C', 'AAA', 'DDD', 1, 0),
+      match('Group C', 'BBB', 'CCC', 1, 0),
+      match('Group C', 'BBB', 'DDD', 1, 0),
+      match('Group C', 'CCC', 'DDD', null, null), // bottom two, can't reach the top
+    ];
+    const tables = computeGroupTables(matches);
+    const locked = lockedSeeds(tables, matches);
+    expect(locked['1C']?.team).toBe('AAA');
+    expect(locked['2C']?.team).toBe('BBB');
+  });
+});
+
+describe('groupOutlooks extra', () => {
   it('spells out what a fence team needs on the final matchday', () => {
     // After two rounds: AAA 6, BBB 3, CCC 3, DDD 0. Last round: AAA-DDD, BBB-CCC.
     const matches = [

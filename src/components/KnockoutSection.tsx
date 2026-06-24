@@ -97,10 +97,18 @@ interface Props {
   byStage: { stage: string; matches: Match[] }[];
   thirdPlace: Match[];
   projected: ProjectedMatch[];
+  /** Teams whose group position is mathematically locked, keyed by seed label. */
+  locked: Record<string, { team: string; code: string | null }>;
   showToggle: boolean;
 }
 
-export default function KnockoutSection({ byStage, thirdPlace, projected, showToggle }: Props) {
+export default function KnockoutSection({
+  byStage,
+  thirdPlace,
+  projected,
+  locked,
+  showToggle,
+}: Props) {
   const [useProjected, setUseProjected] = useState(false);
 
   const stageMap = useMemo(
@@ -111,14 +119,37 @@ export default function KnockoutSection({ byStage, thirdPlace, projected, showTo
   const hasKnockout = byStage.some((s) => s.matches.length > 0);
 
   const r32Matches = stageMap.get('LAST_32') ?? [];
-  const projectedR32 = useMemo(() => {
-    if (!useProjected) return r32Matches;
-    // Fill only the still-TBD slots with the projection; confirmed (real) teams
-    // are left exactly where the fixtures put them. Each projected team lands in
-    // its own slot (pairings are aligned to the fixtures by kickoff order), so no
-    // de-dup is needed: a confirmed team's slot is non-TBD, so the projection
-    // never fills it, and the projection never assigns one team to two slots.
+
+  // Always surface mathematically-locked teams into still-TBD slots, even with
+  // the projection off. The pairing for slot i is projected[i], so its seed
+  // labels ("1C", "2F") tell us which locked team belongs there. The data feed
+  // only publishes a knockout team once it has the official slot, so this fills
+  // the gap for teams whose position is certain but not yet in the feed.
+  const lockedR32 = useMemo(() => {
     return r32Matches.map((m, i) => {
+      const proj = projected[i];
+      if (!proj) return m;
+      const home = m.home_team === 'TBD' ? locked[proj.home.label] : undefined;
+      const away = m.away_team === 'TBD' ? locked[proj.away.label] : undefined;
+      if (!home && !away) return m;
+      return {
+        ...m,
+        home_team: home ? home.team : m.home_team,
+        home_code: home ? home.code : m.home_code,
+        away_team: away ? away.team : m.away_team,
+        away_code: away ? away.code : m.away_code,
+      };
+    });
+  }, [r32Matches, projected, locked]);
+
+  const projectedR32 = useMemo(() => {
+    if (!useProjected) return lockedR32;
+    // Fill the still-TBD slots with the projection; confirmed (real) and locked
+    // teams are left exactly where they are. Each projected team lands in its own
+    // slot (pairings are aligned to the fixtures by kickoff order), so no de-dup
+    // is needed: a filled slot is non-TBD, so the projection never overwrites it,
+    // and the projection never assigns one team to two slots.
+    return lockedR32.map((m, i) => {
       const proj = projected[i];
       if (!proj) return m;
       return {
@@ -129,7 +160,7 @@ export default function KnockoutSection({ byStage, thirdPlace, projected, showTo
         away_code: m.away_team === 'TBD' ? (proj.away.team?.code ?? null) : m.away_code,
       };
     });
-  }, [useProjected, r32Matches, projected]);
+  }, [useProjected, lockedR32, projected]);
 
   return (
     <>
