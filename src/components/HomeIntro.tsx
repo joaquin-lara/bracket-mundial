@@ -23,13 +23,16 @@ export default function HomeIntro() {
       if (!introDecision()) {
         if (topbar) gsap.set(topbar, { y: 0, opacity: 1 });
         gsap.set([stripes, heroContent, todayGames, contenders, signoutFooter].filter(Boolean), { opacity: 1 });
+        // No intro this visit: chat bubble (and anything else waiting) can show now.
+        window.dispatchEvent(new Event('bm-intro-done'));
         return;
       }
 
       // CSS already hides opacity; set the starting Y for the topbar slide.
       if (topbar) gsap.set(topbar, { y: -80 });
 
-      const tl = gsap.timeline();
+      // Tell the chat bubble to fade in once every home icon has popped in.
+      const tl = gsap.timeline({ onComplete: () => window.dispatchEvent(new Event('bm-intro-done')) });
 
       tl.to(stripes,        { opacity: 1, duration: 0.8, ease: 'power2.out' },  GLOBE_END - 0.2)
         .to(topbar,         { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, '<+0.6')

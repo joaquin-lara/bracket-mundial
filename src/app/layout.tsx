@@ -7,7 +7,6 @@ import EnableNotifications from '@/components/EnableNotifications';
 import HomeOnRefresh from '@/components/HomeOnRefresh';
 import PageTransitionProvider from '@/components/PageTransition';
 import PendingApproval from '@/components/PendingApproval';
-import PullToRefresh from '@/components/PullToRefresh';
 import TopNav from '@/components/TopNav';
 import ViewportLock from '@/components/ViewportLock';
 import { createClient } from '@/lib/supabase/server';
@@ -70,7 +69,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <PendingApproval rejected={signupStatus === 'rejected'} />
           ) : (
             <>
-              <PullToRefresh />
               <HomeOnRefresh />
               <AutoRefresh />
               {user && <TopNav achievementsRevealed={achievementsRevealed} isGuest={isGuestEmail(user.email)} />}

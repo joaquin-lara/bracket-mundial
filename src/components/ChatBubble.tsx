@@ -45,6 +45,7 @@ export default function ChatBubble({ me }: { me: string }) {
   const supabase = createClient();
 
   const [open, setOpen] = useState(false);
+  const [ready, setReady] = useState(false); // hold the bubble until the home intro finishes
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,6 +73,9 @@ export default function ChatBubble({ me }: { me: string }) {
   const activeConvId = activeOther === null ? groupConvId : (dmConvByUser.current.get(activeOther) ?? null);
 
   // ---- Presence (online dots + DM "delivered") ----------------------------
+  // Reads the shared presence store that ChallengeWatcher already populates
+  // site-wide, so the chat and home page agree on who is online and we never
+  // open a second presence channel (which can disrupt the first).
   const presence = useSyncExternalStore(subscribePresence, getPresence, getServerPresence);
   const isOnline = useCallback((id: string) => presence.has(id) && id !== me, [presence, me]);
 
@@ -290,6 +294,17 @@ export default function ChatBubble({ me }: { me: string }) {
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, view, activeOther, open]);
 
+  // Show the bubble only after the home intro animation has finished. On pages
+  // without the intro (the `.home-intro` marker is absent) it appears at once.
+  // A fallback timer guarantees it shows even if the event is ever missed.
+  useEffect(() => {
+    if (!document.querySelector('.home-intro')) { setReady(true); return; }
+    const onDone = () => setReady(true);
+    window.addEventListener('bm-intro-done', onDone);
+    const fallback = setTimeout(() => setReady(true), 8000);
+    return () => { window.removeEventListener('bm-intro-done', onDone); clearTimeout(fallback); };
+  }, []);
+
   // When a thread is open and focused, keep my read watermark current.
   useEffect(() => {
     if (!open || view !== 'thread' || !activeConvId) return;
@@ -388,9 +403,23 @@ export default function ChatBubble({ me }: { me: string }) {
   }
 
   const headerTitle = view === 'list' ? 'Chat' : (activeOther === null ? GROUP_CONV_NAME : nameOf(activeOther));
-  const headerSub = view === 'thread' && activeOther !== null
-    ? (isOnline(activeOther) ? 'online' : 'offline')
-    : (view === 'thread' && activeOther === null ? `${roster.length + 1} players` : null);
+  const groupOnlineCount = roster.filter((r) => isOnline(r.id)).length;
+  const selfOnline = presence.has(me); // I'm present in the shared presence store
+  let headerSub: string | null = null;
+  let headerOnline = false; // drives the green live dot in the header
+  if (view === 'thread') {
+    if (activeOther !== null) {
+      headerOnline = isOnline(activeOther);
+      headerSub = headerOnline ? 'online' : 'offline';
+    } else {
+      headerOnline = groupOnlineCount > 0;
+      headerSub = groupOnlineCount > 0 ? `${groupOnlineCount} online` : 'no one else online';
+    }
+  } else {
+    // List view: show my own live status so I can see I'm connected.
+    headerOnline = selfOnline;
+    headerSub = selfOnline ? "You're live" : 'connecting…';
+  }
 
   return (
     <>
@@ -415,6 +444,8 @@ export default function ChatBubble({ me }: { me: string }) {
           background: open ? 'var(--gold)' : 'var(--bg-light)',
           color: open ? 'var(--bg-dark)' : 'var(--gold)',
           boxShadow: '0 6px 20px rgba(0,0,0,0.35)',
+          opacity: ready ? 1 : 0,
+          pointerEvents: ready ? 'auto' : 'none',
           zIndex: 1000,
           display: 'flex',
           alignItems: 'center',
@@ -422,7 +453,7 @@ export default function ChatBubble({ me }: { me: string }) {
           touchAction: 'none',
           userSelect: 'none',
           WebkitUserSelect: 'none',
-          transition: `background 200ms ease, color 200ms ease, ${moveTransition}`,
+          transition: `opacity 400ms ease, background 200ms ease, color 200ms ease, ${moveTransition}`,
         }}
       >
         {open ? (
@@ -491,7 +522,10 @@ export default function ChatBubble({ me }: { me: string }) {
               {headerTitle}
             </div>
             {headerSub && (
-              <div style={{ fontSize: 11, color: headerSub === 'online' ? '#5fcf97' : 'var(--dim)' }}>{headerSub}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: headerOnline ? '#5fcf97' : 'var(--dim)' }}>
+                {headerOnline && <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#5fcf97', boxShadow: '0 0 6px #5fcf97' }} />}
+                {headerSub}
+              </div>
             )}
           </div>
           <button onClick={() => setOpen(false)} aria-label="Close" style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>×</button>
