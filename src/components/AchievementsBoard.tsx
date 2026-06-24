@@ -22,6 +22,8 @@ export interface BoardEarner {
 export interface BoardPlayer {
   userId: string;
   name: string;
+  /** The player's own accent color; falls back to PLAYER_META when omitted. */
+  color?: string | null;
 }
 interface Props {
   earners: Record<string, BoardEarner[]>;
@@ -34,8 +36,9 @@ const TIERS: Tier[] = ['common', 'rare', 'epic', 'legendary', 'platinum'];
 const TOTAL = ACHIEVEMENTS.length;
 
 const META = PLAYER_META as Record<string, { initial: string; color: string; flagCode: string }>;
-function metaFor(name: string) {
-  return META[name] ?? { initial: name.slice(0, 1).toUpperCase(), color: '#9aa5a0', flagCode: '' };
+function metaFor(p: { name: string; color?: string | null }) {
+  const base = META[p.name] ?? { initial: p.name.slice(0, 1).toUpperCase(), color: '#9aa5a0', flagCode: '' };
+  return { ...base, color: p.color ?? base.color };
 }
 
 type GroupMode = 'rarity' | 'category';
@@ -175,7 +178,7 @@ export default function AchievementsBoard({ earners, players, meId }: Props) {
       <div className="ach-players">
         {players.map((p) => {
           const count = earnedByUser.get(p.userId)?.size ?? 0;
-          const m = metaFor(p.name);
+          const m = metaFor(p);
           return (
             <button
               key={p.userId}
@@ -323,7 +326,7 @@ export default function AchievementsBoard({ earners, players, meId }: Props) {
                           <div className="ach-edots">
                             {players.map((p) => {
                               const has = earnedByUser.get(p.userId)?.has(a.id);
-                              const m = metaFor(p.name);
+                              const m = metaFor(p);
                               return (
                                 <span
                                   key={p.userId}
@@ -344,7 +347,7 @@ export default function AchievementsBoard({ earners, players, meId }: Props) {
                           {players.map((p) => {
                             const set = earnedByUser.get(p.userId) ?? new Set<string>();
                             const missing = PLATINUM_REQUIRED_IDS.filter((id) => !set.has(id)).length;
-                            const m = metaFor(p.name);
+                            const m = metaFor(p);
                             return (
                               <div key={p.userId} className="ach-detail-row">
                                 <span className="ach-edot has" style={{ background: m.color, color: '#0b3d2c' }}>
@@ -363,7 +366,7 @@ export default function AchievementsBoard({ earners, players, meId }: Props) {
                         <div className="ach-detail">
                           {players.map((p) => {
                             const e = got4.find((x) => x.userId === p.userId);
-                            const m = metaFor(p.name);
+                            const m = metaFor(p);
                             return (
                               <div key={p.userId} className="ach-detail-row">
                                 <span

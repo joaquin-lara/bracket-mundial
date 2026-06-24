@@ -3,7 +3,7 @@ import AchievementsBoard, { type BoardEarner, type BoardPlayer } from '@/compone
 import { ensureFreshScores } from '@/lib/autoSync';
 import { ensureAchievements } from '@/lib/achievementsSync';
 import { createClient } from '@/lib/supabase/server';
-import { GUEST_NAME, PLAYERS, isAchievementsPreviewUser } from '@/lib/players';
+import { GUEST_NAME, PLAYER_META, PLAYERS, isAchievementsPreviewUser } from '@/lib/players';
 
 export const metadata: Metadata = { title: 'Achievements' };
 export const dynamic = 'force-dynamic';
@@ -48,7 +48,7 @@ export default async function AchievementsPage() {
 
   const [{ data: rows }, { data: profiles }, { data: matchRows }] = await Promise.all([
     supabase.from('user_achievements').select('user_id, achievement_id, earned_at, match_id'),
-    supabase.from('profiles').select('id, display_name'),
+    supabase.from('profiles').select('id, display_name, status, color, founder_slot'),
     supabase.from('matches').select('id, home_code, away_code, home_score, away_score, kickoff'),
   ]);
 
@@ -89,13 +89,30 @@ export default async function AchievementsPage() {
     earners[r.achievement_id].push({ userId: r.user_id, name, detail, earnedAt: r.earned_at });
   }
 
-  // Players in the fixed roster order, only those with a profile.
-  const idByName = new Map<string, string>();
-  for (const [id, name] of nameById) idByName.set(name, id);
-  const players: BoardPlayer[] = PLAYERS.filter((n) => idByName.has(n)).map((n) => ({
-    userId: idByName.get(n)!,
-    name: n,
-  }));
+  // Selector roster: founders first (fixed order, matched by founder_slot so a
+  // renamed founder still lands in place), then every other approved player —
+  // this is what makes newly approved signups show up here too.
+  type Prof = {
+    id: string;
+    display_name: string;
+    status?: string | null;
+    color?: string | null;
+    founder_slot?: string | null;
+  };
+  const approvedProfiles = ((profiles ?? []) as Prof[]).filter(
+    (p) => p.display_name !== GUEST_NAME && p.status === 'approved'
+  );
+  const bySlot = new Map<string, Prof>();
+  for (const p of approvedProfiles) if (p.founder_slot) bySlot.set(p.founder_slot, p);
+  const players: BoardPlayer[] = [];
+  for (const slot of PLAYERS) {
+    const prof = bySlot.get(slot);
+    if (prof) players.push({ userId: prof.id, name: prof.display_name, color: prof.color ?? PLAYER_META[slot].color });
+  }
+  for (const p of approvedProfiles) {
+    if (p.founder_slot) continue;
+    players.push({ userId: p.id, name: p.display_name, color: p.color ?? null });
+  }
 
   return (
     <main>
