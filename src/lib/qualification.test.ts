@@ -106,31 +106,38 @@ describe('projectBracket', () => {
     expect(used.size).toBe(8); // every qualifying group placed exactly once
   });
 
-  it('matches the official R32 schedule exactly: venue + pairing per slot, in order', () => {
-    // Ground truth from the official 2026 schedule (FIFA matches 73-88), used to
-    // lock venue<->pairing alignment so a team can never land at the wrong stadium.
+  it('matches the official R32 schedule exactly, in UTC kickoff order', () => {
+    // Ground truth: the official 2026 R32, ordered by UTC kickoff (the order the
+    // fixtures sort into) — venue + both seeds per slot. Locks venue<->pairing
+    // alignment so a team can never land at the wrong stadium.
     const OFFICIAL: [string, string, string][] = [
-      ['SoFi Stadium', '2A', '2B'],
-      ['Gillette Stadium', '1E', '3ABCDF'],
-      ['Estadio BBVA', '1F', '2C'],
-      ['NRG Stadium', '1C', '2F'],
-      ['MetLife Stadium', '1I', '3CDFGH'],
-      ['AT&T Stadium', '2E', '2I'],
-      ['Estadio Azteca', '1A', '3CEFHI'],
-      ['Mercedes-Benz Stadium', '1L', '3EHIJK'],
-      ["Levi's Stadium", '1D', '3BEFIJ'],
-      ['Lumen Field', '1G', '3AEHIJ'],
-      ['BMO Field', '2K', '2L'],
-      ['SoFi Stadium', '1H', '2J'],
-      ['BC Place', '1B', '3EFGIJ'],
-      ['Hard Rock Stadium', '1J', '2H'],
-      ['Arrowhead Stadium', '1K', '3DEIJL'],
-      ['AT&T Stadium', '2D', '2G'],
+      ['SoFi Stadium', '2A', '2B'], // Los Angeles
+      ['NRG Stadium', '1C', '2F'], // Houston
+      ['Gillette Stadium', '1E', '3ABCDF'], // Boston
+      ['Estadio BBVA', '1F', '2C'], // Monterrey
+      ['AT&T Stadium', '2E', '2I'], // Dallas
+      ['MetLife Stadium', '1I', '3CDFGH'], // New York/New Jersey
+      ['Estadio Azteca', '1A', '3CEFHI'], // Mexico City
+      ['Mercedes-Benz Stadium', '1L', '3EHIJK'], // Atlanta
+      ['Lumen Field', '1G', '3AEHIJ'], // Seattle
+      ["Levi's Stadium", '1D', '3BEFIJ'], // San Francisco Bay Area
+      ['SoFi Stadium', '1H', '2J'], // Los Angeles
+      ['BMO Field', '2K', '2L'], // Toronto
+      ['BC Place', '1B', '3EFGIJ'], // Vancouver
+      ['AT&T Stadium', '2D', '2G'], // Dallas
+      ['Hard Rock Stadium', '1J', '2H'], // Miami
+      ['Arrowhead Stadium', '1K', '3DEIJL'], // Kansas City
     ];
     expect(R32_PAIRINGS).toHaveLength(16);
     expect(
       R32_PAIRINGS.map((p) => [p.venue, seedLabel(p.home), seedLabel(p.away)])
     ).toEqual(OFFICIAL);
+  });
+
+  it('is ordered by kickoff (so it aligns with the kickoff-sorted fixtures)', () => {
+    const times = R32_PAIRINGS.map((p) => Date.parse(p.kickoff));
+    const sorted = [...times].sort((a, b) => a - b);
+    expect(times).toEqual(sorted);
   });
 });
 

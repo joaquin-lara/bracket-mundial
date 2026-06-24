@@ -23,33 +23,38 @@ type Seed =
 
 interface Pairing {
   match: number;
+  kickoff: string; // official UTC kickoff; the array is kept in kickoff order
   venue: string; // host stadium (matches VENUES[].stadium) — single source of truth
   home: Seed;
   away: Seed;
 }
 
 /**
- * The 16 Round-of-32 pairings in official match order (FIFA 73→88), each with
- * its host stadium. This order matches the fixtures' kickoff order and is the
- * single source the venue list derives from, so teams and venues can't drift.
+ * The 16 Round-of-32 pairings, each with its host stadium and kickoff, in
+ * **UTC kickoff order** — which is how the fixtures sort in the DB. FIFA's match
+ * numbers are NOT in UTC order (timezones: a noon local game can kick off in UTC
+ * before an earlier-numbered evening game), so ordering by match number would
+ * misalign venues and teams against the kickoff-sorted fixtures. The venue list
+ * derives from this, so pairings and venues can never drift.
+ * (FIFA match number shown in the trailing comment.)
  */
 export const R32_PAIRINGS: Pairing[] = [
-  { match: 1, venue: 'SoFi Stadium', home: pos(2, 'A'), away: pos(2, 'B') },
-  { match: 2, venue: 'Gillette Stadium', home: pos(1, 'E'), away: third('ABCDF') },
-  { match: 3, venue: 'Estadio BBVA', home: pos(1, 'F'), away: pos(2, 'C') },
-  { match: 4, venue: 'NRG Stadium', home: pos(1, 'C'), away: pos(2, 'F') },
-  { match: 5, venue: 'MetLife Stadium', home: pos(1, 'I'), away: third('CDFGH') },
-  { match: 6, venue: 'AT&T Stadium', home: pos(2, 'E'), away: pos(2, 'I') },
-  { match: 7, venue: 'Estadio Azteca', home: pos(1, 'A'), away: third('CEFHI') },
-  { match: 8, venue: 'Mercedes-Benz Stadium', home: pos(1, 'L'), away: third('EHIJK') },
-  { match: 9, venue: "Levi's Stadium", home: pos(1, 'D'), away: third('BEFIJ') },
-  { match: 10, venue: 'Lumen Field', home: pos(1, 'G'), away: third('AEHIJ') },
-  { match: 11, venue: 'BMO Field', home: pos(2, 'K'), away: pos(2, 'L') },
-  { match: 12, venue: 'SoFi Stadium', home: pos(1, 'H'), away: pos(2, 'J') },
-  { match: 13, venue: 'BC Place', home: pos(1, 'B'), away: third('EFGIJ') },
-  { match: 14, venue: 'Hard Rock Stadium', home: pos(1, 'J'), away: pos(2, 'H') },
-  { match: 15, venue: 'Arrowhead Stadium', home: pos(1, 'K'), away: third('DEIJL') },
-  { match: 16, venue: 'AT&T Stadium', home: pos(2, 'D'), away: pos(2, 'G') },
+  { match: 1, kickoff: '2026-06-28T19:00:00Z', venue: 'SoFi Stadium', home: pos(2, 'A'), away: pos(2, 'B') }, // 73 Los Angeles
+  { match: 2, kickoff: '2026-06-29T17:00:00Z', venue: 'NRG Stadium', home: pos(1, 'C'), away: pos(2, 'F') }, // 76 Houston
+  { match: 3, kickoff: '2026-06-29T20:30:00Z', venue: 'Gillette Stadium', home: pos(1, 'E'), away: third('ABCDF') }, // 74 Boston
+  { match: 4, kickoff: '2026-06-30T01:00:00Z', venue: 'Estadio BBVA', home: pos(1, 'F'), away: pos(2, 'C') }, // 75 Monterrey
+  { match: 5, kickoff: '2026-06-30T17:00:00Z', venue: 'AT&T Stadium', home: pos(2, 'E'), away: pos(2, 'I') }, // 78 Dallas
+  { match: 6, kickoff: '2026-06-30T21:00:00Z', venue: 'MetLife Stadium', home: pos(1, 'I'), away: third('CDFGH') }, // 77 New York/New Jersey
+  { match: 7, kickoff: '2026-07-01T01:00:00Z', venue: 'Estadio Azteca', home: pos(1, 'A'), away: third('CEFHI') }, // 79 Mexico City
+  { match: 8, kickoff: '2026-07-01T16:00:00Z', venue: 'Mercedes-Benz Stadium', home: pos(1, 'L'), away: third('EHIJK') }, // 80 Atlanta
+  { match: 9, kickoff: '2026-07-01T20:00:00Z', venue: 'Lumen Field', home: pos(1, 'G'), away: third('AEHIJ') }, // 82 Seattle
+  { match: 10, kickoff: '2026-07-02T00:00:00Z', venue: "Levi's Stadium", home: pos(1, 'D'), away: third('BEFIJ') }, // 81 San Francisco Bay Area
+  { match: 11, kickoff: '2026-07-02T19:00:00Z', venue: 'SoFi Stadium', home: pos(1, 'H'), away: pos(2, 'J') }, // 84 Los Angeles
+  { match: 12, kickoff: '2026-07-02T23:00:00Z', venue: 'BMO Field', home: pos(2, 'K'), away: pos(2, 'L') }, // 83 Toronto
+  { match: 13, kickoff: '2026-07-03T03:00:00Z', venue: 'BC Place', home: pos(1, 'B'), away: third('EFGIJ') }, // 85 Vancouver
+  { match: 14, kickoff: '2026-07-03T18:00:00Z', venue: 'AT&T Stadium', home: pos(2, 'D'), away: pos(2, 'G') }, // 88 Dallas
+  { match: 15, kickoff: '2026-07-03T22:00:00Z', venue: 'Hard Rock Stadium', home: pos(1, 'J'), away: pos(2, 'H') }, // 86 Miami
+  { match: 16, kickoff: '2026-07-04T01:30:00Z', venue: 'Arrowhead Stadium', home: pos(1, 'K'), away: third('DEIJL') }, // 87 Kansas City
 ];
 
 function pos(p: 1 | 2, group: string): Seed {
