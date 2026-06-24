@@ -87,6 +87,17 @@ export default function ChatBubble({ me }: { me: string }) {
   const cornerRef = useRef<Corner>('br');
   const setCoords = useCallback((c: XY) => { coordsRef.current = c; setCoordsState(c); }, []);
   const drag = useRef({ active: false, moved: false, sx: 0, sy: 0, ox: 0, oy: 0 });
+  // Imperative drag: write position straight to the DOM (one write per frame)
+  // so a live drag never re-renders the whole chat. State only updates on release.
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const pendingRef = useRef<XY | null>(null);
+  const flushPos = useCallback(() => {
+    rafRef.current = null;
+    const el = buttonRef.current;
+    const p = pendingRef.current;
+    if (el && p) { el.style.left = `${p.x}px`; el.style.top = `${p.y}px`; }
+  }, []);
 
   useLayoutEffect(() => {
     let saved: Corner = 'br';
@@ -122,14 +133,20 @@ export default function ChatBubble({ me }: { me: string }) {
     let ny = e.clientY - d.oy;
     nx = Math.max(EDGE, Math.min(nx, w - BTN_SIZE - EDGE));
     ny = Math.max(EDGE, Math.min(ny, h - BTN_SIZE - EDGE));
-    setCoords({ x: nx, y: ny });
-  }, [open, setCoords]);
+    // No setState during the drag: stash the position, keep the ref in sync (so
+    // any incidental re-render stays consistent), and paint once per frame.
+    const next = { x: nx, y: ny };
+    pendingRef.current = next;
+    coordsRef.current = next;
+    if (rafRef.current == null) rafRef.current = requestAnimationFrame(flushPos);
+  }, [open, flushPos]);
 
   const endDrag = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
     const d = drag.current;
     if (!d.active) return;
     d.active = false;
     try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
+    if (rafRef.current != null) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
     if (open) { setOpen(false); return; }
     if (!d.moved) { setOpen(true); return; }
     const w = window.innerWidth, h = window.innerHeight;
@@ -146,11 +163,15 @@ export default function ChatBubble({ me }: { me: string }) {
     const d = drag.current;
     if (!d.active) return;
     d.active = false;
+    if (rafRef.current != null) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
     if (d.moved) {
       setDragging(false);
       setCoords(cornerCoords(cornerRef.current, window.innerWidth, window.innerHeight));
     }
   }, [setCoords]);
+
+  // Cancel any queued drag frame when the bubble unmounts.
+  useEffect(() => () => { if (rafRef.current != null) cancelAnimationFrame(rafRef.current); }, []);
 
   // ---- Data loading -------------------------------------------------------
   const loadStatic = useCallback(async () => {
@@ -377,7 +398,10 @@ export default function ChatBubble({ me }: { me: string }) {
   // ---- Derived positioning (verbatim Curva) -------------------------------
   const isTop = corner[0] === 't';
   const isLeft = corner[1] === 'l';
-  const buttonPos: React.CSSProperties = coords ? { left: coords.x, top: coords.y } : { right: MARGIN, bottom: MARGIN };
+  // While dragging, read the live ref (kept in sync without re-rendering) so any
+  // incidental re-render matches the DOM position the drag handler is writing.
+  const livePos = dragging ? coordsRef.current : coords;
+  const buttonPos: React.CSSProperties = livePos ? { left: livePos.x, top: livePos.y } : { right: MARGIN, bottom: MARGIN };
   const moveTransition = dragging ? 'none'
     : 'left 280ms cubic-bezier(0.22, 1, 0.36, 1), top 280ms cubic-bezier(0.22, 1, 0.36, 1)';
   const panelPos: React.CSSProperties = {
@@ -425,6 +449,7 @@ export default function ChatBubble({ me }: { me: string }) {
     <>
       {/* Floating toggle button (click to open, drag to reposition) */}
       <button
+        ref={buttonRef}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
