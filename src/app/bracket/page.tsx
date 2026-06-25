@@ -70,7 +70,7 @@ export default async function BracketPage() {
 
       <GroupTables tables={groupTables} />
 
-      {!hasRealKnockout && anyGroupPlayed && (
+      {anyGroupPlayed && (
         <AsItStands tables={groupTables} matches={allMatches} />
       )}
 
@@ -79,7 +79,7 @@ export default async function BracketPage() {
         thirdPlace={thirdPlace}
         projected={projected}
         locked={locked}
-        showToggle={!hasRealKnockout && anyGroupPlayed}
+        showToggle={anyGroupPlayed}
       />
 
       <CardsEditor initial={cardsRows} />
