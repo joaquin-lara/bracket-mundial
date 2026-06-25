@@ -5,6 +5,7 @@ import HomeIntro from '@/components/HomeIntro';
 import PitchStripes from '@/components/PitchStripes';
 import PresenceDot from '@/components/PresenceDot';
 import TodayGames from '@/components/TodayGames';
+import LiveOddsSection from '@/components/LiveOddsSection';
 import { GUEST_NAME, PLAYER_META, PLAYERS, isAdminEmail } from '@/lib/players';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { signOut } from '@/app/actions';
@@ -74,6 +75,7 @@ export default async function HomePage() {
     .gte('kickoff', from)
     .lte('kickoff', to)
     .order('kickoff', { ascending: true });
+  const allMatches = (todayMatches ?? []) as Match[];
 
   return (
     <div className="home-pitch">
@@ -86,7 +88,7 @@ export default async function HomePage() {
         </Link>
       )}
       <section className="hero">
-        <GlobeBackdrop matches={(todayMatches ?? []) as Match[]} />
+        <GlobeBackdrop matches={allMatches} />
 
         <div className="hero-content">
           <div className="pill">
@@ -113,7 +115,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <TodayGames matches={(todayMatches ?? []) as Match[]} />
+      <TodayGames matches={allMatches} />
+
+      <LiveOddsSection matches={allMatches} />
 
       <section className="contenders">
         <div className="contenders-head">

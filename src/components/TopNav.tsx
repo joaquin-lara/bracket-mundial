@@ -13,6 +13,7 @@ const BASE_LINKS: readonly (readonly [string, string])[] = [
   ['/standings', 'Player Standings'],
   ['/predictor', 'ML Predictor'],
   ['/duels', 'Penalty Shootouts'],
+  ['/gamblers', 'Gamblers'],
 ];
 
 export default function TopNav({

@@ -4,6 +4,7 @@ import './predictor.css';
 import Flag from '@/components/Flag';
 import ChartTag from '@/components/ChartTag';
 import MatchupPicker, { type LastLineup } from '@/components/MatchupPicker';
+import { MarketOddsProvider, MarketOddsRow } from '@/components/MarketOdds';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { createClient } from '@/lib/supabase/server';
 import type { Match, MatchLineups } from '@/lib/types';
@@ -249,51 +250,57 @@ export default async function PredictorPage() {
         <section className="ml-section">
           <h2 className="ml-h2">Upcoming fixtures, rated<ChartTag kind="prediction" /></h2>
           <p className="ml-lead">
-            Model predictions for the next World Cup 2026 matches — win/draw/win odds and the single likeliest score.
+            Model predictions for the next World Cup 2026 matches — win/draw/win odds and the single
+            likeliest score. Where Polymarket is trading the match, a live &ldquo;Market&rdquo; line
+            shows what bettors are pricing it at, refreshed every 20 seconds.
           </p>
-          <div className="ml-fixtures">
-            {upcoming.map((m) => {
-              const r = predict({ home: m.home_code!, away: m.away_code!, neutral: true })!;
-              return (
-                <div className="ml-fixture" key={m.id}>
-                  <div className="ml-fix-top">
-                    <span className="ml-fix-team">
-                      <Flag code={m.home_code} name={m.home_team} />
-                      {m.home_team}
-                    </span>
-                    <span className="ml-fix-meta">
-                      {stageLabel(m.stage, m.group_name)} ·{' '}
-                      {new Date(m.kickoff).toLocaleDateString(undefined, {
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </span>
-                    <span className="ml-fix-team ml-fix-right">
-                      {m.away_team}
-                      <Flag code={m.away_code} name={m.away_team} />
-                    </span>
+          <MarketOddsProvider>
+            <div className="ml-fixtures">
+              {upcoming.map((m) => {
+                const r = predict({ home: m.home_code!, away: m.away_code!, neutral: true })!;
+                return (
+                  <div className="ml-fixture" key={m.id}>
+                    <div className="ml-fix-top">
+                      <span className="ml-fix-team">
+                        <Flag code={m.home_code} name={m.home_team} />
+                        {m.home_team}
+                      </span>
+                      <span className="ml-fix-meta">
+                        {stageLabel(m.stage, m.group_name)} ·{' '}
+                        {new Date(m.kickoff).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </span>
+                      <span className="ml-fix-team ml-fix-right">
+                        {m.away_team}
+                        <Flag code={m.away_code} name={m.away_team} />
+                      </span>
+                    </div>
+                    <div className="ml-fix-probs">
+                      <span>{pct(r.probHome)}</span>
+                      <span className="ml-fix-draw">{pct(r.probDraw)}</span>
+                      <span>{pct(r.probAway)}</span>
+                    </div>
+                    <MiniBar h={r.probHome} d={r.probDraw} a={r.probAway} />
+                    <div className="ml-fix-score">
+                      likely {r.mostLikelyScore.home}–{r.mostLikelyScore.away}
+                    </div>
+                    <MarketOddsRow home={m.home_code!} away={m.away_code!} />
                   </div>
-                  <div className="ml-fix-probs">
-                    <span>{pct(r.probHome)}</span>
-                    <span className="ml-fix-draw">{pct(r.probDraw)}</span>
-                    <span>{pct(r.probAway)}</span>
-                  </div>
-                  <MiniBar h={r.probHome} d={r.probDraw} a={r.probAway} />
-                  <div className="ml-fix-score">
-                    likely {r.mostLikelyScore.home}–{r.mostLikelyScore.away}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          </MarketOddsProvider>
         </section>
       )}
 
       <p className="ml-foot">
         Model and ratings rebuilt {lastUpdated} from {DATASET.source}. Dixon-Coles attack/defence with
         a low-score correction, blended with an Elo strength model and a FIFA squad talent-pool model
-        for steadier win/draw/win odds, computed in your browser and on the server. No external
-        prediction service.
+        for steadier win/draw/win odds, computed in your browser and on the server. The optional
+        &ldquo;Market&rdquo; line on each fixture is live, real-money pricing from Polymarket — shown
+        alongside the model, not used to compute it.
       </p>
     </main>
   );

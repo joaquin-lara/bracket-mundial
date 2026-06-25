@@ -46,28 +46,25 @@ export async function runLineupSync(admin: SupabaseClient): Promise<string[]> {
     const from = new Date(now - LIVE_BACK_MS).toISOString();
     const nowIso = new Date(now).toISOString();
 
-    // Kicked off, not finished, no lineup yet = a live game we can still fetch.
+    // Every live game, regardless of lineup status -- af_fixture_id is also
+    // needed later by statsSync (see src/lib/statsSync.ts), which can only
+    // use an id captured while the match was live.
     const { data } = await admin
       .from('matches')
       .select('id,home_team,away_team,home_code,away_code,kickoff,af_fixture_id,lineups,lineup_checked_at,lineup_attempts')
       .gte('kickoff', from)
       .lte('kickoff', nowIso)
-      .neq('status', 'FINISHED')
-      .is('lineups', null);
+      .neq('status', 'FINISHED');
 
-    const rows = (data as Row[] | null) ?? [];
-    const due = rows.filter(
-      (m) =>
-        m.home_code &&
-        m.away_code &&
-        (m.lineup_attempts ?? 0) < MAX_ATTEMPTS &&
-        (!m.lineup_checked_at || now - Date.parse(m.lineup_checked_at) >= RECHECK_MS)
-    );
-    if (due.length === 0) return done; // nothing live -> no API calls
+    const liveRows = ((data as Row[] | null) ?? []).filter((m) => m.home_code && m.away_code);
+    const idDue = liveRows.filter((m) => !m.af_fixture_id);
 
     // Map our football-data rows to API-Football fixture ids via the live feed
-    // (one call, shared across every live match this run).
-    if (due.some((m) => !m.af_fixture_id)) {
+    // (one call, shared across every live match this run). Runs for ANY live
+    // match still missing an id -- cheap (one shared call), and broader than
+    // the lineup-fetch loop below so stats can use the id later even for
+    // matches whose lineup was already found.
+    if (idDue.length > 0) {
       try {
         const fixtures = await fetchWcFixtures(key);
         const byPair = new Map<string, { id: number; t: number }[]>();
@@ -80,8 +77,7 @@ export async function runLineupSync(admin: SupabaseClient): Promise<string[]> {
           arr.push({ id: f.id, t: Date.parse(f.date) });
           byPair.set(key2, arr);
         }
-        for (const m of due) {
-          if (m.af_fixture_id) continue;
+        for (const m of idDue) {
           const cands = byPair.get([m.home_code!, m.away_code!].sort().join('|'));
           if (!cands?.length) continue;
           const kt = Date.parse(m.kickoff);
@@ -94,6 +90,16 @@ export async function runLineupSync(admin: SupabaseClient): Promise<string[]> {
         /* mapping failed; try again next run */
       }
     }
+
+    // Of the live matches, only those still missing a lineup spend an actual
+    // fetchLineups call -- unchanged budget from before this change.
+    const due = liveRows.filter(
+      (m) =>
+        m.lineups == null &&
+        (m.lineup_attempts ?? 0) < MAX_ATTEMPTS &&
+        (!m.lineup_checked_at || now - Date.parse(m.lineup_checked_at) >= RECHECK_MS)
+    );
+    if (due.length === 0) return done; // nothing left needing a lineup call
 
     let calls = 0;
     for (const m of due) {

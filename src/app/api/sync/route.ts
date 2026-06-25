@@ -5,7 +5,9 @@ import { runSync } from '@/lib/sync';
 import { makeSupabaseSyncDb } from '@/lib/syncDb';
 import { runMatchNotifications } from '@/lib/push/notify';
 import { runLineupSync } from '@/lib/lineupSync';
+import { runStatsSync } from '@/lib/statsSync';
 import { ensureAchievements } from '@/lib/achievementsSync';
+import { ensureGamblerSettlement } from '@/lib/gamblers';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -42,6 +44,8 @@ export async function GET(request: NextRequest) {
 
   const notified = await runMatchNotifications(admin);
   const lineups = await runLineupSync(admin);
+  const stats = await runStatsSync(admin);
   await ensureAchievements().catch(() => {});
-  return NextResponse.json({ ok: true, ...result, notified, lineups });
+  await ensureGamblerSettlement(admin).catch(() => {});
+  return NextResponse.json({ ok: true, ...result, notified, lineups, stats });
 }

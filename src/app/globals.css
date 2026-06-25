@@ -644,6 +644,183 @@ h1 {
   background: var(--line);
 }
 
+/* ---- live odds (Polymarket) ---- */
+
+.live-odds {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 30px 36px 0;
+}
+
+.live-odds-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .live-odds-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.live-odds-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.live-odds-dot {
+  background: var(--danger);
+  animation: live-odds-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes live-odds-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.live-odds-card {
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px 20px 16px;
+}
+
+.live-odds-teams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.live-odds-team {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.live-odds-team.right {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.live-odds-vs {
+  font-family: var(--narrow);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  flex-shrink: 0;
+}
+
+.live-odds-stage {
+  text-align: center;
+  font-family: var(--narrow);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-top: 4px;
+}
+
+.odds-bar {
+  display: flex;
+  height: 22px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 16px;
+  background: var(--line);
+}
+
+.odds-seg {
+  display: block;
+  height: 100%;
+}
+
+.odds-seg-h {
+  background: var(--gold);
+}
+
+.odds-seg-d {
+  background: var(--dim);
+}
+
+.odds-seg-a {
+  background: #5aa9e6;
+}
+
+.odds-legend {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.odds-legend-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.odds-legend-item:last-child {
+  justify-content: flex-end;
+}
+
+.odds-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.odds-dot-h {
+  background: var(--gold);
+}
+
+.odds-dot-d {
+  background: var(--dim);
+}
+
+.odds-dot-a {
+  background: #5aa9e6;
+}
+
+.odds-legend-name {
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.odds-legend-pct {
+  font-weight: 800;
+  margin-left: auto;
+}
+
+.live-odds-foot {
+  font-size: 12px;
+  color: var(--dim);
+  margin: 14px 0 0;
+  line-height: 1.5;
+}
+
+.live-odds-empty {
+  text-align: center;
+  margin-top: 16px;
+}
+
+@media (max-width: 640px) {
+  .live-odds-teams {
+    font-size: 13px;
+  }
+}
+
 .contender-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

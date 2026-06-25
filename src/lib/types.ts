@@ -13,6 +13,7 @@ export interface Match {
   scored: boolean;
   venue: string | null;
   lineups?: MatchLineups | null;
+  match_stats?: MatchStats | null;
 }
 
 export interface LineupPlayer {
@@ -31,12 +32,103 @@ export interface MatchLineups {
   away: TeamLineup;
 }
 
+export interface TeamMatchStats {
+  shotsOnGoal: number | null;
+  shotsOffGoal: number | null;
+  totalShots: number | null;
+  blockedShots: number | null;
+  shotsInsideBox: number | null;
+  shotsOutsideBox: number | null;
+  fouls: number | null;
+  cornerKicks: number | null;
+  offsides: number | null;
+  possession: number | null; // parsed from "55%" -> 55
+  yellowCards: number | null;
+  redCards: number | null;
+  goalkeeperSaves: number | null;
+}
+export interface MatchStats {
+  home: TeamMatchStats;
+  away: TeamMatchStats;
+}
+
 export interface Prediction {
   id: string;
   match_id: number;
   pred_home: number;
   pred_away: number;
   points: number | null;
+}
+
+export const GAMBLER_MARKETS = [
+  'winner',
+  'exact_score',
+  'corners',
+  'shots_on_goal',
+  'shots_off_goal',
+  'total_shots',
+  'blocked_shots',
+  'shots_inside_box',
+  'shots_outside_box',
+  'fouls',
+  'yellow_cards',
+  'red_cards',
+  'possession',
+] as const;
+export type GamblerMarket = (typeof GAMBLER_MARKETS)[number];
+
+export type GamblerSide = 'home' | 'away' | 'total';
+export type GamblerComparator = 'over' | 'under' | 'eq';
+
+// One row = one prediction on one match. winner/exact_score use `pick`/
+// `pick_home_score`/`pick_away_score`; every other market uses `side` +
+// `comparator` + `line` (the fixed threshold from gambler_market_odds).
+export interface GamblerLeg {
+  match_id: number;
+  market: GamblerMarket;
+  side: GamblerSide | null;
+  comparator: GamblerComparator | null;
+  line: number | null;
+  pick: 'home' | 'draw' | 'away' | null;
+  pick_home_score: number | null;
+  pick_away_score: number | null;
+}
+
+export interface GamblerBet extends GamblerLeg {
+  id: string;
+  user_id: string;
+  amount: number;
+  payout_multiplier: number;
+  status: 'pending' | 'won' | 'lost';
+  payout: number | null;
+  created_at: string;
+  settled_at: string | null;
+}
+
+export interface GamblerParlayLeg extends GamblerLeg {
+  id: string;
+  ticket_id: string;
+  payout_multiplier: number;
+  status: 'pending' | 'won' | 'lost';
+  leg_index: number;
+}
+
+export interface GamblerParlayTicket {
+  id: string;
+  user_id: string;
+  amount: number;
+  payout_multiplier: number;
+  status: 'pending' | 'won' | 'lost';
+  payout: number | null;
+  created_at: string;
+  settled_at: string | null;
+}
+
+export interface MarketOdds {
+  market: GamblerMarket;
+  side: GamblerSide | null;
+  line: number | null;
+  payout_multiplier: number;
 }
 
 export interface RevealedPick {
