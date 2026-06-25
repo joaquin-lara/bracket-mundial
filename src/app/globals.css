@@ -654,13 +654,13 @@ h1 {
 
 .live-odds-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 
 @media (max-width: 640px) {
   .live-odds-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -699,9 +699,15 @@ h1 {
 
 .live-odds-team {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.live-odds-team span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .live-odds-team.right {
@@ -762,6 +768,7 @@ h1 {
 
 .odds-legend-item {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -792,6 +799,7 @@ h1 {
 }
 
 .odds-legend-name {
+  min-width: 0;
   color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
