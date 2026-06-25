@@ -3855,6 +3855,11 @@ table.standings tr.me td {
     width: 100%;
   }
 
+  .today-games,
+  .live-odds {
+    padding: 24px 20px 0;
+  }
+
   .contenders {
     padding: 20px 20px 48px;
   }
