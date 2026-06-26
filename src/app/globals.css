@@ -395,6 +395,15 @@ h1 {
 
 /* ---- home / hero ---- */
 
+/* Belt-and-suspenders: if any home section ever renders wider than the
+   viewport, clip it here so the whole page can't scroll sideways / shift the
+   centered sections off-axis. clip (not hidden) keeps position:sticky working
+   and doesn't create a scroll container; the fixed globe + stripes are
+   portaled to <body>, so they're unaffected. */
+.home-pitch {
+  overflow-x: clip;
+}
+
 .hero {
   max-width: 1040px;
   margin: 0 auto;
@@ -826,6 +835,25 @@ h1 {
 @media (max-width: 640px) {
   .live-odds-teams {
     font-size: 13px;
+  }
+}
+
+/* On phones the 3-up win-probability legend gets cramped (long country names
+   ellipsis down to a letter or two), so stack it one team per row -- full name
+   on the left, percentage on the right. Reads cleaner and can't overflow. */
+@media (max-width: 480px) {
+  .odds-legend {
+    flex-direction: column;
+    gap: 7px;
+  }
+  .odds-legend-item,
+  .odds-legend-item:last-child {
+    justify-content: flex-start;
+  }
+  .odds-legend-name {
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
   }
 }
 
