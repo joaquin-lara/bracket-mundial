@@ -478,17 +478,27 @@ function BetMatchCard({
 function AllBetsBoard({
   bets,
   matchById,
+  myUserId,
+  onCancel,
+  busyId,
+  removedIds,
 }: {
   bets: AllBetEntry[];
   matchById: Record<number, { homeName: string; awayName: string }>;
+  myUserId: string;
+  onCancel: (bet: AllBetEntry) => void;
+  busyId: string | null;
+  removedIds: Set<string>;
 }) {
-  if (bets.length === 0) {
+  const visible = bets.filter((b) => !removedIds.has(b.id));
+  if (visible.length === 0) {
     return <p className="empty">No bets placed yet — be the first.</p>;
   }
   return (
     <div className="gb-all-parlays">
-      {bets.map((b) => {
+      {visible.map((b) => {
         const m = matchById[b.match_id];
+        const isMine = b.user_id === myUserId;
         return (
           <div className={`gb-all-parlay-row gb-placed-${b.status}`} key={b.id}>
             <div className="gb-all-parlay-player">
@@ -508,13 +518,24 @@ function AllBetsBoard({
             </div>
             <div className="gb-all-parlay-foot">
               <span>{fmt(b.amount)} bet</span>
-              <span>
-                {b.status === 'pending'
-                  ? 'Pending'
-                  : b.status === 'won'
-                  ? `+${fmt(b.payout ?? 0)}`
-                  : `-${fmt(b.amount)}`}
-              </span>
+              {isMine && b.status === 'pending' ? (
+                <button
+                  type="button"
+                  className="gb-remove"
+                  disabled={busyId === b.id}
+                  onClick={() => onCancel(b)}
+                >
+                  {busyId === b.id ? 'Removing…' : 'Remove'}
+                </button>
+              ) : (
+                <span>
+                  {b.status === 'pending'
+                    ? 'Pending'
+                    : b.status === 'won'
+                    ? `+${fmt(b.payout ?? 0)}`
+                    : `-${fmt(b.amount)}`}
+                </span>
+              )}
             </div>
           </div>
         );
@@ -527,38 +548,61 @@ function AllBetsBoard({
 function AllParlaysBoard({
   parlays,
   matchById,
+  myUserId,
+  onCancel,
+  busyId,
+  removedIds,
 }: {
   parlays: AllParlayEntry[];
   matchById: Record<number, { homeName: string; awayName: string }>;
+  myUserId: string;
+  onCancel: (p: AllParlayEntry) => void;
+  busyId: string | null;
+  removedIds: Set<string>;
 }) {
-  if (parlays.length === 0) {
+  const visible = parlays.filter((p) => !removedIds.has(p.id));
+  if (visible.length === 0) {
     return <p className="empty">No parlays placed yet — be the first.</p>;
   }
   return (
     <div className="gb-all-parlays">
-      {parlays.map((p) => (
-        <div className={`gb-all-parlay-row gb-placed-${p.status}`} key={p.id}>
-          <div className="gb-all-parlay-player">
-            {p.flagCode && flagUrl(p.flagCode) ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={flagUrl(p.flagCode)!} alt="" className="gb-lb-flag" />
-            ) : (
-              <span className="gb-lb-flag gb-lb-flag-blank" />
-            )}
-            <span className="gb-all-parlay-name">{p.playerName}</span>
-            <span className="gb-mult">{p.payout_multiplier.toFixed(2)}x</span>
+      {visible.map((p) => {
+        const isMine = p.user_id === myUserId;
+        return (
+          <div className={`gb-all-parlay-row gb-placed-${p.status}`} key={p.id}>
+            <div className="gb-all-parlay-player">
+              {p.flagCode && flagUrl(p.flagCode) ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={flagUrl(p.flagCode)!} alt="" className="gb-lb-flag" />
+              ) : (
+                <span className="gb-lb-flag gb-lb-flag-blank" />
+              )}
+              <span className="gb-all-parlay-name">{p.playerName}</span>
+              <span className="gb-mult">{p.payout_multiplier.toFixed(2)}x</span>
+            </div>
+            <div className="gb-all-parlay-legs">
+              {p.legs.map((leg) => describeLeg(leg, matchById[leg.match_id])).join(' + ')}
+            </div>
+            <div className="gb-all-parlay-foot">
+              <span>{fmt(p.amount)} bet</span>
+              {isMine && p.status === 'pending' ? (
+                <button
+                  type="button"
+                  className="gb-remove"
+                  disabled={busyId === p.id}
+                  onClick={() => onCancel(p)}
+                >
+                  {busyId === p.id ? 'Removing…' : 'Remove'}
+                </button>
+              ) : (
+                <span>
+                  {p.status === 'pending' ? 'Pending' : p.status === 'won' ? `+${fmt(p.payout ?? 0)}` : `-${fmt(p.amount)}`}
+                </span>
+              )}
+            </div>
           </div>
-          <div className="gb-all-parlay-legs">
-            {p.legs.map((leg) => describeLeg(leg, matchById[leg.match_id])).join(' + ')}
-          </div>
-          <div className="gb-all-parlay-foot">
-            <span>{fmt(p.amount)} bet</span>
-            <span>
-              {p.status === 'pending' ? 'Pending' : p.status === 'won' ? `+${fmt(p.payout ?? 0)}` : `-${fmt(p.amount)}`}
-            </span>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -686,11 +730,25 @@ export default function GamblersBoard({
         <div className="gb-top-grid-col">
           <section className="gb-section">
             <h2 className="gb-h2">All bets</h2>
-            <AllBetsBoard bets={allBets} matchById={matchById} />
+            <AllBetsBoard
+              bets={allBets}
+              matchById={matchById}
+              myUserId={myUserId}
+              onCancel={cancelBet}
+              busyId={busyId}
+              removedIds={removedIds}
+            />
           </section>
           <section className="gb-section">
             <h2 className="gb-h2">All parlays</h2>
-            <AllParlaysBoard parlays={allParlays} matchById={matchById} />
+            <AllParlaysBoard
+              parlays={allParlays}
+              matchById={matchById}
+              myUserId={myUserId}
+              onCancel={cancelParlay}
+              busyId={busyId}
+              removedIds={removedIds}
+            />
           </section>
         </div>
       </div>
