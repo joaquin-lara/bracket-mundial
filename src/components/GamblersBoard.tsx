@@ -540,6 +540,9 @@ export default function GamblersBoard({
   const [balance, setBalance] = useState(myBalance);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  // IDs already cancelled this session -- filtered out immediately so a removed
+  // bet/parlay disappears even before router.refresh() refetches from the server.
+  const [removedIds, setRemovedIds] = useState<Set<string>>(() => new Set());
 
   const betsByMatch = useMemo(() => {
     const map = new Map<number, GamblerBet[]>();
@@ -569,8 +572,9 @@ export default function GamblersBoard({
     return map;
   }, [myBets, myParlays]);
 
-  const pendingBets = myBets.filter((b) => b.status === 'pending');
+  const pendingBets = myBets.filter((b) => b.status === 'pending' && !removedIds.has(b.id));
   const settledBets = myBets.filter((b) => b.status !== 'pending');
+  const visibleParlays = myParlays.filter((p) => !removedIds.has(p.id));
 
   function matchLocked(matchId: number): boolean {
     const kickoff = matchById[matchId]?.kickoff;
@@ -585,9 +589,13 @@ export default function GamblersBoard({
     const { error } = await supabase.rpc(rpc, arg);
     setBusyId(null);
     if (error) {
-      setActionError(error.message);
+      // Surface the real reason loudly -- a missing DB function, a locked match,
+      // etc. -- instead of silently doing nothing.
+      console.error(`${rpc} failed:`, error);
+      setActionError(error.message || `Couldn't remove that (${rpc}).`);
       return;
     }
+    setRemovedIds((prev) => new Set(prev).add(id));
     setBalance((b) => b + refund);
     router.refresh();
   }
@@ -653,21 +661,30 @@ export default function GamblersBoard({
         </section>
       )}
 
-      {!readOnly && actionError && <p className="gb-error">{actionError}</p>}
+      {!readOnly && actionError && (
+        <p className="gb-error gb-action-error" role="alert">
+          {actionError}
+        </p>
+      )}
 
       {!readOnly && pendingBets.length > 0 && (
         <section className="gb-section">
           <h2 className="gb-h2">Your open bets</h2>
-          <div className="gb-history">
+          <div className="gb-all-parlays">
             {pendingBets.map((b) => {
               const m = matchById[b.match_id];
               const locked = matchLocked(b.match_id);
               return (
-                <div className="gb-history-row gb-placed-pending" key={b.id}>
-                  <span>{m ? `${m.homeName} vs ${m.awayName}` : `Match #${b.match_id}`}</span>
-                  <span>{describeLeg(b, m)}</span>
-                  <span>{fmt(b.amount)} bet</span>
-                  <span>
+                <div className="gb-all-parlay-row gb-placed-pending" key={b.id}>
+                  <div className="gb-all-parlay-player">
+                    <span className="gb-all-parlay-name">
+                      {m ? `${m.homeName} vs ${m.awayName}` : `Match #${b.match_id}`}
+                    </span>
+                    <span className="gb-mult">{b.payout_multiplier.toFixed(2)}x</span>
+                  </div>
+                  <div className="gb-all-parlay-legs">{describeLeg(b, m)}</div>
+                  <div className="gb-all-parlay-foot">
+                    <span>{fmt(b.amount)} bet</span>
                     {locked ? (
                       <span className="gb-locked">Locked</span>
                     ) : (
@@ -680,7 +697,7 @@ export default function GamblersBoard({
                         {busyId === b.id ? 'Removing…' : 'Remove'}
                       </button>
                     )}
-                  </span>
+                  </div>
                 </div>
               );
             })}
@@ -688,18 +705,25 @@ export default function GamblersBoard({
         </section>
       )}
 
-      {!readOnly && myParlays.length > 0 && (
+      {!readOnly && visibleParlays.length > 0 && (
         <section className="gb-section">
           <h2 className="gb-h2">Your parlays</h2>
-          <div className="gb-history">
-            {myParlays.map((p) => {
+          <div className="gb-all-parlays">
+            {visibleParlays.map((p) => {
               const locked = p.legs.some((leg) => matchLocked(leg.match_id));
               return (
-                <div className={`gb-history-row gb-placed-${p.status}`} key={p.id}>
-                  <span>{p.legs.map((leg) => describeLeg(leg, matchById[leg.match_id])).join(' + ')}</span>
-                  <span>{p.status === 'pending' ? 'Pending' : p.status === 'won' ? 'Won' : 'Lost'}</span>
-                  <span>{fmt(p.amount)} bet</span>
-                  <span>
+                <div className={`gb-all-parlay-row gb-placed-${p.status}`} key={p.id}>
+                  <div className="gb-all-parlay-player">
+                    <span className="gb-all-parlay-name">
+                      {p.status === 'pending' ? 'Pending' : p.status === 'won' ? 'Won' : 'Lost'}
+                    </span>
+                    <span className="gb-mult">{p.payout_multiplier.toFixed(2)}x</span>
+                  </div>
+                  <div className="gb-all-parlay-legs">
+                    {p.legs.map((leg) => describeLeg(leg, matchById[leg.match_id])).join(' + ')}
+                  </div>
+                  <div className="gb-all-parlay-foot">
+                    <span>{fmt(p.amount)} bet</span>
                     {p.status === 'pending' && !locked ? (
                       <button
                         type="button"
@@ -709,14 +733,12 @@ export default function GamblersBoard({
                       >
                         {busyId === p.id ? 'Removing…' : 'Remove'}
                       </button>
-                    ) : p.status === 'won' ? (
-                      `+${fmt(p.payout ?? 0)}`
-                    ) : p.status === 'lost' ? (
-                      `-${fmt(p.amount)}`
                     ) : (
-                      '—'
+                      <span>
+                        {p.status === 'won' ? `+${fmt(p.payout ?? 0)}` : p.status === 'lost' ? `-${fmt(p.amount)}` : '—'}
+                      </span>
                     )}
-                  </span>
+                  </div>
                 </div>
               );
             })}
