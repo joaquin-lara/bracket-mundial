@@ -12,7 +12,11 @@ import { stageLabel, type Match } from '@/lib/types';
 export default function LiveOddsSection({ matches }: { matches: Match[] }) {
   const localToday = new Date().toLocaleDateString('en-CA');
   const todays = matches.filter(
-    (m) => new Date(m.kickoff).toLocaleDateString('en-CA') === localToday
+    (m) =>
+      new Date(m.kickoff).toLocaleDateString('en-CA') === localToday &&
+      // Once a match is over, drop it from Live Odds — the market is settled and
+      // no longer reflects a live, tradeable probability.
+      m.status !== 'FINISHED'
   );
 
   const rateable = todays
