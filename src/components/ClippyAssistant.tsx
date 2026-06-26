@@ -145,7 +145,6 @@ export default function ClippyAssistant() {
   const [results, setResults] = useState<SearchHit[] | null>(null);
   const [ready, setReady] = useState(false);
   const [bubble, setBubble] = useState<string | null>(null);
-  const [greet, setGreet] = useState(false);
   const [thinking, setThinking] = useState(false);
   const [btnSize, setBtnSize] = useState(DESKTOP_BTN);
 
@@ -180,12 +179,6 @@ export default function ClippyAssistant() {
     return () => clearTimeout(hideTimer);
   }, [bubble]);
 
-  useEffect(() => {
-    if (!bubble) return;
-    setGreet(true);
-    const t = setTimeout(() => setGreet(false), 1300);
-    return () => clearTimeout(t);
-  }, [bubble]);
 
   useEffect(() => {
     if (open) setBubble(null);
@@ -239,16 +232,12 @@ export default function ClippyAssistant() {
         {open ? (
           <span style={{ fontSize: 26, lineHeight: 1, fontWeight: 700 }}>×</span>
         ) : (
-          greet ? (
-            <span className="clippy-wave">👋</span>
-          ) : (
-            <img
-              src="/clippy.png"
-              alt="Clippy"
-              className="clippy-emoji"
-              style={{ width: '85%', height: '85%', objectFit: 'cover', borderRadius: '50%' }}
-            />
-          )
+          <img
+            src="/clippy.png"
+            alt="Clippy"
+            className="clippy-emoji"
+            style={{ width: '85%', height: '85%', objectFit: 'cover', borderRadius: '50%' }}
+          />
         )}
       </button>
 
@@ -334,7 +323,7 @@ export default function ClippyAssistant() {
           </div>
           {!category && (
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <img src="/clippy_green.png" alt="Clippy" style={{ width: 130, height: 130, objectFit: 'contain', display: 'block' }} />
+              <img src="/clippy_green.png" alt="Clippy" style={{ width: 150, height: 150, objectFit: 'contain', display: 'block' }} />
             </div>
           )}
         </div>
