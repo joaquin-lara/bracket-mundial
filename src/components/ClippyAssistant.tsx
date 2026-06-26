@@ -1,28 +1,11 @@
 'use client';
 
-import React, { useEffect, useLayoutEffect, useRef, useCallback, useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 
 const DESKTOP_BTN = 56;
 const MOBILE_BTN = 65;
 const MARGIN = 20;
 const GAP = 12;
-const EDGE = 8;
-const DRAG_THRESHOLD = 6;
-const STORAGE_KEY = 'bm-clippy-corner';
-
-type Corner = 'tl' | 'tr' | 'bl' | 'br';
-type XY = { x: number; y: number };
-
-function cornerCoords(c: Corner, w: number, h: number, bs: number): XY {
-  const x = c[1] === 'l' ? MARGIN : w - MARGIN - bs;
-  const y = c[0] === 't' ? MARGIN : h - MARGIN - bs;
-  return { x, y };
-}
-function nearestCorner(cx: number, cy: number, w: number, h: number): Corner {
-  const v = cy < h / 2 ? 't' : 'b';
-  const hz = cx < w / 2 ? 'l' : 'r';
-  return (v + hz) as Corner;
-}
 
 const GREETINGS = [
   "Hey, I'm right here 👋",
@@ -164,125 +147,17 @@ export default function ClippyAssistant() {
   const [bubble, setBubble] = useState<string | null>(null);
   const [greet, setGreet] = useState(false);
   const [thinking, setThinking] = useState(false);
+  const [btnSize, setBtnSize] = useState(DESKTOP_BTN);
 
   const category = CATEGORIES.find((c) => c.id === activeCategory) ?? null;
 
-  // ---- Drag / position state (same approach as ChatBubble) -----------------
-  const [corner, setCorner] = useState<Corner>('bl');
-  const [coords, setCoordsState] = useState<XY | null>(null);
-  const [dragging, setDragging] = useState(false);
-  const coordsRef = useRef<XY | null>(null);
-  const cornerRef = useRef<Corner>('bl');
-  const btnSizeRef = useRef(DESKTOP_BTN);
-  const [btnSize, setBtnSize] = useState(DESKTOP_BTN);
-  const setCoords = useCallback((c: XY) => { coordsRef.current = c; setCoordsState(c); }, []);
-  const drag = useRef({ active: false, moved: false, sx: 0, sy: 0, ox: 0, oy: 0 });
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const rafRef = useRef<number | null>(null);
-  const pendingRef = useRef<XY | null>(null);
-  const flushPos = useCallback(() => {
-    rafRef.current = null;
-    const el = buttonRef.current;
-    const p = pendingRef.current;
-    if (el && p) { el.style.left = `${p.x}px`; el.style.top = `${p.y}px`; }
+  useEffect(() => {
+    const update = () => setBtnSize(window.innerWidth < 768 ? MOBILE_BTN : DESKTOP_BTN);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
   }, []);
 
-  useLayoutEffect(() => {
-    let saved: Corner = 'bl';
-    try {
-      const v = localStorage.getItem(STORAGE_KEY);
-      if (v === 'tl' || v === 'tr' || v === 'bl' || v === 'br') saved = v;
-    } catch {}
-    cornerRef.current = saved;
-    setCorner(saved);
-    const bs = window.innerWidth < 768 ? MOBILE_BTN : DESKTOP_BTN;
-    btnSizeRef.current = bs;
-    setBtnSize(bs);
-    setCoords(cornerCoords(saved, window.innerWidth, window.innerHeight, bs));
-    const onResize = () => {
-      const newBs = window.innerWidth < 768 ? MOBILE_BTN : DESKTOP_BTN;
-      btnSizeRef.current = newBs;
-      setBtnSize(newBs);
-      setCoords(cornerCoords(cornerRef.current, window.innerWidth, window.innerHeight, newBs));
-    };
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, [setCoords]);
-
-  const onPointerDown = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
-    if (e.button !== 0) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    try { e.currentTarget.setPointerCapture(e.pointerId); } catch {}
-    drag.current = { active: true, moved: false, sx: e.clientX, sy: e.clientY, ox: e.clientX - rect.left, oy: e.clientY - rect.top };
-    if (!coordsRef.current) setCoords({ x: rect.left, y: rect.top });
-  }, [setCoords]);
-
-  const onPointerMove = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
-    const d = drag.current;
-    if (!d.active || open) return;
-    const dx = e.clientX - d.sx;
-    const dy = e.clientY - d.sy;
-    if (!d.moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
-    if (!d.moved) { d.moved = true; setDragging(true); }
-    const w = window.innerWidth, h = window.innerHeight;
-    let nx = e.clientX - d.ox;
-    let ny = e.clientY - d.oy;
-    nx = Math.max(EDGE, Math.min(nx, w - btnSizeRef.current - EDGE));
-    ny = Math.max(EDGE, Math.min(ny, h - btnSizeRef.current - EDGE));
-    const next = { x: nx, y: ny };
-    pendingRef.current = next;
-    coordsRef.current = next;
-    if (rafRef.current == null) rafRef.current = requestAnimationFrame(flushPos);
-  }, [open, flushPos]);
-
-  const endDrag = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
-    const d = drag.current;
-    if (!d.active) return;
-    d.active = false;
-    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
-    if (rafRef.current != null) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
-    if (open) { setOpen(false); return; }
-    if (!d.moved) { setOpen(true); return; }
-    const w = window.innerWidth, h = window.innerHeight;
-    const bs = btnSizeRef.current;
-    const c = coordsRef.current ?? cornerCoords(cornerRef.current, w, h, bs);
-    const next = nearestCorner(c.x + bs / 2, c.y + bs / 2, w, h);
-    cornerRef.current = next;
-    setCorner(next);
-    setDragging(false);
-    setCoords(cornerCoords(next, w, h, bs));
-    try { localStorage.setItem(STORAGE_KEY, next); } catch {}
-  }, [open, setCoords]);
-
-  const onPointerCancel = useCallback(() => {
-    const d = drag.current;
-    if (!d.active) return;
-    d.active = false;
-    if (rafRef.current != null) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
-    if (d.moved) {
-      setDragging(false);
-      setCoords(cornerCoords(cornerRef.current, window.innerWidth, window.innerHeight, btnSizeRef.current));
-    }
-  }, [setCoords]);
-
-  useEffect(() => () => { if (rafRef.current != null) cancelAnimationFrame(rafRef.current); }, []);
-
-  // ---- Derived positioning -------------------------------------------------
-  const isTop = corner[0] === 't';
-  const isLeft = corner[1] === 'l';
-  const livePos = dragging ? coordsRef.current : coords;
-  const buttonPos: React.CSSProperties = livePos
-    ? { left: livePos.x, top: livePos.y }
-    : { left: MARGIN, bottom: MARGIN };
-  const moveTransition = dragging
-    ? 'none'
-    : 'left 280ms cubic-bezier(0.22, 1, 0.36, 1), top 280ms cubic-bezier(0.22, 1, 0.36, 1)';
-  const panelPos: React.CSSProperties = {
-    ...(isLeft ? { left: MARGIN } : { right: MARGIN }),
-    ...(isTop ? { top: MARGIN + btnSize + GAP } : { bottom: MARGIN + btnSize + GAP }),
-  };
-
-  // ---- Intro gate (same as before) ----------------------------------------
   useEffect(() => {
     if (!document.querySelector('.home-intro')) { setReady(true); return; }
     const onDone = () => setReady(true);
@@ -336,23 +211,18 @@ export default function ClippyAssistant() {
   return (
     <>
       <button
-        ref={buttonRef}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onPointerCancel={onPointerCancel}
-        onDragStart={(e) => e.preventDefault()}
-        draggable={false}
+        onClick={() => setOpen((v) => !v)}
         aria-label={open ? 'Close help' : 'Open help'}
         style={{
           position: 'fixed',
-          ...buttonPos,
+          left: MARGIN,
+          bottom: MARGIN,
           width: btnSize,
           height: btnSize,
           padding: 0,
           borderRadius: '50%',
           border: open ? 'none' : '1px solid var(--gold)',
-          cursor: dragging ? 'grabbing' : open ? 'pointer' : 'grab',
+          cursor: 'pointer',
           background: open ? 'var(--gold)' : 'var(--bg-light)',
           color: open ? 'var(--bg-dark)' : 'var(--gold)',
           boxShadow: '0 6px 20px rgba(0,0,0,0.35)',
@@ -361,7 +231,7 @@ export default function ClippyAssistant() {
           alignItems: 'center',
           justifyContent: 'center',
           fontSize: 24,
-          transition: `background 200ms ease, color 200ms ease, ${moveTransition}`,
+          transition: 'background 200ms ease, color 200ms ease',
         }}
       >
         {open ? (
@@ -374,21 +244,19 @@ export default function ClippyAssistant() {
               src="/clippy.png"
               alt="Clippy"
               className="clippy-emoji"
-              style={{ width: '90%', height: '85%', objectFit: 'cover', borderRadius: '50%' }}
+              style={{ width: '85%', height: '85%', objectFit: 'cover', borderRadius: '50%' }}
             />
           )
         )}
       </button>
 
-      {/* Greeting bubble — anchored to the current corner */}
+      {/* Greeting bubble */}
       <div
         role="status"
         style={{
           position: 'fixed',
-          ...(isLeft
-            ? { left: MARGIN + btnSize + 10 }
-            : { right: MARGIN + btnSize + 10 }),
-          ...(isTop ? { top: MARGIN + 14 } : { bottom: MARGIN + 14 }),
+          left: MARGIN + btnSize + 10,
+          bottom: MARGIN + 14,
           maxWidth: 200,
           padding: '9px 12px',
           borderRadius: 14,
@@ -399,9 +267,7 @@ export default function ClippyAssistant() {
           lineHeight: 1.35,
           boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
           zIndex: 999,
-          transformOrigin: isLeft
-            ? (isTop ? 'top left' : 'bottom left')
-            : (isTop ? 'top right' : 'bottom right'),
+          transformOrigin: 'bottom left',
           transform: bubble ? 'translateY(0) scale(1)' : 'translateY(6px) scale(0.9)',
           opacity: bubble ? 1 : 0,
           pointerEvents: bubble ? 'auto' : 'none',
@@ -409,19 +275,12 @@ export default function ClippyAssistant() {
           fontFamily: 'var(--sans)',
         }}
       >
-        {/* Tail arrow pointing toward the button */}
         <span
           aria-hidden="true"
           style={{
-            position: 'absolute',
-            ...(isTop ? { top: 16 } : { bottom: 16 }),
-            ...(isLeft
-              ? { left: -6, borderRight: '6px solid var(--cream)', borderLeft: 'none' }
-              : { right: -6, borderLeft: '6px solid var(--cream)', borderRight: 'none' }),
-            width: 0,
-            height: 0,
-            borderTop: '6px solid transparent',
-            borderBottom: '6px solid transparent',
+            position: 'absolute', left: -6, bottom: 16, width: 0, height: 0,
+            borderTop: '6px solid transparent', borderBottom: '6px solid transparent',
+            borderRight: '6px solid var(--cream)',
           }}
         />
         {bubble}
@@ -442,7 +301,8 @@ export default function ClippyAssistant() {
       <div
         style={{
           position: 'fixed',
-          ...panelPos,
+          left: MARGIN,
+          bottom: MARGIN + btnSize + GAP,
           width: 340,
           maxWidth: 'calc(100vw - 40px)',
           maxHeight: 'calc(100vh - 140px)',
@@ -454,9 +314,7 @@ export default function ClippyAssistant() {
           boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
           zIndex: 1000,
           overflow: 'hidden',
-          transformOrigin: isLeft
-            ? (isTop ? 'top left' : 'bottom left')
-            : (isTop ? 'top right' : 'bottom right'),
+          transformOrigin: 'bottom left',
           transform: open ? 'translateY(0) scale(1)' : 'translateY(12px) scale(0.92)',
           opacity: open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',

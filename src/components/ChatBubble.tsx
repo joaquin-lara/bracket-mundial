@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useLayoutEffect, useCallback, useSyncExternalStore } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useSyncExternalStore } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { getPresence, getServerPresence, subscribePresence } from '@/lib/presenceStore';
 import { GUEST_NAME } from '@/lib/players';
@@ -17,28 +17,10 @@ import {
   type TickState,
 } from '@/lib/chat';
 
-// ---- Drag / corner-snap config (carried over from Curva's ChatBubble) ------
-type Corner = 'tl' | 'tr' | 'bl' | 'br';
 const DESKTOP_BTN = 56;
 const MOBILE_BTN = 65;
 const MARGIN = 20;
 const GAP = 12;
-const EDGE = 8;
-const DRAG_THRESHOLD = 6;
-const STORAGE_KEY = 'bm-chat-corner';
-
-type XY = { x: number; y: number };
-
-function cornerCoords(c: Corner, w: number, h: number, bs: number): XY {
-  const x = c[1] === 'l' ? MARGIN : w - MARGIN - bs;
-  const y = c[0] === 't' ? MARGIN : h - MARGIN - bs;
-  return { x, y };
-}
-function nearestCorner(cx: number, cy: number, w: number, h: number): Corner {
-  const v = cy < h / 2 ? 't' : 'b';
-  const horiz = cx < w / 2 ? 'l' : 'r';
-  return (v + horiz) as Corner;
-}
 
 const GROUP_KEY = 'group'; // local key for the group room in the maps below
 
@@ -85,110 +67,14 @@ export default function ChatBubble({ me }: { me: string }) {
   const presence = useSyncExternalStore(subscribePresence, getPresence, getServerPresence);
   const isOnline = useCallback((id: string) => presence.has(id) && id !== me, [presence, me]);
 
-  // ---- Drag / position state (verbatim Curva behaviour) -------------------
-  const [corner, setCorner] = useState<Corner>('br');
-  const [coords, setCoordsState] = useState<XY | null>(null);
-  const [dragging, setDragging] = useState(false);
-  const coordsRef = useRef<XY | null>(null);
-  const cornerRef = useRef<Corner>('br');
-  const btnSizeRef = useRef(DESKTOP_BTN);
   const [btnSize, setBtnSize] = useState(DESKTOP_BTN);
-  const setCoords = useCallback((c: XY) => { coordsRef.current = c; setCoordsState(c); }, []);
-  const drag = useRef({ active: false, moved: false, sx: 0, sy: 0, ox: 0, oy: 0 });
-  // Imperative drag: write position straight to the DOM (one write per frame)
-  // so a live drag never re-renders the whole chat. State only updates on release.
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const rafRef = useRef<number | null>(null);
-  const pendingRef = useRef<XY | null>(null);
-  const flushPos = useCallback(() => {
-    rafRef.current = null;
-    const el = buttonRef.current;
-    const p = pendingRef.current;
-    if (el && p) { el.style.left = `${p.x}px`; el.style.top = `${p.y}px`; }
+
+  useEffect(() => {
+    const update = () => setBtnSize(window.innerWidth < 768 ? MOBILE_BTN : DESKTOP_BTN);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
   }, []);
-
-  useLayoutEffect(() => {
-    let saved: Corner = 'br';
-    try {
-      const v = localStorage.getItem(STORAGE_KEY);
-      if (v === 'tl' || v === 'tr' || v === 'bl' || v === 'br') saved = v;
-    } catch {}
-    cornerRef.current = saved;
-    setCorner(saved);
-    const bs = window.innerWidth < 768 ? MOBILE_BTN : DESKTOP_BTN;
-    btnSizeRef.current = bs;
-    setBtnSize(bs);
-    setCoords(cornerCoords(saved, window.innerWidth, window.innerHeight, bs));
-    const onResize = () => {
-      const newBs = window.innerWidth < 768 ? MOBILE_BTN : DESKTOP_BTN;
-      btnSizeRef.current = newBs;
-      setBtnSize(newBs);
-      setCoords(cornerCoords(cornerRef.current, window.innerWidth, window.innerHeight, newBs));
-    };
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, [setCoords]);
-
-  const onPointerDown = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
-    if (e.button !== 0) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    try { e.currentTarget.setPointerCapture(e.pointerId); } catch {}
-    drag.current = { active: true, moved: false, sx: e.clientX, sy: e.clientY, ox: e.clientX - rect.left, oy: e.clientY - rect.top };
-    if (!coordsRef.current) setCoords({ x: rect.left, y: rect.top });
-  }, [setCoords]);
-
-  const onPointerMove = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
-    const d = drag.current;
-    if (!d.active || open) return;
-    const dx = e.clientX - d.sx;
-    const dy = e.clientY - d.sy;
-    if (!d.moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
-    if (!d.moved) { d.moved = true; setDragging(true); }
-    const w = window.innerWidth, h = window.innerHeight;
-    let nx = e.clientX - d.ox;
-    let ny = e.clientY - d.oy;
-    nx = Math.max(EDGE, Math.min(nx, w - btnSizeRef.current - EDGE));
-    ny = Math.max(EDGE, Math.min(ny, h - btnSizeRef.current - EDGE));
-    // No setState during the drag: stash the position, keep the ref in sync (so
-    // any incidental re-render stays consistent), and paint once per frame.
-    const next = { x: nx, y: ny };
-    pendingRef.current = next;
-    coordsRef.current = next;
-    if (rafRef.current == null) rafRef.current = requestAnimationFrame(flushPos);
-  }, [open, flushPos]);
-
-  const endDrag = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
-    const d = drag.current;
-    if (!d.active) return;
-    d.active = false;
-    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
-    if (rafRef.current != null) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
-    if (open) { setOpen(false); return; }
-    if (!d.moved) { setOpen(true); return; }
-    const w = window.innerWidth, h = window.innerHeight;
-    const bs = btnSizeRef.current;
-    const c = coordsRef.current ?? cornerCoords(cornerRef.current, w, h, bs);
-    const next = nearestCorner(c.x + bs / 2, c.y + bs / 2, w, h);
-    cornerRef.current = next;
-    setCorner(next);
-    setDragging(false);
-    setCoords(cornerCoords(next, w, h, bs));
-    try { localStorage.setItem(STORAGE_KEY, next); } catch {}
-  }, [open, setCoords]);
-
-  const onPointerCancel = useCallback(() => {
-    const d = drag.current;
-    if (!d.active) return;
-    d.active = false;
-    if (rafRef.current != null) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
-    if (d.moved) {
-      setDragging(false);
-      setCoords(cornerCoords(cornerRef.current, window.innerWidth, window.innerHeight, btnSizeRef.current));
-    }
-  }, [setCoords]);
-
-  // Cancel any queued drag frame when the bubble unmounts.
-  useEffect(() => () => { if (rafRef.current != null) cancelAnimationFrame(rafRef.current); }, []);
 
   // ---- Data loading -------------------------------------------------------
   const loadStatic = useCallback(async () => {
@@ -438,21 +324,6 @@ export default function ChatBubble({ me }: { me: string }) {
     markRead(activeConvId);
   }, [supabase, activeConvId, me, markRead]);
 
-  // ---- Derived positioning (verbatim Curva) -------------------------------
-  const isTop = corner[0] === 't';
-  const isLeft = corner[1] === 'l';
-  // While dragging, read the live ref (kept in sync without re-rendering) so any
-  // incidental re-render matches the DOM position the drag handler is writing.
-  const livePos = dragging ? coordsRef.current : coords;
-  const buttonPos: React.CSSProperties = livePos ? { left: livePos.x, top: livePos.y } : { right: MARGIN, bottom: MARGIN };
-  const moveTransition = dragging ? 'none'
-    : 'left 280ms cubic-bezier(0.22, 1, 0.36, 1), top 280ms cubic-bezier(0.22, 1, 0.36, 1)';
-  const panelPos: React.CSSProperties = {
-    ...(isLeft ? { left: MARGIN } : { right: MARGIN }),
-    ...(isTop ? { top: MARGIN + btnSize + GAP } : { bottom: MARGIN + btnSize + GAP }),
-  };
-  const panelOrigin = `${isTop ? 'top' : 'bottom'} ${isLeft ? 'left' : 'right'}`;
-  const panelClosedTransform = `translateY(${isTop ? '-12px' : '12px'}) scale(0.92)`;
 
   // ---- Render helpers -----------------------------------------------------
   const activeMsgs = activeConvId ? (messages.get(activeConvId) ?? []) : [];
@@ -490,25 +361,20 @@ export default function ChatBubble({ me }: { me: string }) {
 
   return (
     <>
-      {/* Floating toggle button (click to open, drag to reposition) */}
+      {/* Floating toggle button */}
       <button
-        ref={buttonRef}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onPointerCancel={onPointerCancel}
-        onDragStart={(e) => e.preventDefault()}
-        draggable={false}
+        onClick={() => setOpen((v) => !v)}
         aria-label={open ? 'Close chat' : 'Open chat'}
         style={{
           position: 'fixed',
-          ...buttonPos,
+          right: MARGIN,
+          bottom: MARGIN,
           width: btnSize,
           height: btnSize,
           padding: 0,
           borderRadius: '50%',
           border: open ? 'none' : '1px solid var(--gold)',
-          cursor: dragging ? 'grabbing' : open ? 'pointer' : 'grab',
+          cursor: 'pointer',
           background: open ? 'var(--gold)' : 'var(--bg-light)',
           color: open ? 'var(--bg-dark)' : 'var(--gold)',
           boxShadow: '0 6px 20px rgba(0,0,0,0.35)',
@@ -518,10 +384,7 @@ export default function ChatBubble({ me }: { me: string }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          touchAction: 'none',
-          userSelect: 'none',
-          WebkitUserSelect: 'none',
-          transition: `opacity 400ms ease, background 200ms ease, color 200ms ease, ${moveTransition}`,
+          transition: 'opacity 400ms ease, background 200ms ease, color 200ms ease',
         }}
       >
         {open ? (
@@ -549,7 +412,8 @@ export default function ChatBubble({ me }: { me: string }) {
       <div
         style={{
           position: 'fixed',
-          ...panelPos,
+          right: MARGIN,
+          bottom: MARGIN + btnSize + GAP,
           width: 360,
           maxWidth: 'calc(100vw - 40px)',
           height: 520,
@@ -562,8 +426,8 @@ export default function ChatBubble({ me }: { me: string }) {
           boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
           zIndex: 1000,
           overflow: 'hidden',
-          transformOrigin: panelOrigin,
-          transform: open ? 'translateY(0) scale(1)' : panelClosedTransform,
+          transformOrigin: 'bottom right',
+          transform: open ? 'translateY(0) scale(1)' : 'translateY(12px) scale(0.92)',
           opacity: open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',
           transition: 'opacity 180ms ease, transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1)',
