@@ -3,6 +3,7 @@ import AchievementWatcher from '@/components/AchievementWatcher';
 import AutoRefresh from '@/components/AutoRefresh';
 import ChallengeWatcher from '@/components/ChallengeWatcher';
 import ChatBubble from '@/components/ChatBubble';
+import ClippyAssistant from '@/components/ClippyAssistant';
 import EnableNotifications from '@/components/EnableNotifications';
 import HomeOnRefresh from '@/components/HomeOnRefresh';
 import PageTransitionProvider from '@/components/PageTransition';
@@ -76,6 +77,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               {user && <AchievementWatcher me={user.id} />}
               {user && <EnableNotifications />}
               {user && !isGuestEmail(user.email) && <ChatBubble me={user.id} />}
+              {user && <ClippyAssistant />}
               {children}
             </>
           )}
