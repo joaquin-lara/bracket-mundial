@@ -226,12 +226,14 @@ export default function ClippyAssistant() {
           background: open ? 'var(--gold)' : 'var(--bg-light)',
           color: open ? 'var(--bg-dark)' : 'var(--gold)',
           boxShadow: '0 6px 20px rgba(0,0,0,0.35)',
+          opacity: ready ? 1 : 0,
+          pointerEvents: ready ? 'auto' : 'none',
           zIndex: 1000,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           fontSize: 24,
-          transition: 'background 200ms ease, color 200ms ease',
+          transition: 'opacity 400ms ease, background 200ms ease, color 200ms ease',
         }}
       >
         {open ? (
