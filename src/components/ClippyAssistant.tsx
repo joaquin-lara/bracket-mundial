@@ -3,7 +3,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useCallback, useState, type FormEvent } from 'react';
 
 const DESKTOP_BTN = 56;
-const MOBILE_BTN = 84;
+const MOBILE_BTN = 76;
 const MARGIN = 20;
 const GAP = 12;
 const EDGE = 8;
