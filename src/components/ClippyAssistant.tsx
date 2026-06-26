@@ -284,17 +284,6 @@ export default function ClippyAssistant() {
           }}
         />
         {bubble}
-        <button
-          onClick={() => setBubble(null)}
-          aria-label="Dismiss"
-          style={{
-            position: 'absolute', top: -7, right: -7, width: 18, height: 18, borderRadius: '50%',
-            background: 'var(--bg-dark)', color: 'var(--cream)', border: '1px solid var(--line)',
-            cursor: 'pointer', fontSize: 11, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >
-          ×
-        </button>
       </div>
 
       {/* Help panel */}
