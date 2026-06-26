@@ -19,7 +19,7 @@ import {
 
 // ---- Drag / corner-snap config (carried over from Curva's ChatBubble) ------
 type Corner = 'tl' | 'tr' | 'bl' | 'br';
-const BTN_SIZE = 56;
+const BTN_SIZE = 84;
 const MARGIN = 20;
 const GAP = 12;
 const EDGE = 8;

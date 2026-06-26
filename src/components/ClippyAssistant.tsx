@@ -1,17 +1,34 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useCallback, useState, type FormEvent } from 'react';
 
-const BTN_SIZE = 56;
+const BTN_SIZE = 84;
 const MARGIN = 20;
 const GAP = 12;
+const EDGE = 8;
+const DRAG_THRESHOLD = 6;
+const STORAGE_KEY = 'bm-clippy-corner';
+
+type Corner = 'tl' | 'tr' | 'bl' | 'br';
+type XY = { x: number; y: number };
+
+function cornerCoords(c: Corner, w: number, h: number): XY {
+  const x = c[1] === 'l' ? MARGIN : w - MARGIN - BTN_SIZE;
+  const y = c[0] === 't' ? MARGIN : h - MARGIN - BTN_SIZE;
+  return { x, y };
+}
+function nearestCorner(cx: number, cy: number, w: number, h: number): Corner {
+  const v = cy < h / 2 ? 't' : 'b';
+  const hz = cx < w / 2 ? 'l' : 'r';
+  return (v + hz) as Corner;
+}
 
 const GREETINGS = [
-  'Hey, I’m right here 👋',
+  'Hey, I'm right here 👋',
   'Ask me anything about the app!',
-  'Stuck on something? I’ve got you.',
+  'Stuck on something? I've got you.',
   'Need help? Just tap me.',
-  'Got questions? I’m all ears.',
+  'Got questions? I'm all ears.',
   'Not sure how this works? Ask away.',
 ];
 
@@ -34,7 +51,7 @@ const CATEGORIES: ClippyCategory[] = [
       },
       {
         q: 'Can other people see my picks?',
-        a: 'No — picks are hidden until the match kicks off. After that everyone’s picks are revealed.',
+        a: 'No — picks are hidden until the match kicks off. After that everyone's picks are revealed.',
       },
       {
         q: 'How do penalty shootouts count for scoring?',
@@ -52,7 +69,7 @@ const CATEGORIES: ClippyCategory[] = [
         a: 'A fake-money side game. Everyone starts with $1000 and bets on match winners, exact scores, or stat markets like corners, shots, cards and possession.',
       },
       {
-        q: 'What’s a parlay?',
+        q: 'What's a parlay?',
         a: 'Tap "+ add another market" on a match card to stack up to 4 picks on that game into one ticket for a bigger combined multiplier. Miss a single leg and you lose the whole parlay.',
       },
       {
@@ -68,7 +85,7 @@ const CATEGORIES: ClippyCategory[] = [
     items: [
       {
         q: 'What is Live Odds?',
-        a: 'Real-time win probabilities for today’s matches, pulled from Polymarket. It only shows games that haven’t finished yet.',
+        a: 'Real-time win probabilities for today's matches, pulled from Polymarket. It only shows games that haven't finished yet.',
       },
     ],
   },
@@ -79,7 +96,7 @@ const CATEGORIES: ClippyCategory[] = [
     items: [
       {
         q: 'How do Penalty Shootouts work?',
-        a: 'Challenge another player to a 1v1 shootout: best of 5 penalties, then sudden death if it’s still tied.',
+        a: 'Challenge another player to a 1v1 shootout: best of 5 penalties, then sudden death if it's still tied.',
       },
     ],
   },
@@ -149,8 +166,111 @@ export default function ClippyAssistant() {
 
   const category = CATEGORIES.find((c) => c.id === activeCategory) ?? null;
 
-  // Wait for the home intro to finish (if one is playing) before popping up,
-  // same gating ChatBubble uses, so the greeting doesn't appear under it.
+  // ---- Drag / position state (same approach as ChatBubble) -----------------
+  const [corner, setCorner] = useState<Corner>('bl');
+  const [coords, setCoordsState] = useState<XY | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const coordsRef = useRef<XY | null>(null);
+  const cornerRef = useRef<Corner>('bl');
+  const setCoords = useCallback((c: XY) => { coordsRef.current = c; setCoordsState(c); }, []);
+  const drag = useRef({ active: false, moved: false, sx: 0, sy: 0, ox: 0, oy: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const pendingRef = useRef<XY | null>(null);
+  const flushPos = useCallback(() => {
+    rafRef.current = null;
+    const el = buttonRef.current;
+    const p = pendingRef.current;
+    if (el && p) { el.style.left = `${p.x}px`; el.style.top = `${p.y}px`; }
+  }, []);
+
+  useLayoutEffect(() => {
+    let saved: Corner = 'bl';
+    try {
+      const v = localStorage.getItem(STORAGE_KEY);
+      if (v === 'tl' || v === 'tr' || v === 'bl' || v === 'br') saved = v;
+    } catch {}
+    cornerRef.current = saved;
+    setCorner(saved);
+    setCoords(cornerCoords(saved, window.innerWidth, window.innerHeight));
+    const onResize = () => setCoords(cornerCoords(cornerRef.current, window.innerWidth, window.innerHeight));
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [setCoords]);
+
+  const onPointerDown = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
+    if (e.button !== 0) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch {}
+    drag.current = { active: true, moved: false, sx: e.clientX, sy: e.clientY, ox: e.clientX - rect.left, oy: e.clientY - rect.top };
+    if (!coordsRef.current) setCoords({ x: rect.left, y: rect.top });
+  }, [setCoords]);
+
+  const onPointerMove = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
+    const d = drag.current;
+    if (!d.active || open) return;
+    const dx = e.clientX - d.sx;
+    const dy = e.clientY - d.sy;
+    if (!d.moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+    if (!d.moved) { d.moved = true; setDragging(true); }
+    const w = window.innerWidth, h = window.innerHeight;
+    let nx = e.clientX - d.ox;
+    let ny = e.clientY - d.oy;
+    nx = Math.max(EDGE, Math.min(nx, w - BTN_SIZE - EDGE));
+    ny = Math.max(EDGE, Math.min(ny, h - BTN_SIZE - EDGE));
+    const next = { x: nx, y: ny };
+    pendingRef.current = next;
+    coordsRef.current = next;
+    if (rafRef.current == null) rafRef.current = requestAnimationFrame(flushPos);
+  }, [open, flushPos]);
+
+  const endDrag = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
+    const d = drag.current;
+    if (!d.active) return;
+    d.active = false;
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
+    if (rafRef.current != null) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
+    if (open) { setOpen(false); return; }
+    if (!d.moved) { setOpen(true); return; }
+    const w = window.innerWidth, h = window.innerHeight;
+    const c = coordsRef.current ?? cornerCoords(cornerRef.current, w, h);
+    const next = nearestCorner(c.x + BTN_SIZE / 2, c.y + BTN_SIZE / 2, w, h);
+    cornerRef.current = next;
+    setCorner(next);
+    setDragging(false);
+    setCoords(cornerCoords(next, w, h));
+    try { localStorage.setItem(STORAGE_KEY, next); } catch {}
+  }, [open, setCoords]);
+
+  const onPointerCancel = useCallback(() => {
+    const d = drag.current;
+    if (!d.active) return;
+    d.active = false;
+    if (rafRef.current != null) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
+    if (d.moved) {
+      setDragging(false);
+      setCoords(cornerCoords(cornerRef.current, window.innerWidth, window.innerHeight));
+    }
+  }, [setCoords]);
+
+  useEffect(() => () => { if (rafRef.current != null) cancelAnimationFrame(rafRef.current); }, []);
+
+  // ---- Derived positioning -------------------------------------------------
+  const isTop = corner[0] === 't';
+  const isLeft = corner[1] === 'l';
+  const livePos = dragging ? coordsRef.current : coords;
+  const buttonPos: React.CSSProperties = livePos
+    ? { left: livePos.x, top: livePos.y }
+    : { left: MARGIN, bottom: MARGIN };
+  const moveTransition = dragging
+    ? 'none'
+    : 'left 280ms cubic-bezier(0.22, 1, 0.36, 1), top 280ms cubic-bezier(0.22, 1, 0.36, 1)';
+  const panelPos: React.CSSProperties = {
+    ...(isLeft ? { left: MARGIN } : { right: MARGIN }),
+    ...(isTop ? { top: MARGIN + BTN_SIZE + GAP } : { bottom: MARGIN + BTN_SIZE + GAP }),
+  };
+
+  // ---- Intro gate (same as before) ----------------------------------------
   useEffect(() => {
     if (!document.querySelector('.home-intro')) { setReady(true); return; }
     const onDone = () => setReady(true);
@@ -159,8 +279,6 @@ export default function ClippyAssistant() {
     return () => { window.removeEventListener('bm-intro-done', onDone); clearTimeout(fallback); };
   }, []);
 
-  // Pop up a greeting a moment after the page settles, then fade it on its
-  // own after a few seconds. Opening the panel dismisses it immediately.
   useEffect(() => {
     if (!ready) return;
     const showTimer = setTimeout(() => {
@@ -175,8 +293,6 @@ export default function ClippyAssistant() {
     return () => clearTimeout(hideTimer);
   }, [bubble]);
 
-  // One-shot wave when the greeting first appears, then settle back to the
-  // regular idle wiggle while the bubble stays up.
   useEffect(() => {
     if (!bubble) return;
     setGreet(true);
@@ -208,18 +324,23 @@ export default function ClippyAssistant() {
   return (
     <>
       <button
-        onClick={() => setOpen((v) => !v)}
+        ref={buttonRef}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={onPointerCancel}
+        onDragStart={(e) => e.preventDefault()}
+        draggable={false}
         aria-label={open ? 'Close help' : 'Open help'}
         style={{
           position: 'fixed',
-          left: MARGIN,
-          bottom: MARGIN,
+          ...buttonPos,
           width: BTN_SIZE,
           height: BTN_SIZE,
           padding: 0,
           borderRadius: '50%',
           border: open ? 'none' : '1px solid var(--gold)',
-          cursor: 'pointer',
+          cursor: dragging ? 'grabbing' : open ? 'pointer' : 'grab',
           background: open ? 'var(--gold)' : 'var(--bg-light)',
           color: open ? 'var(--bg-dark)' : 'var(--gold)',
           boxShadow: '0 6px 20px rgba(0,0,0,0.35)',
@@ -228,7 +349,7 @@ export default function ClippyAssistant() {
           alignItems: 'center',
           justifyContent: 'center',
           fontSize: 24,
-          transition: 'background 200ms ease, color 200ms ease',
+          transition: `background 200ms ease, color 200ms ease, ${moveTransition}`,
         }}
       >
         {open ? (
@@ -247,12 +368,15 @@ export default function ClippyAssistant() {
         )}
       </button>
 
+      {/* Greeting bubble — anchored to the current corner */}
       <div
         role="status"
         style={{
           position: 'fixed',
-          left: MARGIN + BTN_SIZE + 10,
-          bottom: MARGIN + 14,
+          ...(isLeft
+            ? { left: MARGIN + BTN_SIZE + 10 }
+            : { right: MARGIN + BTN_SIZE + 10 }),
+          ...(isTop ? { top: MARGIN + 14 } : { bottom: MARGIN + 14 }),
           maxWidth: 200,
           padding: '9px 12px',
           borderRadius: 14,
@@ -263,7 +387,9 @@ export default function ClippyAssistant() {
           lineHeight: 1.35,
           boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
           zIndex: 999,
-          transformOrigin: 'bottom left',
+          transformOrigin: isLeft
+            ? (isTop ? 'top left' : 'bottom left')
+            : (isTop ? 'top right' : 'bottom right'),
           transform: bubble ? 'translateY(0) scale(1)' : 'translateY(6px) scale(0.9)',
           opacity: bubble ? 1 : 0,
           pointerEvents: bubble ? 'auto' : 'none',
@@ -271,12 +397,19 @@ export default function ClippyAssistant() {
           fontFamily: 'var(--sans)',
         }}
       >
+        {/* Tail arrow pointing toward the button */}
         <span
           aria-hidden="true"
           style={{
-            position: 'absolute', left: -6, bottom: 16, width: 0, height: 0,
-            borderTop: '6px solid transparent', borderBottom: '6px solid transparent',
-            borderRight: '6px solid var(--cream)',
+            position: 'absolute',
+            ...(isTop ? { top: 16 } : { bottom: 16 }),
+            ...(isLeft
+              ? { left: -6, borderRight: '6px solid var(--cream)', borderLeft: 'none' }
+              : { right: -6, borderLeft: '6px solid var(--cream)', borderRight: 'none' }),
+            width: 0,
+            height: 0,
+            borderTop: '6px solid transparent',
+            borderBottom: '6px solid transparent',
           }}
         />
         {bubble}
@@ -293,11 +426,11 @@ export default function ClippyAssistant() {
         </button>
       </div>
 
+      {/* Help panel */}
       <div
         style={{
           position: 'fixed',
-          left: MARGIN,
-          bottom: MARGIN + BTN_SIZE + GAP,
+          ...panelPos,
           width: 340,
           maxWidth: 'calc(100vw - 40px)',
           maxHeight: 'calc(100vh - 140px)',
@@ -309,7 +442,9 @@ export default function ClippyAssistant() {
           boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
           zIndex: 1000,
           overflow: 'hidden',
-          transformOrigin: 'bottom left',
+          transformOrigin: isLeft
+            ? (isTop ? 'top left' : 'bottom left')
+            : (isTop ? 'top right' : 'bottom right'),
           transform: open ? 'translateY(0) scale(1)' : 'translateY(12px) scale(0.92)',
           opacity: open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',
@@ -369,9 +504,9 @@ export default function ClippyAssistant() {
           {!category && !thinking && results !== null && (
             <div style={{ padding: '10px 14px', fontSize: 12.5, color: 'var(--dim)', borderBottom: '1px solid var(--line)' }}>
               {results.length > 0 ? (
-                <>✨ Here’s what I found for “{query.trim()}”:</>
+                <>✨ Here's what I found for "{query.trim()}":</>
               ) : (
-                <>🤷 I don’t know that one yet. Here’s everything I can help with:</>
+                <>🤷 I don't know that one yet. Here's everything I can help with:</>
               )}
               <button
                 onClick={() => { setResults(null); setQuery(''); }}
