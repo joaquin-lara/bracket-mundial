@@ -134,8 +134,8 @@ export default async function GamblersPage() {
     flagCode: playerById.get(t.user_id)?.flagCode ?? null,
   }));
 
-  const matchById: Record<number, { homeName: string; awayName: string }> = {};
-  for (const m of matches) matchById[m.id] = { homeName: m.home_team, awayName: m.away_team };
+  const matchById: Record<number, { homeName: string; awayName: string; kickoff: string }> = {};
+  for (const m of matches) matchById[m.id] = { homeName: m.home_team, awayName: m.away_team, kickoff: m.kickoff };
 
   return (
     <main>

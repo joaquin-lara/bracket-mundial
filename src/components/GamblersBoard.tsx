@@ -7,6 +7,7 @@ import { flagUrl } from '@/lib/flags';
 import { createClient } from '@/lib/supabase/client';
 import {
   GAMBLER_MARKETS,
+  lockTime,
   type GamblerBet,
   type GamblerComparator,
   type GamblerMarket,
@@ -51,6 +52,10 @@ export interface LeaderboardRow {
 
 export type ParlayWithLegs = GamblerParlayTicket & { legs: GamblerParlayLeg[] };
 export type AllParlayEntry = ParlayWithLegs & { playerName: string; flagCode: string | null };
+
+// Stable empty set for cards with nothing taken yet -- avoids a fresh Set()
+// (and a needless re-render) on every parent render.
+const EMPTY_KEYS: Set<string> = new Set();
 
 function fmt(n: number): string {
   return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
@@ -121,20 +126,31 @@ function legComplete(leg: LegInput): boolean {
   return leg.side != null && leg.comparator != null;
 }
 
-// Identifies what a leg actually bets on, for duplicate detection. `side` is
-// always null for winner/exact_score, so those two markets need the pick
-// itself (team / scoreline) folded in -- otherwise e.g. "winner: home" and
-// "winner: away" collapse to the same key and look like duplicates.
-function legUiKey(leg: LegInput): string {
-  if (leg.market === 'winner') return `winner|${leg.pick ?? ''}`;
-  if (leg.market === 'exact_score') return `exact_score|${leg.homeScore}-${leg.awayScore}`;
-  return `${leg.market}|${leg.side ?? ''}`;
+// Identifies the (market, side) a leg occupies, for duplicate detection. One
+// such slot may hold at most one pending prediction per match -- mirrors the
+// `gambler_market_taken` DB guard. winner/exact_score carry side = null, so
+// they collapse to one bet per match regardless of which pick: betting "home
+// wins" then blocks also betting "draw" or "away wins" on the same game.
+function marketKey(market: GamblerMarket, side: GamblerSide | null): string {
+  if (market === 'winner' || market === 'exact_score') return market;
+  return `${market}|${side ?? ''}`;
 }
 
-function placedLegUiKey(bet: GamblerBet): string {
-  if (bet.market === 'winner') return `winner|${bet.pick ?? ''}`;
-  if (bet.market === 'exact_score') return `exact_score|${bet.pick_home_score}-${bet.pick_away_score}`;
-  return `${bet.market}|${bet.side ?? ''}`;
+function legUiKey(leg: LegInput): string {
+  return marketKey(leg.market, leg.side);
+}
+
+function placedLegUiKey(bet: { market: GamblerMarket; side: GamblerSide | null }): string {
+  return marketKey(bet.market, bet.side);
+}
+
+// First market not already taken on this match -- used to seed a fresh leg so
+// the picker never opens on a winner/exact_score slot the user already filled.
+function firstOpenMarket(markets: GamblerMarket[], takenKeys: Set<string>): GamblerMarket {
+  return (
+    markets.find((m) => !((m === 'winner' || m === 'exact_score') && takenKeys.has(m))) ??
+    markets[0]
+  );
 }
 
 /** Picks a market, then the market-specific inputs (pick / score / side+over-under). */
@@ -144,12 +160,14 @@ function MarketPicker({
   leg,
   onChange,
   availableMarkets,
+  takenKeys,
 }: {
   match: BettableMatch;
   odds: MarketOdds[];
   leg: LegInput;
   onChange: (leg: LegInput) => void;
   availableMarkets: GamblerMarket[];
+  takenKeys: Set<string>;
 }) {
   const sideOptions = (leg.market === 'possession' ? (['home', 'away'] as const) : (['home', 'away', 'total'] as const)).filter(
     (s) => oddsFor(odds, leg.market, s) != null
@@ -162,11 +180,15 @@ function MarketPicker({
         value={leg.market}
         onChange={(e) => onChange(emptyLeg(e.target.value as GamblerMarket))}
       >
-        {availableMarkets.map((market) => (
-          <option key={market} value={market}>
-            {MARKET_LABELS[market]}
-          </option>
-        ))}
+        {availableMarkets.map((market) => {
+          const taken = (market === 'winner' || market === 'exact_score') && takenKeys.has(market);
+          return (
+            <option key={market} value={market} disabled={taken}>
+              {MARKET_LABELS[market]}
+              {taken ? ' (placed)' : ''}
+            </option>
+          );
+        })}
       </select>
 
       {leg.market === 'winner' && (
@@ -176,6 +198,7 @@ function MarketPicker({
               key={p}
               type="button"
               className={`gb-pick-btn${leg.pick === p ? ' active' : ''}`}
+              disabled={takenKeys.has('winner')}
               onClick={() => onChange({ ...leg, pick: p })}
             >
               {pickName(match, p)}
@@ -211,16 +234,21 @@ function MarketPicker({
       {leg.market !== 'winner' && leg.market !== 'exact_score' && (
         <>
           <div className="gb-pick-group">
-            {sideOptions.map((s) => (
-              <button
-                key={s}
-                type="button"
-                className={`gb-pick-btn${leg.side === s ? ' active' : ''}`}
-                onClick={() => onChange({ ...leg, side: s, comparator: null })}
-              >
-                {sideName(match, s)}
-              </button>
-            ))}
+            {sideOptions.map((s) => {
+              const taken = takenKeys.has(`${leg.market}|${s}`);
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  className={`gb-pick-btn${leg.side === s ? ' active' : ''}`}
+                  disabled={taken}
+                  title={taken ? 'Already placed for this match' : undefined}
+                  onClick={() => onChange({ ...leg, side: s, comparator: null })}
+                >
+                  {sideName(match, s)}
+                </button>
+              );
+            })}
           </div>
           {currentForSide && (
             <div className="gb-pick-group">
@@ -267,24 +295,27 @@ function BetMatchCard({
   bets,
   odds,
   balance,
+  takenKeys,
   onPlaced,
+  onCancel,
 }: {
   match: BettableMatch;
   bets: GamblerBet[];
   odds: MarketOdds[];
   balance: number;
+  takenKeys: Set<string>;
   onPlaced: (amount: number) => void;
+  onCancel: (bet: GamblerBet) => void;
 }) {
   const router = useRouter();
-  const placedKeys = new Set(bets.map(placedLegUiKey));
   const availableMarkets = GAMBLER_MARKETS.filter((m) => marketHasOdds(odds, m));
-  const [legs, setLegs] = useState<LegInput[]>([emptyLeg(availableMarkets[0])]);
+  const [legs, setLegs] = useState<LegInput[]>([emptyLeg(firstOpenMarket(availableMarkets, takenKeys))]);
   const [amount, setAmount] = useState('50');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const legKeys = legs.map(legUiKey);
-  const hasDuplicate = new Set(legKeys).size !== legKeys.length || legKeys.some((k) => placedKeys.has(k));
+  const hasDuplicate = new Set(legKeys).size !== legKeys.length || legKeys.some((k) => takenKeys.has(k));
   const allComplete = legs.every(legComplete);
   const ready = allComplete && !hasDuplicate;
 
@@ -299,7 +330,7 @@ function BetMatchCard({
   }
   function addLeg() {
     if (legs.length >= MAX_CARD_LEGS) return;
-    setLegs((a) => [...a, emptyLeg(availableMarkets[0])]);
+    setLegs((a) => [...a, emptyLeg(firstOpenMarket(availableMarkets, takenKeys))]);
   }
   function removeLeg(i: number) {
     if (legs.length <= 1) return;
@@ -349,7 +380,7 @@ function BetMatchCard({
       return;
     }
     onPlaced(amt);
-    setLegs([emptyLeg(availableMarkets[0])]);
+    setLegs([emptyLeg(firstOpenMarket(availableMarkets, takenKeys))]);
     router.refresh();
   }
 
@@ -379,9 +410,16 @@ function BetMatchCard({
         <div className="gb-placed-list">
           {bets.map((b) => (
             <div className={`gb-placed gb-placed-${b.status}`} key={b.id}>
-              {describeLeg(b, match)} — {fmt(b.amount)}
-              {b.status !== 'pending' && (
-                <> ({b.status === 'won' ? `won ${fmt(b.payout ?? 0)}` : 'lost'})</>
+              <span className="gb-placed-text">
+                {describeLeg(b, match)} — {fmt(b.amount)}
+                {b.status !== 'pending' && (
+                  <> ({b.status === 'won' ? `won ${fmt(b.payout ?? 0)}` : 'lost'})</>
+                )}
+              </span>
+              {b.status === 'pending' && (
+                <button type="button" className="gb-remove" onClick={() => onCancel(b)}>
+                  remove
+                </button>
               )}
             </div>
           ))}
@@ -398,7 +436,7 @@ function BetMatchCard({
         <div className="gb-bet-form">
           {legs.map((leg, i) => (
             <div className="gb-leg-slot" key={i}>
-              <MarketPicker match={match} odds={odds} leg={leg} onChange={(l) => updateLeg(i, l)} availableMarkets={availableMarkets} />
+              <MarketPicker match={match} odds={odds} leg={leg} onChange={(l) => updateLeg(i, l)} availableMarkets={availableMarkets} takenKeys={takenKeys} />
               {legs.length > 1 && (
                 <button type="button" className="gb-leg-remove" onClick={() => removeLeg(i)} title="Remove this pick">
                   remove
@@ -495,10 +533,13 @@ export default function GamblersBoard({
   myParlays: ParlayWithLegs[];
   myUserId: string;
   myBalance: number;
-  matchById: Record<number, { homeName: string; awayName: string }>;
+  matchById: Record<number, { homeName: string; awayName: string; kickoff?: string }>;
   readOnly: boolean;
 }) {
+  const router = useRouter();
   const [balance, setBalance] = useState(myBalance);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const betsByMatch = useMemo(() => {
     const map = new Map<number, GamblerBet[]>();
@@ -510,7 +551,49 @@ export default function GamblersBoard({
     return map;
   }, [myBets]);
 
+  // Every (match, market, side) the user already holds, across BOTH standalone
+  // bets and pending parlay legs -- the picker greys these out and the duplicate
+  // guard blocks re-selecting them, matching the `gambler_market_taken` DB check.
+  const takenByMatch = useMemo(() => {
+    const map = new Map<number, Set<string>>();
+    const add = (matchId: number, key: string) => {
+      const set = map.get(matchId) ?? new Set<string>();
+      set.add(key);
+      map.set(matchId, set);
+    };
+    for (const b of myBets) if (b.status === 'pending') add(b.match_id, placedLegUiKey(b));
+    for (const p of myParlays) {
+      if (p.status !== 'pending') continue;
+      for (const leg of p.legs) add(leg.match_id, placedLegUiKey(leg));
+    }
+    return map;
+  }, [myBets, myParlays]);
+
+  const pendingBets = myBets.filter((b) => b.status === 'pending');
   const settledBets = myBets.filter((b) => b.status !== 'pending');
+
+  function matchLocked(matchId: number): boolean {
+    const kickoff = matchById[matchId]?.kickoff;
+    return kickoff ? lockTime(kickoff) <= Date.now() : false;
+  }
+
+  async function cancel(rpc: 'gambler_cancel_bet' | 'gambler_cancel_parlay', id: string, refund: number) {
+    setActionError(null);
+    setBusyId(id);
+    const supabase = createClient();
+    const arg = rpc === 'gambler_cancel_bet' ? { p_bet_id: id } : { p_ticket_id: id };
+    const { error } = await supabase.rpc(rpc, arg);
+    setBusyId(null);
+    if (error) {
+      setActionError(error.message);
+      return;
+    }
+    setBalance((b) => b + refund);
+    router.refresh();
+  }
+
+  const cancelBet = (bet: GamblerBet) => cancel('gambler_cancel_bet', bet.id, bet.amount);
+  const cancelParlay = (p: ParlayWithLegs) => cancel('gambler_cancel_parlay', p.id, p.amount);
 
   return (
     <>
@@ -560,7 +643,9 @@ export default function GamblersBoard({
                   bets={betsByMatch.get(m.id) ?? []}
                   odds={odds}
                   balance={balance}
+                  takenKeys={takenByMatch.get(m.id) ?? EMPTY_KEYS}
                   onPlaced={(amount) => setBalance((b) => b - amount)}
+                  onCancel={cancelBet}
                 />
               ))}
             </div>
@@ -568,20 +653,73 @@ export default function GamblersBoard({
         </section>
       )}
 
+      {!readOnly && actionError && <p className="gb-error">{actionError}</p>}
+
+      {!readOnly && pendingBets.length > 0 && (
+        <section className="gb-section">
+          <h2 className="gb-h2">Your open bets</h2>
+          <div className="gb-history">
+            {pendingBets.map((b) => {
+              const m = matchById[b.match_id];
+              const locked = matchLocked(b.match_id);
+              return (
+                <div className="gb-history-row gb-placed-pending" key={b.id}>
+                  <span>{m ? `${m.homeName} vs ${m.awayName}` : `Match #${b.match_id}`}</span>
+                  <span>{describeLeg(b, m)}</span>
+                  <span>{fmt(b.amount)} bet</span>
+                  <span>
+                    {locked ? (
+                      <span className="gb-locked">Locked</span>
+                    ) : (
+                      <button
+                        type="button"
+                        className="gb-remove"
+                        disabled={busyId === b.id}
+                        onClick={() => cancelBet(b)}
+                      >
+                        {busyId === b.id ? 'Removing…' : 'Remove'}
+                      </button>
+                    )}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {!readOnly && myParlays.length > 0 && (
         <section className="gb-section">
           <h2 className="gb-h2">Your parlays</h2>
           <div className="gb-history">
-            {myParlays.map((p) => (
-              <div className={`gb-history-row gb-placed-${p.status}`} key={p.id}>
-                <span>{p.legs.map((leg) => describeLeg(leg, matchById[leg.match_id])).join(' + ')}</span>
-                <span>{p.status === 'pending' ? 'Pending' : p.status === 'won' ? 'Won' : 'Lost'}</span>
-                <span>{fmt(p.amount)} bet</span>
-                <span>
-                  {p.status === 'won' ? `+${fmt(p.payout ?? 0)}` : p.status === 'lost' ? `-${fmt(p.amount)}` : '—'}
-                </span>
-              </div>
-            ))}
+            {myParlays.map((p) => {
+              const locked = p.legs.some((leg) => matchLocked(leg.match_id));
+              return (
+                <div className={`gb-history-row gb-placed-${p.status}`} key={p.id}>
+                  <span>{p.legs.map((leg) => describeLeg(leg, matchById[leg.match_id])).join(' + ')}</span>
+                  <span>{p.status === 'pending' ? 'Pending' : p.status === 'won' ? 'Won' : 'Lost'}</span>
+                  <span>{fmt(p.amount)} bet</span>
+                  <span>
+                    {p.status === 'pending' && !locked ? (
+                      <button
+                        type="button"
+                        className="gb-remove"
+                        disabled={busyId === p.id}
+                        onClick={() => cancelParlay(p)}
+                      >
+                        {busyId === p.id ? 'Removing…' : 'Remove'}
+                      </button>
+                    ) : p.status === 'won' ? (
+                      `+${fmt(p.payout ?? 0)}`
+                    ) : p.status === 'lost' ? (
+                      `-${fmt(p.amount)}`
+                    ) : (
+                      '—'
+                    )}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </section>
       )}
