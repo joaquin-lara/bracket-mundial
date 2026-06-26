@@ -238,7 +238,7 @@ export default function ClippyAssistant() {
             <span className="clippy-wave">👋</span>
           ) : (
             <img
-              src="/clippy.jpeg"
+              src="/clippy.png"
               alt="Clippy"
               className="clippy-emoji"
               style={{ width: '75%', height: '75%', objectFit: 'cover', borderRadius: '50%' }}
