@@ -21,7 +21,7 @@
 .gb-balance {
   font-size: 16px;
   color: var(--muted);
-  margin: 0 0 28px;
+  margin: 0 0 24px;
 }
 
 .gb-balance strong {
@@ -41,6 +41,14 @@
 
 .gb-top-grid-col {
   margin: 0;
+}
+
+.gb-top-grid-col > .gb-section {
+  margin-bottom: 20px;
+}
+
+.gb-top-grid-col > .gb-section:last-child {
+  margin-bottom: 0;
 }
 
 @media (max-width: 820px) {

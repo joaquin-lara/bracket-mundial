@@ -41,28 +41,24 @@ export default function LiveOddsCard({ match }: { match: LiveOddsMatch }) {
 
       {entry ? (
         <>
+          <div className="odds-prob-head">
+            <span className="odds-prob-item">
+              {match.homeName} win
+              <strong>{pct(entry.probHome)}</strong>
+            </span>
+            <span className="odds-prob-item odds-prob-center">
+              Draw
+              <strong>{pct(entry.probDraw)}</strong>
+            </span>
+            <span className="odds-prob-item odds-prob-right">
+              {match.awayName} win
+              <strong>{pct(entry.probAway)}</strong>
+            </span>
+          </div>
           <div className="odds-bar">
             <span className="odds-seg odds-seg-h" style={{ width: `${entry.probHome * 100}%` }} />
             <span className="odds-seg odds-seg-d" style={{ width: `${entry.probDraw * 100}%` }} />
             <span className="odds-seg odds-seg-a" style={{ width: `${entry.probAway * 100}%` }} />
-          </div>
-
-          <div className="odds-legend">
-            <div className="odds-legend-item">
-              <span className="odds-dot odds-dot-h" />
-              <span className="odds-legend-name">{match.homeName}</span>
-              <span className="odds-legend-pct">{pct(entry.probHome)}</span>
-            </div>
-            <div className="odds-legend-item">
-              <span className="odds-dot odds-dot-d" />
-              <span className="odds-legend-name">Draw</span>
-              <span className="odds-legend-pct">{pct(entry.probDraw)}</span>
-            </div>
-            <div className="odds-legend-item">
-              <span className="odds-dot odds-dot-a" />
-              <span className="odds-legend-name">{match.awayName}</span>
-              <span className="odds-legend-pct">{pct(entry.probAway)}</span>
-            </div>
           </div>
 
           <p className="live-odds-foot">

@@ -15,6 +15,7 @@ export default function HomeIntro() {
       const stripes = document.querySelector<HTMLElement>('.pitch-stripes');
       const heroContent = document.querySelector<HTMLElement>('.hero-content');
       const todayGames = document.querySelector<HTMLElement>('.today-games');
+      const liveOdds = document.querySelector<HTMLElement>('.live-odds');
       const contenders = document.querySelector<HTMLElement>('.contenders');
 
       // Revisiting the home tab: no show, just make everything visible.
@@ -22,7 +23,7 @@ export default function HomeIntro() {
 
       if (!introDecision()) {
         if (topbar) gsap.set(topbar, { y: 0, opacity: 1 });
-        gsap.set([stripes, heroContent, todayGames, contenders, signoutFooter].filter(Boolean), { opacity: 1 });
+        gsap.set([stripes, heroContent, todayGames, liveOdds, contenders, signoutFooter].filter(Boolean), { opacity: 1 });
         // No intro this visit: chat bubble (and anything else waiting) can show now.
         window.dispatchEvent(new Event('bm-intro-done'));
         return;
@@ -38,6 +39,7 @@ export default function HomeIntro() {
         .to(topbar,         { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, '<+0.6')
         .to(heroContent,    { opacity: 1, duration: 0.5, ease: 'power2.out' },   '<+0.2')
         .to(todayGames,     { opacity: 1, duration: 0.5, ease: 'power2.out' },   '<+0.2')
+        .to(liveOdds,       { opacity: 1, duration: 0.5, ease: 'power2.out' },   '<+0.2')
         .to(contenders,     { opacity: 1, duration: 0.5, ease: 'power2.out' },   '<+0.2')
         .to(signoutFooter,  { opacity: 1, duration: 0.4, ease: 'power2.out' },   '<+0.3');
     }, 100);

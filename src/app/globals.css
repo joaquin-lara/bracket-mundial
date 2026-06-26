@@ -119,6 +119,7 @@ a {
 body:has(.home-intro) .topbar,
 body:has(.home-intro) .hero-content,
 body:has(.home-intro) .today-games,
+body:has(.home-intro) .live-odds,
 body:has(.home-intro) .contenders,
 body:has(.home-intro) .signout-footer,
 body:has(.home-intro) .pitch-stripes {
@@ -756,12 +757,42 @@ h1 {
   margin-top: 6px;
 }
 
+.odds-prob-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 14px;
+  margin-bottom: 8px;
+}
+
+.odds-prob-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.odds-prob-item strong {
+  font-size: 17px;
+  color: var(--cream);
+  font-weight: 800;
+}
+
+.odds-prob-center {
+  align-items: center;
+}
+
+.odds-prob-right {
+  align-items: flex-end;
+  text-align: right;
+}
+
 .odds-bar {
   display: flex;
-  height: 22px;
-  border-radius: 6px;
+  height: 14px;
+  border-radius: 7px;
   overflow: hidden;
-  margin-top: 14px;
   background: var(--line);
 }
 
@@ -782,58 +813,6 @@ h1 {
   background: #5aa9e6;
 }
 
-.odds-legend {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.odds-legend-item {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-}
-
-.odds-legend-item:last-child {
-  justify-content: flex-end;
-}
-
-.odds-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.odds-dot-h {
-  background: var(--gold);
-}
-
-.odds-dot-d {
-  background: var(--dim);
-}
-
-.odds-dot-a {
-  background: #5aa9e6;
-}
-
-.odds-legend-name {
-  min-width: 0;
-  color: var(--muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.odds-legend-pct {
-  font-weight: 800;
-  margin-left: auto;
-}
-
 .live-odds-foot {
   font-size: 12px;
   color: var(--dim);
@@ -852,24 +831,6 @@ h1 {
   }
 }
 
-/* On phones the 3-up win-probability legend gets cramped (long country names
-   ellipsis down to a letter or two), so stack it one team per row -- full name
-   on the left, percentage on the right. Reads cleaner and can't overflow. */
-@media (max-width: 480px) {
-  .odds-legend {
-    flex-direction: column;
-    gap: 7px;
-  }
-  .odds-legend-item,
-  .odds-legend-item:last-child {
-    justify-content: flex-start;
-  }
-  .odds-legend-name {
-    white-space: nowrap;
-    overflow: visible;
-    text-overflow: clip;
-  }
-}
 
 .contender-grid {
   display: grid;

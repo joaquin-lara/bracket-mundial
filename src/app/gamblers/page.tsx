@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { ensureFreshScores } from '@/lib/autoSync';
 import { GUEST_NAME, PLAYER_META, PLAYERS, isGuestEmail } from '@/lib/players';
 import { stageLabel, lockTime, type GamblerBet, type GamblerParlayLeg, type GamblerParlayTicket, type MarketOdds, type Match } from '@/lib/types';
-import GamblersBoard, { type AllParlayEntry, type BettableMatch, type LeaderboardRow, type ParlayWithLegs } from '@/components/GamblersBoard';
+import GamblersBoard, { type AllBetEntry, type AllParlayEntry, type BettableMatch, type LeaderboardRow, type ParlayWithLegs } from '@/components/GamblersBoard';
 
 export const metadata: Metadata = { title: 'Gamblers' };
 export const dynamic = 'force-dynamic';
@@ -134,6 +134,17 @@ export default async function GamblersPage() {
     flagCode: playerById.get(t.user_id)?.flagCode ?? null,
   }));
 
+  const { data: allBetRows } = await supabase
+    .from('gambler_bets_v2')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(50);
+  const allBets: AllBetEntry[] = (allBetRows ?? []).map((b) => ({
+    ...(b as GamblerBet),
+    playerName: playerById.get(b.user_id as string)?.name ?? 'Unknown',
+    flagCode: playerById.get(b.user_id as string)?.flagCode ?? null,
+  }));
+
   const matchById: Record<number, { homeName: string; awayName: string; kickoff: string }> = {};
   for (const m of matches) matchById[m.id] = { homeName: m.home_team, awayName: m.away_team, kickoff: m.kickoff };
 
@@ -159,6 +170,7 @@ export default async function GamblersPage() {
         matches={openMatches}
         odds={(oddsRows ?? []) as MarketOdds[]}
         leaderboard={leaderboard}
+        allBets={allBets}
         allParlays={allParlays}
         myBets={(myBetRows ?? []) as GamblerBet[]}
         myParlays={myParlays}

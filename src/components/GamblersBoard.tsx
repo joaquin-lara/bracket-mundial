@@ -52,6 +52,7 @@ export interface LeaderboardRow {
 
 export type ParlayWithLegs = GamblerParlayTicket & { legs: GamblerParlayLeg[] };
 export type AllParlayEntry = ParlayWithLegs & { playerName: string; flagCode: string | null };
+export type AllBetEntry = GamblerBet & { playerName: string; flagCode: string | null };
 
 // Stable empty set for cards with nothing taken yet -- avoids a fresh Set()
 // (and a needless re-render) on every parent render.
@@ -473,6 +474,55 @@ function BetMatchCard({
   );
 }
 
+/** Bragging-rights box: everyone's standalone bets, most recent first. */
+function AllBetsBoard({
+  bets,
+  matchById,
+}: {
+  bets: AllBetEntry[];
+  matchById: Record<number, { homeName: string; awayName: string }>;
+}) {
+  if (bets.length === 0) {
+    return <p className="empty">No bets placed yet — be the first.</p>;
+  }
+  return (
+    <div className="gb-all-parlays">
+      {bets.map((b) => {
+        const m = matchById[b.match_id];
+        return (
+          <div className={`gb-all-parlay-row gb-placed-${b.status}`} key={b.id}>
+            <div className="gb-all-parlay-player">
+              {b.flagCode && flagUrl(b.flagCode) ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={flagUrl(b.flagCode)!} alt="" className="gb-lb-flag" />
+              ) : (
+                <span className="gb-lb-flag gb-lb-flag-blank" />
+              )}
+              <span className="gb-all-parlay-name">{b.playerName}</span>
+              <span className="gb-mult">{b.payout_multiplier.toFixed(2)}x</span>
+            </div>
+            <div className="gb-all-parlay-legs">
+              {m ? `${m.homeName} vs ${m.awayName}` : `Match #${b.match_id}`}
+              {' · '}
+              {describeLeg(b, m)}
+            </div>
+            <div className="gb-all-parlay-foot">
+              <span>{fmt(b.amount)} bet</span>
+              <span>
+                {b.status === 'pending'
+                  ? 'Pending'
+                  : b.status === 'won'
+                  ? `+${fmt(b.payout ?? 0)}`
+                  : `-${fmt(b.amount)}`}
+              </span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 /** Bragging-rights box: everyone's parlays (pending + settled), most recent first. */
 function AllParlaysBoard({
   parlays,
@@ -517,6 +567,7 @@ export default function GamblersBoard({
   matches,
   odds,
   leaderboard,
+  allBets,
   allParlays,
   myBets,
   myParlays,
@@ -528,6 +579,7 @@ export default function GamblersBoard({
   matches: BettableMatch[];
   odds: MarketOdds[];
   leaderboard: LeaderboardRow[];
+  allBets: AllBetEntry[];
   allParlays: AllParlayEntry[];
   myBets: GamblerBet[];
   myParlays: ParlayWithLegs[];
@@ -631,10 +683,16 @@ export default function GamblersBoard({
           </div>
         </section>
 
-        <section className="gb-section gb-top-grid-col">
-          <h2 className="gb-h2">All parlays</h2>
-          <AllParlaysBoard parlays={allParlays} matchById={matchById} />
-        </section>
+        <div className="gb-top-grid-col">
+          <section className="gb-section">
+            <h2 className="gb-h2">All bets</h2>
+            <AllBetsBoard bets={allBets} matchById={matchById} />
+          </section>
+          <section className="gb-section">
+            <h2 className="gb-h2">All parlays</h2>
+            <AllParlaysBoard parlays={allParlays} matchById={matchById} />
+          </section>
+        </div>
       </div>
 
       {!readOnly && (
