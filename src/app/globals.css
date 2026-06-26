@@ -664,7 +664,7 @@ h1 {
 .live-odds-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 14px;
 }
 
 @media (max-width: 640px) {
@@ -689,21 +689,22 @@ h1 {
   50% { opacity: 0.35; }
 }
 
+/* Match the Today's Games (.sched-card) panel exactly: same radius, padding,
+   row layout, flag placement (flags inner, flanking the center) and type
+   scale, so the two home-page sections read as one consistent system. */
 .live-odds-card {
   background: rgba(0, 0, 0, 0.5);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 18px 20px 16px;
+  border-radius: var(--panel-radius);
+  padding: 11px 16px 14px;
 }
 
 .live-odds-teams {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  font-weight: 700;
-  font-size: 15px;
+  gap: 10px;
+  font-size: 14px;
 }
 
 .live-odds-team {
@@ -712,42 +713,55 @@ h1 {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-weight: 600;
 }
 
-.live-odds-team span {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.live-odds-team.right {
+.live-odds-team.home {
   justify-content: flex-end;
   text-align: right;
 }
 
+.live-odds-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Center column mirrors .sched-mid: same width/colour so "vs"/"LIVE" lines up
+   with where the score sits in the schedule above. */
 .live-odds-vs {
   font-family: var(--narrow);
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--dim);
+  min-width: 38px;
+  text-align: center;
+  white-space: nowrap;
   flex-shrink: 0;
+}
+
+.live-odds-vs.live {
+  color: var(--danger);
+  font-weight: 800;
 }
 
 .live-odds-stage {
   text-align: center;
   font-family: var(--narrow);
-  font-size: 10px;
-  letter-spacing: 0.06em;
+  font-size: 11px;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--dim);
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .odds-bar {
   display: flex;
   height: 22px;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
-  margin-top: 16px;
+  margin-top: 14px;
   background: var(--line);
 }
 
@@ -823,13 +837,13 @@ h1 {
 .live-odds-foot {
   font-size: 12px;
   color: var(--dim);
-  margin: 14px 0 0;
+  margin: 12px 0 0;
   line-height: 1.5;
 }
 
 .live-odds-empty {
   text-align: center;
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
 @media (max-width: 640px) {

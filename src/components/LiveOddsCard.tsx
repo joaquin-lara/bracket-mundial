@@ -25,15 +25,17 @@ export default function LiveOddsCard({ match }: { match: LiveOddsMatch }) {
   return (
     <div className="live-odds-card">
       <div className="live-odds-teams">
-        <div className="live-odds-team">
+        <span className="live-odds-team home">
+          <span className="live-odds-name">{match.homeName}</span>
           <Flag code={match.homeCode} name={match.homeName} />
-          <span>{match.homeName}</span>
-        </div>
-        <span className="live-odds-vs">{match.live ? 'LIVE' : 'vs'}</span>
-        <div className="live-odds-team right">
-          <span>{match.awayName}</span>
+        </span>
+        <span className={`live-odds-vs${match.live ? ' live' : ''}`}>
+          {match.live ? 'LIVE' : 'vs'}
+        </span>
+        <span className="live-odds-team">
           <Flag code={match.awayCode} name={match.awayName} />
-        </div>
+          <span className="live-odds-name">{match.awayName}</span>
+        </span>
       </div>
       <div className="live-odds-stage">{match.stage}</div>
 
