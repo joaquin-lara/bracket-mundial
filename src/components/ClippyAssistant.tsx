@@ -24,11 +24,11 @@ function nearestCorner(cx: number, cy: number, w: number, h: number): Corner {
 }
 
 const GREETINGS = [
-  'Hey, I'm right here 👋',
+  "Hey, I'm right here 👋",
   'Ask me anything about the app!',
-  'Stuck on something? I've got you.',
+  "Stuck on something? I've got you.",
   'Need help? Just tap me.',
-  'Got questions? I'm all ears.',
+  "Got questions? I'm all ears.",
   'Not sure how this works? Ask away.',
 ];
 
@@ -51,7 +51,7 @@ const CATEGORIES: ClippyCategory[] = [
       },
       {
         q: 'Can other people see my picks?',
-        a: 'No — picks are hidden until the match kicks off. After that everyone's picks are revealed.',
+        a: "No — picks are hidden until the match kicks off. After that everyone's picks are revealed.",
       },
       {
         q: 'How do penalty shootouts count for scoring?',
@@ -69,7 +69,7 @@ const CATEGORIES: ClippyCategory[] = [
         a: 'A fake-money side game. Everyone starts with $1000 and bets on match winners, exact scores, or stat markets like corners, shots, cards and possession.',
       },
       {
-        q: 'What's a parlay?',
+        q: "What's a parlay?",
         a: 'Tap "+ add another market" on a match card to stack up to 4 picks on that game into one ticket for a bigger combined multiplier. Miss a single leg and you lose the whole parlay.',
       },
       {
@@ -85,7 +85,7 @@ const CATEGORIES: ClippyCategory[] = [
     items: [
       {
         q: 'What is Live Odds?',
-        a: 'Real-time win probabilities for today's matches, pulled from Polymarket. It only shows games that haven't finished yet.',
+        a: "Real-time win probabilities for today's matches, pulled from Polymarket. It only shows games that haven't finished yet.",
       },
     ],
   },
@@ -96,7 +96,7 @@ const CATEGORIES: ClippyCategory[] = [
     items: [
       {
         q: 'How do Penalty Shootouts work?',
-        a: 'Challenge another player to a 1v1 shootout: best of 5 penalties, then sudden death if it's still tied.',
+        a: "Challenge another player to a 1v1 shootout: best of 5 penalties, then sudden death if it's still tied.",
       },
     ],
   },
