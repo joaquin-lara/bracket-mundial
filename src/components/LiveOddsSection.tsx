@@ -11,13 +11,18 @@ import { stageLabel, type Match } from '@/lib/types';
  */
 export default function LiveOddsSection({ matches }: { matches: Match[] }) {
   const localToday = new Date().toLocaleDateString('en-CA');
-  const todays = matches.filter(
-    (m) =>
-      new Date(m.kickoff).toLocaleDateString('en-CA') === localToday &&
-      // Once a match is over, drop it from Live Odds — the market is settled and
-      // no longer reflects a live, tradeable probability.
-      m.status !== 'FINISHED'
-  );
+  const now = Date.now();
+  // A match can't still be running this long after kickoff (90' + half-time +
+  // stoppage, plus extra time and penalties for knockouts ≈ 3h). Past that it
+  // has ended, so drop it from Live Odds even if its stored status never
+  // flipped to FINISHED — the market is settled, not a live price.
+  const MATCH_OVER_MS = 3 * 60 * 60 * 1000;
+  const todays = matches.filter((m) => {
+    if (new Date(m.kickoff).toLocaleDateString('en-CA') !== localToday) return false;
+    if (m.status === 'FINISHED') return false;
+    if (now - new Date(m.kickoff).getTime() > MATCH_OVER_MS) return false;
+    return true;
+  });
 
   const rateable = todays
     .map((m) => {
