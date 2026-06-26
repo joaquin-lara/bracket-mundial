@@ -234,7 +234,16 @@ export default function ClippyAssistant() {
         {open ? (
           <span style={{ fontSize: 26, lineHeight: 1, fontWeight: 700 }}>×</span>
         ) : (
-          <span className={greet ? 'clippy-wave' : 'clippy-emoji'}>{greet ? '👋' : '📎'}</span>
+          greet ? (
+            <span className="clippy-wave">👋</span>
+          ) : (
+            <img
+              src="/clippy.jpeg"
+              alt="Clippy"
+              className="clippy-emoji"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+            />
+          )
         )}
       </button>
 
