@@ -19,7 +19,8 @@ import {
 
 // ---- Drag / corner-snap config (carried over from Curva's ChatBubble) ------
 type Corner = 'tl' | 'tr' | 'bl' | 'br';
-const BTN_SIZE = 84;
+const DESKTOP_BTN = 56;
+const MOBILE_BTN = 84;
 const MARGIN = 20;
 const GAP = 12;
 const EDGE = 8;
@@ -28,9 +29,9 @@ const STORAGE_KEY = 'bm-chat-corner';
 
 type XY = { x: number; y: number };
 
-function cornerCoords(c: Corner, w: number, h: number): XY {
-  const x = c[1] === 'l' ? MARGIN : w - MARGIN - BTN_SIZE;
-  const y = c[0] === 't' ? MARGIN : h - MARGIN - BTN_SIZE;
+function cornerCoords(c: Corner, w: number, h: number, bs: number): XY {
+  const x = c[1] === 'l' ? MARGIN : w - MARGIN - bs;
+  const y = c[0] === 't' ? MARGIN : h - MARGIN - bs;
   return { x, y };
 }
 function nearestCorner(cx: number, cy: number, w: number, h: number): Corner {
@@ -90,6 +91,8 @@ export default function ChatBubble({ me }: { me: string }) {
   const [dragging, setDragging] = useState(false);
   const coordsRef = useRef<XY | null>(null);
   const cornerRef = useRef<Corner>('br');
+  const btnSizeRef = useRef(DESKTOP_BTN);
+  const [btnSize, setBtnSize] = useState(DESKTOP_BTN);
   const setCoords = useCallback((c: XY) => { coordsRef.current = c; setCoordsState(c); }, []);
   const drag = useRef({ active: false, moved: false, sx: 0, sy: 0, ox: 0, oy: 0 });
   // Imperative drag: write position straight to the DOM (one write per frame)
@@ -112,8 +115,16 @@ export default function ChatBubble({ me }: { me: string }) {
     } catch {}
     cornerRef.current = saved;
     setCorner(saved);
-    setCoords(cornerCoords(saved, window.innerWidth, window.innerHeight));
-    const onResize = () => setCoords(cornerCoords(cornerRef.current, window.innerWidth, window.innerHeight));
+    const bs = window.innerWidth < 768 ? MOBILE_BTN : DESKTOP_BTN;
+    btnSizeRef.current = bs;
+    setBtnSize(bs);
+    setCoords(cornerCoords(saved, window.innerWidth, window.innerHeight, bs));
+    const onResize = () => {
+      const newBs = window.innerWidth < 768 ? MOBILE_BTN : DESKTOP_BTN;
+      btnSizeRef.current = newBs;
+      setBtnSize(newBs);
+      setCoords(cornerCoords(cornerRef.current, window.innerWidth, window.innerHeight, newBs));
+    };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, [setCoords]);
@@ -136,8 +147,8 @@ export default function ChatBubble({ me }: { me: string }) {
     const w = window.innerWidth, h = window.innerHeight;
     let nx = e.clientX - d.ox;
     let ny = e.clientY - d.oy;
-    nx = Math.max(EDGE, Math.min(nx, w - BTN_SIZE - EDGE));
-    ny = Math.max(EDGE, Math.min(ny, h - BTN_SIZE - EDGE));
+    nx = Math.max(EDGE, Math.min(nx, w - btnSizeRef.current - EDGE));
+    ny = Math.max(EDGE, Math.min(ny, h - btnSizeRef.current - EDGE));
     // No setState during the drag: stash the position, keep the ref in sync (so
     // any incidental re-render stays consistent), and paint once per frame.
     const next = { x: nx, y: ny };
@@ -155,12 +166,13 @@ export default function ChatBubble({ me }: { me: string }) {
     if (open) { setOpen(false); return; }
     if (!d.moved) { setOpen(true); return; }
     const w = window.innerWidth, h = window.innerHeight;
-    const c = coordsRef.current ?? cornerCoords(cornerRef.current, w, h);
-    const next = nearestCorner(c.x + BTN_SIZE / 2, c.y + BTN_SIZE / 2, w, h);
+    const bs = btnSizeRef.current;
+    const c = coordsRef.current ?? cornerCoords(cornerRef.current, w, h, bs);
+    const next = nearestCorner(c.x + bs / 2, c.y + bs / 2, w, h);
     cornerRef.current = next;
     setCorner(next);
     setDragging(false);
-    setCoords(cornerCoords(next, w, h));
+    setCoords(cornerCoords(next, w, h, bs));
     try { localStorage.setItem(STORAGE_KEY, next); } catch {}
   }, [open, setCoords]);
 
@@ -171,7 +183,7 @@ export default function ChatBubble({ me }: { me: string }) {
     if (rafRef.current != null) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
     if (d.moved) {
       setDragging(false);
-      setCoords(cornerCoords(cornerRef.current, window.innerWidth, window.innerHeight));
+      setCoords(cornerCoords(cornerRef.current, window.innerWidth, window.innerHeight, btnSizeRef.current));
     }
   }, [setCoords]);
 
@@ -437,7 +449,7 @@ export default function ChatBubble({ me }: { me: string }) {
     : 'left 280ms cubic-bezier(0.22, 1, 0.36, 1), top 280ms cubic-bezier(0.22, 1, 0.36, 1)';
   const panelPos: React.CSSProperties = {
     ...(isLeft ? { left: MARGIN } : { right: MARGIN }),
-    ...(isTop ? { top: MARGIN + BTN_SIZE + GAP } : { bottom: MARGIN + BTN_SIZE + GAP }),
+    ...(isTop ? { top: MARGIN + btnSize + GAP } : { bottom: MARGIN + btnSize + GAP }),
   };
   const panelOrigin = `${isTop ? 'top' : 'bottom'} ${isLeft ? 'left' : 'right'}`;
   const panelClosedTransform = `translateY(${isTop ? '-12px' : '12px'}) scale(0.92)`;
@@ -491,8 +503,8 @@ export default function ChatBubble({ me }: { me: string }) {
         style={{
           position: 'fixed',
           ...buttonPos,
-          width: BTN_SIZE,
-          height: BTN_SIZE,
+          width: btnSize,
+          height: btnSize,
           padding: 0,
           borderRadius: '50%',
           border: open ? 'none' : '1px solid var(--gold)',
