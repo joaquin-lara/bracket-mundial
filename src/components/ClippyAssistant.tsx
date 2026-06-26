@@ -313,23 +313,30 @@ export default function ClippyAssistant() {
           fontFamily: 'var(--sans)',
         }}
       >
-        <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: 10 }}>
-          {category && (
-            <button
-              onClick={() => { setActiveCategory(null); setOpenQuestion(null); }}
-              aria-label="Back"
-              style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: 0, display: 'flex' }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
-            </button>
-          )}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: '.04em', color: 'var(--cream)', textTransform: 'uppercase' }}>
-              {category ? category.title : 'Clippy'}
+        <div style={{ borderBottom: '1px solid var(--line)' }}>
+          <div style={{ padding: '12px 14px 0', display: 'flex', alignItems: 'center', gap: 10 }}>
+            {category && (
+              <button
+                onClick={() => { setActiveCategory(null); setOpenQuestion(null); }}
+                aria-label="Back"
+                style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: 0, display: 'flex' }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+              </button>
+            )}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: '.04em', color: 'var(--cream)', textTransform: 'uppercase' }}>
+                {category ? category.title : 'Clippy'}
+              </div>
+              {!category && <div style={{ fontSize: 11, color: 'var(--dim)' }}>Ask me how something works</div>}
             </div>
-            {!category && <div style={{ fontSize: 11, color: 'var(--dim)' }}>Ask me how something works</div>}
+            <button onClick={closeAndReset} aria-label="Close" style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>×</button>
           </div>
-          <button onClick={closeAndReset} aria-label="Close" style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>×</button>
+          {!category && (
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <img src="/clippy_green.png" alt="Clippy" style={{ width: 130, height: 130, objectFit: 'contain', display: 'block' }} />
+            </div>
+          )}
         </div>
 
         {!category && (
