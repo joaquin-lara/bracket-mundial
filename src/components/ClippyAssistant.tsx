@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 
 const DESKTOP_BTN = 56;
 const MOBILE_BTN = 65;
 const MARGIN = 20;
 const GAP = 12;
+
+const CLIPS = ['/clippy_clean.mp4', '/clippy_spring.mp4', '/clippy_shuffle.mp4', '/clippy_phone.mp4', '/clippy_looking_good.mp4'];
 
 const GREETINGS = [
   "Hey, I'm right here 👋",
@@ -147,6 +149,9 @@ export default function ClippyAssistant() {
   const [bubble, setBubble] = useState<string | null>(null);
   const [thinking, setThinking] = useState(false);
   const [btnSize, setBtnSize] = useState(DESKTOP_BTN);
+  const [clipIndex, setClipIndex] = useState(0);
+  const [playingClip, setPlayingClip] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const category = CATEGORIES.find((c) => c.id === activeCategory) ?? null;
 
@@ -183,6 +188,29 @@ export default function ClippyAssistant() {
   useEffect(() => {
     if (open) setBubble(null);
   }, [open]);
+
+  useEffect(() => {
+    if (!open) { setPlayingClip(false); return; }
+    const t = setTimeout(() => setPlayingClip(true), 6000);
+    return () => clearTimeout(t);
+  }, [open, playingClip]);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (playingClip) {
+      v.load();
+      v.play().catch(() => {});
+    } else {
+      v.pause();
+      v.currentTime = 0;
+    }
+  }, [playingClip, clipIndex]);
+
+  function onClipEnded() {
+    setPlayingClip(false);
+    setClipIndex((i) => (i + 1) % CLIPS.length);
+  }
 
   function closeAndReset() {
     setOpen(false);
@@ -323,7 +351,23 @@ export default function ClippyAssistant() {
           </div>
           {!category && (
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <img src="/clippy_green.png" alt="Clippy" style={{ width: 150, height: 150, objectFit: 'contain', display: 'block' }} />
+              <div style={{ position: 'relative', width: 150, height: 150, flexShrink: 0, borderRadius: 18, border: '2px solid var(--gold)', overflow: 'hidden', margin: '4px 0' }}>
+                <img src="/clippy_green.png" alt="Clippy" style={{ width: 150, height: 150, objectFit: 'contain', display: 'block' }} />
+                <video
+                  ref={videoRef}
+                  src={CLIPS[clipIndex]}
+                  muted
+                  playsInline
+                  onEnded={onClipEnded}
+                  style={{
+                    position: 'absolute', top: 0, left: 0,
+                    width: 150, height: 150, objectFit: 'cover',
+                    opacity: playingClip ? 1 : 0,
+                    transition: 'opacity 300ms ease',
+                    pointerEvents: 'none',
+                  }}
+                />
+              </div>
             </div>
           )}
         </div>
