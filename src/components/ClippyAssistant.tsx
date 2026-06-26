@@ -241,7 +241,7 @@ export default function ClippyAssistant() {
               src="/clippy.jpeg"
               alt="Clippy"
               className="clippy-emoji"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+              style={{ width: '75%', height: '75%', objectFit: 'cover', borderRadius: '50%' }}
             />
           )
         )}
