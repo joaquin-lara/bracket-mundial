@@ -1,3 +1,4 @@
+import CollapsibleSection from './CollapsibleSection';
 import Flag from './Flag';
 import type { GroupTable } from '@/lib/groups';
 
@@ -7,10 +8,7 @@ export default function GroupTables({ tables }: { tables: GroupTable[] }) {
 
   return (
     <section className="groups-section">
-      <div className="groups-head">
-        <span className="groups-title">Group Stage</span>
-        <div className="contenders-line" />
-      </div>
+      <CollapsibleSection title="Group Stage">
       <p className="subtitle">
         Top 2 of each group qualify (gold). The 8 best third-placed teams also make it.
       </p>
@@ -76,6 +74,7 @@ export default function GroupTables({ tables }: { tables: GroupTable[] }) {
           </div>
         ))}
       </div>
+      </CollapsibleSection>
     </section>
   );
 }

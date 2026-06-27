@@ -1,3 +1,4 @@
+import CollapsibleSection from './CollapsibleSection';
 import Flag from './Flag';
 import type { GroupRow, GroupTable } from '@/lib/groups';
 import {
@@ -115,10 +116,7 @@ export default function AsItStands({
 
   return (
     <section className="ais-section">
-      <div className="groups-head">
-        <span className="groups-title">As It Stands</span>
-        <div className="contenders-line" />
-      </div>
+      <CollapsibleSection title="As It Stands">
       <p className="subtitle">
         A live projection from the results so far — current placings, what the teams on the
         bubble still need, and the Round of 32 these standings would produce. Updates as games
@@ -130,11 +128,9 @@ export default function AsItStands({
           <GroupOutlookCard key={t.name} table={t} outlooks={groupOutlooks(t, matches)} />
         ))}
       </div>
+      </CollapsibleSection>
 
-      <div className="groups-head">
-        <span className="groups-title">Placement Summary</span>
-        <div className="contenders-line" />
-      </div>
+      <CollapsibleSection title="Placement Summary">
       <p className="subtitle">
         Where every team sits if the group stage ended now. Group winners (1) and runners-up (2)
         all advance; the eight best third-placed teams (gold) join them.
@@ -153,7 +149,7 @@ export default function AsItStands({
           </div>
         </div>
       </div>
-
+      </CollapsibleSection>
     </section>
   );
 }

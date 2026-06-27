@@ -79,7 +79,6 @@ export default async function BracketPage() {
         thirdPlace={thirdPlace}
         projected={projected}
         locked={locked}
-        showToggle={anyGroupPlayed}
       />
 
       <CardsEditor initial={cardsRows} />

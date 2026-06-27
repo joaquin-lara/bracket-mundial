@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { flagUrl } from '@/lib/flags';
 import type { ProjectedMatch } from '@/lib/qualification';
 import type { Match } from '@/lib/types';
@@ -99,7 +99,6 @@ interface Props {
   projected: ProjectedMatch[];
   /** Teams whose group position is mathematically locked, keyed by seed label. */
   locked: Record<string, { team: string; code: string | null }>;
-  showToggle: boolean;
 }
 
 export default function KnockoutSection({
@@ -107,10 +106,7 @@ export default function KnockoutSection({
   thirdPlace,
   projected,
   locked,
-  showToggle,
 }: Props) {
-  const [useProjected, setUseProjected] = useState(false);
-
   const stageMap = useMemo(
     () => new Map(byStage.map((s) => [s.stage, s.matches])),
     [byStage],
@@ -120,11 +116,11 @@ export default function KnockoutSection({
 
   const r32Matches = stageMap.get('LAST_32') ?? [];
 
-  // Always surface mathematically-locked teams into still-TBD slots, even with
-  // the projection off. The pairing for slot i is projected[i], so its seed
-  // labels ("1C", "2F") tell us which locked team belongs there. The data feed
-  // only publishes a knockout team once it has the official slot, so this fills
-  // the gap for teams whose position is certain but not yet in the feed.
+  // Surface mathematically-locked teams into still-TBD slots. The pairing for
+  // slot i is projected[i], so its seed labels ("1C", "2F") tell us which locked
+  // team belongs there. The data feed only publishes a knockout team once it has
+  // the official slot, so this fills the gap for teams whose position is certain
+  // but not yet in the feed.
   const lockedR32 = useMemo(() => {
     return r32Matches.map((m, i) => {
       const proj = projected[i];
@@ -142,39 +138,11 @@ export default function KnockoutSection({
     });
   }, [r32Matches, projected, locked]);
 
-  const projectedR32 = useMemo(() => {
-    if (!useProjected) return lockedR32;
-    // Fill the still-TBD slots with the projection; confirmed (real) and locked
-    // teams are left exactly where they are. Each projected team lands in its own
-    // slot (pairings are aligned to the fixtures by kickoff order), so no de-dup
-    // is needed: a filled slot is non-TBD, so the projection never overwrites it,
-    // and the projection never assigns one team to two slots.
-    return lockedR32.map((m, i) => {
-      const proj = projected[i];
-      if (!proj) return m;
-      return {
-        ...m,
-        home_team: m.home_team === 'TBD' ? (proj.home.team?.team ?? proj.home.label) : m.home_team,
-        home_code: m.home_team === 'TBD' ? (proj.home.team?.code ?? null) : m.home_code,
-        away_team: m.away_team === 'TBD' ? (proj.away.team?.team ?? proj.away.label) : m.away_team,
-        away_code: m.away_team === 'TBD' ? (proj.away.team?.code ?? null) : m.away_code,
-      };
-    });
-  }, [useProjected, lockedR32, projected]);
-
   return (
     <>
       <div className="groups-head">
         <span className="groups-title">Knockout Stage</span>
         <div className="contenders-line" />
-        {showToggle && (
-          <button
-            className={`projected-toggle${useProjected ? ' active' : ''}`}
-            onClick={() => setUseProjected((v) => !v)}
-          >
-            {useProjected ? 'Hide projection' : 'Show projected lineup'}
-          </button>
-        )}
       </div>
       {!hasKnockout ? (
         <p className="empty">The knockout fixtures appear here once the sync loads them.</p>
@@ -182,7 +150,7 @@ export default function KnockoutSection({
         <div className="bracket">
           {ROUNDS.map((round, roundIndex) => {
             const roundMatches =
-              round.stage === 'LAST_32' ? projectedR32 : (stageMap.get(round.stage) ?? []);
+              round.stage === 'LAST_32' ? lockedR32 : (stageMap.get(round.stage) ?? []);
             const slotClass = `match-slot${roundIndex > 0 ? ' has-in' : ''}${
               roundIndex < ROUNDS.length - 1 ? ' has-out' : ''
             }`;
