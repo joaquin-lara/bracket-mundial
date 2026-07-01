@@ -90,11 +90,13 @@ const ALIASES: Record<string, string> = {
   turkiye: 'TUR', turkey: 'TUR',
   caboverde: 'CPV', capeverde: 'CPV', capeverdeislands: 'CPV',
   bosniaherzegovina: 'BIH', bosniaandherzegovina: 'BIH',
-  drcongo: 'COD', congodr: 'COD', democraticrepublicofthecongo: 'COD', congodemocraticrepublic: 'COD',
+  drcongo: 'COD', congodr: 'COD', democraticrepublicofthecongo: 'COD', congodemocraticrepublic: 'COD', drc: 'COD',
   curacao: 'CUR', cuw: 'CUR', // football-data serves Curaçao's TLA as CUW; dataset uses CUR
   saudiarabia: 'KSA',
   southafrica: 'RSA',
   newzealand: 'NZL',
+  bosnia: 'BIH',
+  holland: 'NED',
 };
 
 // Build a normalized-name -> code index from the dataset names themselves.
