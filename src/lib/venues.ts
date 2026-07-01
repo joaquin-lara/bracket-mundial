@@ -54,8 +54,10 @@ function norm(s: string): string {
  */
 export const KNOCKOUT_VENUES: Record<string, string[]> = {
   LAST_32: R32_PAIRINGS.map((p) => p.venue),
+  // Chronological (kickoff) order: NRG/Houston (M90) kicks off before
+  // Lincoln Financial/Philadelphia (M89) on the opening day of the round.
   LAST_16: [
-    'Lincoln Financial Field', 'NRG Stadium', 'MetLife Stadium', 'Estadio Azteca',
+    'NRG Stadium', 'Lincoln Financial Field', 'MetLife Stadium', 'Estadio Azteca',
     'AT&T Stadium', 'Lumen Field', 'Mercedes-Benz Stadium', 'BC Place',
   ],
   QUARTER_FINALS: ['Gillette Stadium', 'SoFi Stadium', 'Hard Rock Stadium', 'Arrowhead Stadium'],
@@ -63,6 +65,41 @@ export const KNOCKOUT_VENUES: Record<string, string[]> = {
   THIRD_PLACE: ['Hard Rock Stadium'],
   FINAL: ['MetLife Stadium'],
 };
+
+/**
+ * Host stadiums for each knockout round in **bracket** (top-to-bottom) order —
+ * the order needed to lay the round out as a tree, not the chronological order
+ * above. Every stadium is unique within its round, so a fixture's pinned venue
+ * is enough to place it in the bracket. LAST_32 is ordered separately (it has
+ * repeat venues) via R32_BRACKET_FIFA; FINAL is a single match.
+ */
+export const KNOCKOUT_BRACKET_VENUES: Record<string, string[]> = {
+  LAST_16: [
+    'Lincoln Financial Field', // 89: W74 v W77
+    'NRG Stadium', // 90: W73 v W75
+    'AT&T Stadium', // 93: W83 v W84
+    'Lumen Field', // 94: W81 v W82
+    'MetLife Stadium', // 91: W76 v W78
+    'Estadio Azteca', // 92: W79 v W80
+    'Mercedes-Benz Stadium', // 95: W86 v W88
+    'BC Place', // 96: W85 v W87
+  ],
+  QUARTER_FINALS: ['Gillette Stadium', 'SoFi Stadium', 'Hard Rock Stadium', 'Arrowhead Stadium'], // 97-100
+  SEMI_FINALS: ['AT&T Stadium', 'Mercedes-Benz Stadium'], // 101, 102
+};
+
+/**
+ * Position of a fixture within its round's bracket layout (top→bottom), keyed
+ * by its pinned venue. Rounds not in KNOCKOUT_BRACKET_VENUES return -1 (order
+ * left untouched); an unknown/unresolved venue sorts to the end of its round.
+ */
+export function bracketVenueRank(stage: string, rawVenue: string | null | undefined): number {
+  const order = KNOCKOUT_BRACKET_VENUES[stage];
+  if (!order) return -1;
+  const v = lookupVenue(rawVenue);
+  const i = v ? order.indexOf(v.stadium) : -1;
+  return i === -1 ? order.length : i;
+}
 
 /**
  * Stamp knockout fixtures with their fixed venue. The schedule pins each

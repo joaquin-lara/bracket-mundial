@@ -23,6 +23,7 @@ type Seed =
 
 interface Pairing {
   match: number;
+  fifa: number; // official FIFA match number — the fixed key into the bracket tree
   kickoff: string; // official UTC kickoff; the array is kept in kickoff order
   venue: string; // host stadium (matches VENUES[].stadium) — single source of truth
   home: Seed;
@@ -39,23 +40,51 @@ interface Pairing {
  * (FIFA match number shown in the trailing comment.)
  */
 export const R32_PAIRINGS: Pairing[] = [
-  { match: 1, kickoff: '2026-06-28T19:00:00Z', venue: 'SoFi Stadium', home: pos(2, 'A'), away: pos(2, 'B') }, // 73 Los Angeles
-  { match: 2, kickoff: '2026-06-29T17:00:00Z', venue: 'NRG Stadium', home: pos(1, 'C'), away: pos(2, 'F') }, // 76 Houston
-  { match: 3, kickoff: '2026-06-29T20:30:00Z', venue: 'Gillette Stadium', home: pos(1, 'E'), away: third('ABCDF') }, // 74 Boston
-  { match: 4, kickoff: '2026-06-30T01:00:00Z', venue: 'Estadio BBVA', home: pos(1, 'F'), away: pos(2, 'C') }, // 75 Monterrey
-  { match: 5, kickoff: '2026-06-30T17:00:00Z', venue: 'AT&T Stadium', home: pos(2, 'E'), away: pos(2, 'I') }, // 78 Dallas
-  { match: 6, kickoff: '2026-06-30T21:00:00Z', venue: 'MetLife Stadium', home: pos(1, 'I'), away: third('CDFGH') }, // 77 New York/New Jersey
-  { match: 7, kickoff: '2026-07-01T01:00:00Z', venue: 'Estadio Azteca', home: pos(1, 'A'), away: third('CEFHI') }, // 79 Mexico City
-  { match: 8, kickoff: '2026-07-01T16:00:00Z', venue: 'Mercedes-Benz Stadium', home: pos(1, 'L'), away: third('EHIJK') }, // 80 Atlanta
-  { match: 9, kickoff: '2026-07-01T20:00:00Z', venue: 'Lumen Field', home: pos(1, 'G'), away: third('AEHIJ') }, // 82 Seattle
-  { match: 10, kickoff: '2026-07-02T00:00:00Z', venue: "Levi's Stadium", home: pos(1, 'D'), away: third('BEFIJ') }, // 81 San Francisco Bay Area
-  { match: 11, kickoff: '2026-07-02T19:00:00Z', venue: 'SoFi Stadium', home: pos(1, 'H'), away: pos(2, 'J') }, // 84 Los Angeles
-  { match: 12, kickoff: '2026-07-02T23:00:00Z', venue: 'BMO Field', home: pos(2, 'K'), away: pos(2, 'L') }, // 83 Toronto
-  { match: 13, kickoff: '2026-07-03T03:00:00Z', venue: 'BC Place', home: pos(1, 'B'), away: third('EFGIJ') }, // 85 Vancouver
-  { match: 14, kickoff: '2026-07-03T18:00:00Z', venue: 'AT&T Stadium', home: pos(2, 'D'), away: pos(2, 'G') }, // 88 Dallas
-  { match: 15, kickoff: '2026-07-03T22:00:00Z', venue: 'Hard Rock Stadium', home: pos(1, 'J'), away: pos(2, 'H') }, // 86 Miami
-  { match: 16, kickoff: '2026-07-04T01:30:00Z', venue: 'Arrowhead Stadium', home: pos(1, 'K'), away: third('DEIJL') }, // 87 Kansas City
+  { match: 1, fifa: 73, kickoff: '2026-06-28T19:00:00Z', venue: 'SoFi Stadium', home: pos(2, 'A'), away: pos(2, 'B') }, // Los Angeles
+  { match: 2, fifa: 76, kickoff: '2026-06-29T17:00:00Z', venue: 'NRG Stadium', home: pos(1, 'C'), away: pos(2, 'F') }, // Houston
+  { match: 3, fifa: 74, kickoff: '2026-06-29T20:30:00Z', venue: 'Gillette Stadium', home: pos(1, 'E'), away: third('ABCDF') }, // Boston
+  { match: 4, fifa: 75, kickoff: '2026-06-30T01:00:00Z', venue: 'Estadio BBVA', home: pos(1, 'F'), away: pos(2, 'C') }, // Monterrey
+  { match: 5, fifa: 78, kickoff: '2026-06-30T17:00:00Z', venue: 'AT&T Stadium', home: pos(2, 'E'), away: pos(2, 'I') }, // Dallas
+  { match: 6, fifa: 77, kickoff: '2026-06-30T21:00:00Z', venue: 'MetLife Stadium', home: pos(1, 'I'), away: third('CDFGH') }, // New York/New Jersey
+  { match: 7, fifa: 79, kickoff: '2026-07-01T01:00:00Z', venue: 'Estadio Azteca', home: pos(1, 'A'), away: third('CEFHI') }, // Mexico City
+  { match: 8, fifa: 80, kickoff: '2026-07-01T16:00:00Z', venue: 'Mercedes-Benz Stadium', home: pos(1, 'L'), away: third('EHIJK') }, // Atlanta
+  { match: 9, fifa: 82, kickoff: '2026-07-01T20:00:00Z', venue: 'Lumen Field', home: pos(1, 'G'), away: third('AEHIJ') }, // Seattle
+  { match: 10, fifa: 81, kickoff: '2026-07-02T00:00:00Z', venue: "Levi's Stadium", home: pos(1, 'D'), away: third('BEFIJ') }, // San Francisco Bay Area
+  { match: 11, fifa: 84, kickoff: '2026-07-02T19:00:00Z', venue: 'SoFi Stadium', home: pos(1, 'H'), away: pos(2, 'J') }, // Los Angeles
+  { match: 12, fifa: 83, kickoff: '2026-07-02T23:00:00Z', venue: 'BMO Field', home: pos(2, 'K'), away: pos(2, 'L') }, // Toronto
+  { match: 13, fifa: 85, kickoff: '2026-07-03T03:00:00Z', venue: 'BC Place', home: pos(1, 'B'), away: third('EFGIJ') }, // Vancouver
+  { match: 14, fifa: 88, kickoff: '2026-07-03T18:00:00Z', venue: 'AT&T Stadium', home: pos(2, 'D'), away: pos(2, 'G') }, // Dallas
+  { match: 15, fifa: 86, kickoff: '2026-07-03T22:00:00Z', venue: 'Hard Rock Stadium', home: pos(1, 'J'), away: pos(2, 'H') }, // Miami
+  { match: 16, fifa: 87, kickoff: '2026-07-04T01:30:00Z', venue: 'Arrowhead Stadium', home: pos(1, 'K'), away: third('DEIJL') }, // Kansas City
 ];
+
+// --- knockout bracket tree -------------------------------------------------
+//
+// FIFA fixes the whole knockout tree in advance by match number. The DB sorts
+// fixtures by kickoff, which is NOT bracket order, so laying a round out in
+// kickoff order misaligns every match with the two boxes that feed it. These
+// tables give the fixed feeding structure so the tracker can order each round
+// top-to-bottom as a real bracket. (FIFA match numbers in the trailing comment.)
+
+/**
+ * Round-of-16 feeders in bracket (top-to-bottom) order: each entry is the two
+ * Round-of-32 FIFA match numbers whose winners meet. Winner(2i) plays
+ * Winner(2i+1) at every step, so this single tree drives the layout of every
+ * later round too.
+ */
+export const R16_FEEDERS: [number, number][] = [
+  [74, 77], // 89
+  [73, 75], // 90
+  [83, 84], // 93
+  [81, 82], // 94
+  [76, 78], // 91
+  [79, 80], // 92
+  [86, 88], // 95
+  [85, 87], // 96
+];
+
+/** Round-of-32 FIFA match numbers in bracket (top-to-bottom) order. */
+export const R32_BRACKET_FIFA: number[] = R16_FEEDERS.flat();
 
 function pos(p: 1 | 2, group: string): Seed {
   return { kind: 'pos', pos: p, group };

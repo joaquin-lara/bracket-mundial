@@ -2,9 +2,9 @@
 
 import { useMemo } from 'react';
 import { flagUrl } from '@/lib/flags';
-import type { ProjectedMatch } from '@/lib/qualification';
+import { R32_BRACKET_FIFA, R32_PAIRINGS, type ProjectedMatch } from '@/lib/qualification';
 import type { Match } from '@/lib/types';
-import { lookupVenue } from '@/lib/venues';
+import { bracketVenueRank, KNOCKOUT_BRACKET_VENUES, lookupVenue } from '@/lib/venues';
 
 const ROUNDS: { stage: string; label: string }[] = [
   { stage: 'LAST_32', label: 'Round of 32' },
@@ -138,6 +138,27 @@ export default function KnockoutSection({
     });
   }, [r32Matches, projected, locked]);
 
+  // The DB sorts fixtures by kickoff, but the bracket connectors assume each
+  // slot i in a round is fed by slots 2i / 2i+1 of the previous round. Reorder
+  // every round into that fixed FIFA bracket order so winners flow into the
+  // right boxes. Round of 32 is keyed by FIFA match number (kickoff-index
+  // aligned with R32_PAIRINGS, since it has repeat venues); later rounds are
+  // keyed by their unique pinned venue.
+  const bracketR32 = useMemo(() => {
+    if (lockedR32.length !== R32_PAIRINGS.length) return lockedR32; // partial feed: leave as-is
+    return R32_BRACKET_FIFA.map(
+      (fifa) => lockedR32[R32_PAIRINGS.findIndex((p) => p.fifa === fifa)],
+    );
+  }, [lockedR32]);
+
+  const orderRound = (stage: string, matches: Match[]): Match[] => {
+    if (stage === 'LAST_32') return bracketR32;
+    if (!KNOCKOUT_BRACKET_VENUES[stage]) return matches;
+    return matches
+      .slice()
+      .sort((a, b) => bracketVenueRank(stage, a.venue) - bracketVenueRank(stage, b.venue));
+  };
+
   return (
     <>
       <div className="groups-head">
@@ -149,8 +170,10 @@ export default function KnockoutSection({
       ) : (
         <div className="bracket">
           {ROUNDS.map((round, roundIndex) => {
-            const roundMatches =
-              round.stage === 'LAST_32' ? lockedR32 : (stageMap.get(round.stage) ?? []);
+            const roundMatches = orderRound(
+              round.stage,
+              round.stage === 'LAST_32' ? lockedR32 : (stageMap.get(round.stage) ?? []),
+            );
             const slotClass = `match-slot${roundIndex > 0 ? ' has-in' : ''}${
               roundIndex < ROUNDS.length - 1 ? ' has-out' : ''
             }`;
