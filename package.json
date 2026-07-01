@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run src/lib/scoring.test.ts src/lib/groups.test.ts src/lib/fairPlay.test.ts src/lib/qualification.test.ts src/lib/footballData.test.ts src/lib/ml/model.test.ts src/lib/achievements.test.ts src/lib/achievementsSync.test.ts",
+    "test": "vitest run src/lib/scoring.test.ts src/lib/groups.test.ts src/lib/fairPlay.test.ts src/lib/qualification.test.ts src/lib/footballData.test.ts src/lib/ml/model.test.ts src/lib/achievements.test.ts src/lib/achievementsSync.test.ts src/lib/bracketOrder.test.ts",
     "test:db": "vitest run tests/db.test.ts",
     "seed:openfootball": "tsx scripts/seed-openfootball.ts",
     "build:elo": "tsx scripts/build-elo.ts",
