@@ -2,17 +2,33 @@ import { createClient as createAdmin } from '@supabase/supabase-js';
 import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { sendToUser } from '@/lib/push/webpush';
+import { checkRateLimit, clientIp } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
+
+const MAX_BODY_BYTES = 1 * 1024;
 
 /** Push the challenged player a notification when a penalty-shootout duel is created. */
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit: 10 per minute per IP
+    const ip = clientIp(req);
+    if (!checkRateLimit(`push:duel:${ip}`, 10, 60 * 1000)) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
+    // Reject oversized payloads
+    const contentLength = Number(req.headers.get('content-length') ?? 0);
+    if (contentLength > MAX_BODY_BYTES) {
+      return NextResponse.json({ error: 'Payload too large' }, { status: 413 });
+    }
+
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
 
-    const { duelId } = await req.json().catch(() => ({ duelId: null }));
+    const body = await req.json().catch(() => ({ duelId: null }));
+    const duelId = typeof body?.duelId === 'string' ? body.duelId.trim() : null;
     if (!duelId) return NextResponse.json({ error: 'missing duelId' }, { status: 400 });
 
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -25,9 +41,9 @@ export async function POST(req: NextRequest) {
     if (!duel || duel.challenger !== user.id) {
       return NextResponse.json({ error: 'not your duel' }, { status: 403 });
     }
+
     // Rate-limit: at most 2 challenge pushes to this opponent per minute, so they
-    // can't be spammed. Counted from duels created against them in the last 60s
-    // (includes this one), so the 3rd+ within a minute is silently skipped.
+    // can't be spammed.
     const since = new Date(Date.now() - 60_000).toISOString();
     const { count } = await admin
       .from('duels')

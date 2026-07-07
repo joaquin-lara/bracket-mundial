@@ -8,11 +8,18 @@ import { runLineupSync } from '@/lib/lineupSync';
 import { runStatsSync } from '@/lib/statsSync';
 import { ensureAchievements } from '@/lib/achievementsSync';
 import { ensureGamblerSettlement } from '@/lib/gamblers';
+import { checkRateLimit, clientIp } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 export async function GET(request: NextRequest) {
+  // Rate limit: 5 per 15 minutes per IP (brute-force guard on CRON_SECRET)
+  const ip = clientIp(request);
+  if (!checkRateLimit(`sync:${ip}`, 5, 15 * 60 * 1000)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   // Vercel Cron / GitHub Actions send "Authorization: Bearer <CRON_SECRET>".
   const secret = process.env.CRON_SECRET;
   if (!secret || request.headers.get('authorization') !== `Bearer ${secret}`) {
@@ -25,16 +32,12 @@ export async function GET(request: NextRequest) {
     { auth: { persistSession: false, autoRefreshToken: false } }
   );
 
-  // notifyOnly=1: fire any due push notifications and nothing else. This runs
-  // every minute (so the kickoff alert lands on the clock) and touches only the
-  // database — no football-data API calls — so it never hits the API quota. The
-  // full fixture/score sync stays on its slower schedule.
+  // notifyOnly=1: fire any due push notifications and nothing else.
   if (new URL(request.url).searchParams.get('notifyOnly') === '1') {
     const notified = await runMatchNotifications(admin);
     return NextResponse.json({ ok: true, notifyOnly: true, notified });
   }
 
-  // Update fixtures/scores; a sync failure must NOT stop notifications.
   let result: Record<string, unknown> = {};
   try {
     result = { ...(await runSync(makeSupabaseSyncDb(admin), fetchFixtures)) };
